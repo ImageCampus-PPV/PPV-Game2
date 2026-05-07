@@ -1,3 +1,3 @@
 [submodule "Framework"]
-	path = Framework
+	path = Assets/Scripts/Framework
 	url = https://github.com/BiscupidTea/PPV-Framework
