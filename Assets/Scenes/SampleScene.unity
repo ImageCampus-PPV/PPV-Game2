@@ -148,7 +148,7 @@ Transform:
   m_GameObject: {fileID: 724442}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: 0, z: 14}
+  m_LocalPosition: {x: 6, y: 1, z: 14}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -166,9 +166,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5705906a151e094cb2a9763f986ce78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
-  _isWalkable: 1
+  _isWalkable: 0
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 3, y: 7}
   gCost: 0
@@ -550,7 +550,7 @@ Transform:
   m_GameObject: {fileID: 83931589}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14, y: 0, z: 6}
+  m_LocalPosition: {x: 14, y: 1, z: 6}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -568,9 +568,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5705906a151e094cb2a9763f986ce78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
-  _isWalkable: 1
+  _isWalkable: 0
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 7, y: 3}
   gCost: 0
@@ -1086,7 +1086,7 @@ Transform:
   m_GameObject: {fileID: 214632013}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 16, y: 0, z: 6}
+  m_LocalPosition: {x: 16, y: 1, z: 6}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1104,9 +1104,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5705906a151e094cb2a9763f986ce78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
-  _isWalkable: 1
+  _isWalkable: 0
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 8, y: 3}
   gCost: 0
@@ -1923,7 +1923,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 11
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1947,13 +1947,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.54424596, y: -0, z: -0, w: 0.8389257}
-  m_LocalPosition: {x: 14.26, y: 15.18, z: 7.09}
+  m_LocalRotation: {x: 0.35729873, y: 0.33784667, z: -0.14047083, w: 0.85933995}
+  m_LocalPosition: {x: 8.7, y: 11.87, z: 8.12}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 65.946, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 45.153, y: 42.924, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2845,7 +2845,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5705906a151e094cb2a9763f986ce78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
-  _isWalkable: 1
+  _isWalkable: 0
   _isHeightConnector: 0
   _height: 2
   _heightStep: 1
@@ -2900,7 +2900,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: a8a5463bb0de91e418f32416c2ec2eba, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3377,7 +3377,7 @@ Transform:
   m_GameObject: {fileID: 573055262}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 0, z: 6}
+  m_LocalPosition: {x: 4, y: 1, z: 6}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3397,7 +3397,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Cell
   _isWalkable: 1
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 2, y: 3}
   gCost: 0
@@ -4570,7 +4570,7 @@ Transform:
   m_GameObject: {fileID: 688121547}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: 0, z: 16}
+  m_LocalPosition: {x: 6, y: 1, z: 16}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4588,9 +4588,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5705906a151e094cb2a9763f986ce78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
-  _isWalkable: 1
+  _isWalkable: 0
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 3, y: 8}
   gCost: 0
@@ -5259,7 +5259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
   _isWalkable: 1
-  _isHeightConnector: 1
+  _isHeightConnector: 0
   _height: 2
   _heightStep: 1
   _coordinates: {x: 8, y: 7}
@@ -5313,7 +5313,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5be1fd45090ceaa40ab94b7703e8c3ee, type: 2}
+  - {fileID: 2100000, guid: 230651a71114c43448e5afb86dbb5ece, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5642,7 +5642,7 @@ Transform:
   m_GameObject: {fileID: 772280729}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: 0, z: 18}
+  m_LocalPosition: {x: 6, y: 1, z: 18}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5660,9 +5660,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5705906a151e094cb2a9763f986ce78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
-  _isWalkable: 1
+  _isWalkable: 0
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 3, y: 9}
   gCost: 0
@@ -8907,7 +8907,7 @@ Transform:
   m_GameObject: {fileID: 1351698380}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12, y: 0, z: 2}
+  m_LocalPosition: {x: 12, y: 1, z: 2}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8925,9 +8925,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5705906a151e094cb2a9763f986ce78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
-  _isWalkable: 1
+  _isWalkable: 0
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 6, y: 1}
   gCost: 0
@@ -9175,7 +9175,7 @@ Transform:
   m_GameObject: {fileID: 1383206125}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 0, z: 10}
+  m_LocalPosition: {x: 2, y: 1, z: 10}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9195,7 +9195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Cell
   _isWalkable: 0
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 1, y: 5}
   gCost: 0
@@ -9577,7 +9577,7 @@ Transform:
   m_GameObject: {fileID: 1510298700}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 0, z: 10}
+  m_LocalPosition: {x: 4, y: 1, z: 10}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9597,7 +9597,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Cell
   _isWalkable: 0
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 2, y: 5}
   gCost: 0
@@ -10228,7 +10228,7 @@ Transform:
   m_GameObject: {fileID: 1614727723}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 0, z: 4}
+  m_LocalPosition: {x: 4, y: 1, z: 4}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10248,7 +10248,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Cell
   _isWalkable: 1
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 2, y: 2}
   gCost: 0
@@ -10783,7 +10783,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
   _isWalkable: 1
-  _isHeightConnector: 1
+  _isHeightConnector: 0
   _height: 2
   _heightStep: 1
   _coordinates: {x: 7, y: 8}
@@ -10837,7 +10837,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5be1fd45090ceaa40ab94b7703e8c3ee, type: 2}
+  - {fileID: 2100000, guid: 230651a71114c43448e5afb86dbb5ece, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13219,7 +13219,7 @@ Transform:
   m_GameObject: {fileID: 2010823056}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12, y: 0, z: 0}
+  m_LocalPosition: {x: 12, y: 1, z: 0}
   m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13237,9 +13237,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5705906a151e094cb2a9763f986ce78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cell
-  _isWalkable: 1
+  _isWalkable: 0
   _isHeightConnector: 0
-  _height: 0
+  _height: 1
   _heightStep: 1
   _coordinates: {x: 6, y: 0}
   gCost: 0
