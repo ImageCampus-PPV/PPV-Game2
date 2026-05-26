@@ -77,10 +77,6 @@ public class UnitController : MonoBehaviour
             Vector3 startPos = transform.position;
 
 
-            Cell previousCell = _currentCell;
-            _currentCell = targetCell;
-            previousCell.isOccupied = false;
-            _currentCell.isOccupied = true;
 
             //Horizontal movement
             Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
@@ -96,6 +92,10 @@ public class UnitController : MonoBehaviour
                 finalTarget.y = transform.position.y;
             }
 
+            Cell previousCell = _currentCell;
+            _currentCell = targetCell;
+            previousCell.isOccupied = false;
+            _currentCell.isOccupied = true;
             OnMovementStarted(); //Replace with event call
 
             float elapsed = 0f;

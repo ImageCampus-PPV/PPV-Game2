@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,15 +47,17 @@ public class EnemyController : UnitController
         StartCoroutine(FollowPath());
     }
 
+    private bool IsInRange(Cell playerCell)
+    {
+        return GetGridDistance(_currentCell, playerCell) <= _attackRange;
+    }
+
     private bool IsInGoodCover(Cell playerCell)
     {
         if (_currentCell == null)
             return false;
 
-        bool hasCover = HasCoverAgainstPlayer(_currentCell, playerCell);
-        bool inRange = GetGridDistance(_currentCell, playerCell) <= _attackRange;
-
-        return hasCover && inRange;
+        return HasCoverAgainstPlayer(_currentCell, playerCell) && IsInRange(playerCell);
     }
 
     private Cell FindBestCell()
@@ -89,7 +92,7 @@ public class EnemyController : UnitController
                 if (distToPlayer > _attackRange)
                     continue;
 
-                //Make sure enemy can actually reach it
+                //Make sure enemy can reach the cell
                 List<Cell> path = _pathfindingController.FindPath(_currentCell.Coordinates, cell.Coordinates);
 
                 if (path == null || path.Count <= 1)
@@ -108,13 +111,17 @@ public class EnemyController : UnitController
                     continue;
                 }
 
-                // Try to stay close to attack range
-                float rangeScore = Mathf.Abs(distToPlayer - _attackRange);
 
-                if (rangeScore < fallbackDist)
+                if (!IsInRange(playerCell))
                 {
-                    fallbackDist = rangeScore;
-                    fallbackCell = cell;
+                    //Try to stay close to attack range
+                    float rangeScore = Mathf.Abs(distToPlayer - _attackRange);
+
+                    if (rangeScore < fallbackDist)
+                    {
+                        fallbackDist = rangeScore;
+                        fallbackCell = cell;
+                    }
                 }
             }
         }
