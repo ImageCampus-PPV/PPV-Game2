@@ -1,0 +1,152 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemyController : UnitController
+{
+    [Header("Enemy")]
+    [SerializeField] private int _attackRange = 4;
+
+    private PlayerController _player;
+    public void TakeTurn(PlayerController player)
+    {
+        _player = player;
+        if (_isMoving)
+            return;
+
+        Cell playerCell = player.CurrentCell;
+
+        if (IsInGoodCover(playerCell))
+        {
+            Debug.Log($"{name} holding position");
+            return;
+        }
+
+        Cell targetCell = FindBestCell();
+
+        if (targetCell == null)
+        {
+            Debug.Log($"{name} found no valid move");
+            return;
+        }
+
+        List<Cell> path = _pathfindingController.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
+
+        if (path == null || path.Count <= 1)
+            return;
+
+        //Move one tile per turn
+        _currentPath = new List<Cell>()
+        {
+            path[0],
+            path[1]
+        };
+
+        _pathIndex = 1;
+
+        StartCoroutine(FollowPath());
+    }
+
+    private bool IsInGoodCover(Cell playerCell)
+    {
+        if (_currentCell == null)
+            return false;
+
+        bool hasCover = HasCoverAgainstPlayer(_currentCell, playerCell);
+        bool inRange = GetGridDistance(_currentCell, playerCell) <= _attackRange;
+
+        return hasCover && inRange;
+    }
+
+    private Cell FindBestCell()
+    {
+        Cell playerCell = _player.CurrentCell;
+
+        Cell bestCoverCell = null;
+        float bestCoverDist = float.MaxValue;
+
+        Cell fallbackCell = null;
+        float fallbackDist = float.MaxValue;
+
+        int minX = Mathf.Max(0, playerCell.Coordinates.x - _attackRange);
+        int maxX = Mathf.Min(_grid.Width - 1, playerCell.Coordinates.x + _attackRange);
+        int minZ = Mathf.Max(0, playerCell.Coordinates.y - _attackRange);
+        int maxZ = Mathf.Min(_grid.Height - 1, playerCell.Coordinates.y + _attackRange);
+
+        for (int x = minX; x <= maxX; x++)
+        {
+            for (int z = minZ; z <= maxZ; z++)
+            {
+                Cell cell = _grid.GetCell(x, z);
+
+                if (!cell.IsWalkable)
+                    continue;
+
+                if (cell.isOccupied)
+                    continue;
+
+                int distToPlayer = GetGridDistance(cell, playerCell);
+
+                if (distToPlayer > _attackRange)
+                    continue;
+
+                //Make sure enemy can actually reach it
+                List<Cell> path = _pathfindingController.FindPath(_currentCell.Coordinates, cell.Coordinates);
+
+                if (path == null || path.Count <= 1)
+                    continue;
+
+                if (HasCoverAgainstPlayer(cell, playerCell))
+                {
+                    float coverScore = GetGridDistance(cell, _currentCell);
+
+                    if (coverScore < bestCoverDist)
+                    {
+                        bestCoverDist = coverScore;
+                        bestCoverCell = cell;
+                    }
+
+                    continue;
+                }
+
+                // Try to stay close to attack range
+                float rangeScore = Mathf.Abs(distToPlayer - _attackRange);
+
+                if (rangeScore < fallbackDist)
+                {
+                    fallbackDist = rangeScore;
+                    fallbackCell = cell;
+                }
+            }
+        }
+
+        //Prefer cover
+        if (bestCoverCell != null)
+            return bestCoverCell;
+
+        //Otherwise fallback movement
+        return fallbackCell;
+    }
+
+    private bool HasCoverAgainstPlayer(Cell cell, Cell playerCell)
+    {
+        Vector3 end = playerCell.GetWorldTopPosition();
+        Vector3 direction = end - cell.GetWorldTopPosition();
+        Vector3 start = cell.GetWorldTopPosition() + direction.normalized * 0.1f;
+        float distance = direction.magnitude;
+
+        if (Physics.Raycast(start, direction.normalized, out RaycastHit hit, distance))
+        {
+            Cell hitCell = hit.collider.GetComponentInParent<Cell>();
+
+            if (hitCell != null && hitCell != playerCell && hitCell != cell && !hitCell.IsWalkable)
+                return true;
+        }
+
+        return false;
+    }
+
+    private int GetGridDistance(Cell a, Cell b)
+    {
+        return Mathf.Abs(a.Coordinates.x - b.Coordinates.x) + Mathf.Abs(a.Coordinates.y - b.Coordinates.y);
+    }
+}

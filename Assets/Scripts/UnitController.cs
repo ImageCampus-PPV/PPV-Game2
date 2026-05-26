@@ -1,0 +1,144 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class UnitController : MonoBehaviour
+{
+    [Header("References")]
+    [SerializeField] protected MyGrid _grid;
+    [SerializeField] protected PathfindingController _pathfindingController;
+
+    [Header("Spawn")]
+    [SerializeField] protected Cell _spawnCell;
+
+    [Header("Movement")]
+    [SerializeField] protected float _timeToMoveCells = 0.2f;
+    [SerializeField] protected float _timeToStayInCell = 0.05f;
+
+    protected List<Cell> _currentPath;
+    protected int _pathIndex;
+    protected bool _isMoving;
+
+    protected Cell _currentCell;
+
+    public Cell CurrentCell => _currentCell;
+    public bool IsMoving => _isMoving;
+
+    protected virtual void Awake()
+    {
+        Spawn();
+    }
+
+    protected virtual void Spawn()
+    {
+        _currentCell = _spawnCell;
+
+        if (_currentCell != null)
+        {
+            transform.position = GetStandPosition(_currentCell.GetWorldTopPosition());
+            _currentCell.isOccupied = true;
+        }
+    }
+
+    protected void RequestPath(Cell targetCell)
+    {
+        if (targetCell == null)
+            return;
+
+        if (!targetCell.IsWalkable)
+            return;
+
+        if (targetCell.isOccupied)
+            return;
+
+        Debug.Log($"Target: {targetCell}");
+        Debug.Log($"CurrentCell: {_currentCell}");
+        Debug.Log($"PathfindingController: {_pathfindingController}");
+
+        List<Cell> path = _pathfindingController.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
+
+        if (path != null && path.Count > 1)
+        {
+            _currentPath = path;
+            _pathIndex = 1;
+
+            StartCoroutine(FollowPath());           
+        }
+    }
+
+    protected IEnumerator FollowPath()
+    {
+        _isMoving = true;
+
+        while (_pathIndex < _currentPath.Count)
+        {
+
+            Cell targetCell = _currentPath[_pathIndex];
+            Vector3 startPos = transform.position;
+
+
+            Cell previousCell = _currentCell;
+            _currentCell = targetCell;
+            previousCell.isOccupied = false;
+            _currentCell.isOccupied = true;
+
+            //Horizontal movement
+            Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
+            Vector3 finalTarget;
+
+            if (targetCell.Height != _currentCell.Height)
+            {
+                finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
+            }
+            else
+            {
+                finalTarget = targetCell.transform.position;
+                finalTarget.y = transform.position.y;
+            }
+
+            OnMovementStarted(); //Replace with event call
+
+            float elapsed = 0f;
+            while (elapsed < _timeToMoveCells)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / _timeToMoveCells;
+
+                transform.position = Vector3.Lerp(startPos, flatTarget, t);
+                yield return null;
+            }
+
+            //Height adjustment
+            elapsed = 0f;
+            float heightTime = _timeToMoveCells * 0.5f;
+
+            while (elapsed < heightTime)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / heightTime;
+
+                transform.position = Vector3.Lerp(flatTarget, finalTarget, t);
+                yield return null;
+            }
+
+            transform.position = finalTarget;
+
+            _pathIndex++;         
+
+            if (_timeToStayInCell > 0)
+                yield return new WaitForSeconds(_timeToStayInCell);
+        }
+
+        _isMoving = false;
+        OnMovementFinished();
+    }
+
+    protected virtual void OnMovementStarted() { }
+
+    protected virtual void OnMovementFinished() { }
+
+    protected Vector3 GetStandPosition(Vector3 basePosition)
+    {
+        return basePosition + new Vector3(0, transform.localScale.y * 0.5f, 0);
+    }
+}
