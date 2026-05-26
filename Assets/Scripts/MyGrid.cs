@@ -84,19 +84,20 @@ public class MyGrid : MonoBehaviour
     }
 
     [ContextMenu("Rebuild Grid From Scene")]
-private void RebuildGrid()
-{
-    _gridArray = new Cell[_cellsX, _cellsZ];
-
-    foreach (Transform child in transform)
+    private void RebuildGrid()
     {
-        Cell cell = child.GetComponent<Cell>();
-        if (cell == null) continue;
+        _gridArray = new Cell[_cellsX, _cellsZ];
 
-        Vector2Int coord = cell.Coordinates;
-        _gridArray[coord.x, coord.y] = cell;
+        foreach (Transform child in transform)
+        {
+            Cell cell = child.GetComponent<Cell>();
+            if (cell == null)
+                continue;
+
+            Vector2Int coord = cell.Coordinates;
+            _gridArray[coord.x, coord.y] = cell;
+        }
     }
-}
 
     [ContextMenu("Delete Grid")]
     private void DeleteGrid()

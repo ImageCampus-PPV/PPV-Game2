@@ -44,7 +44,7 @@ public class Pathfinding
             {
                 Cell cell = _grid.GetCell(new Vector2Int(x, z));
                 cell.gCost = int.MaxValue;
-                cell.hCost = 0; 
+                cell.hCost = 0;
                 cell.CalculateFCost();
                 cell.cameFromCell = null;
             }
@@ -71,21 +71,22 @@ public class Pathfinding
                 if (!neighbourCell.IsWalkable)
                     continue;
 
+                if (neighbourCell.isOccupied && neighbourCell != endCell)
+                    continue;
+
                 int heightDiff = neighbourCell.Height - currentCell.Height;
                 if (Mathf.Abs(heightDiff) > HEIGHT_DIFFERENCE_TOLERANCE)
                     continue;
 
                 if (heightDiff != 0)
                 {
-                    bool hasConnector =
-                        currentCell.IsHeightConnector ||
-                        neighbourCell.IsHeightConnector;
-
+                    bool hasConnector = currentCell.IsHeightConnector || neighbourCell.IsHeightConnector;
                     if (!hasConnector)
                         continue;
                 }
 
                 int tentativeGCost = currentCell.gCost + MOVE_STRAIGHT_COST;
+
                 if (tentativeGCost < neighbourCell.gCost)
                 {
                     neighbourCell.cameFromCell = currentCell;
