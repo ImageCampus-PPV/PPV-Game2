@@ -2,15 +2,15 @@
 
 public struct BehaviourActions
 {
-    private Action _mainThreadBehaviours;
+    private Action _updateBehaviours;
     private Action _transitionBehaviour;
 
-    public Action MainThreadBehaviours => _mainThreadBehaviours;
+    public Action UpdateBehaviours => _updateBehaviours;
     public Action TransitionBehaviour => _transitionBehaviour;
 
-    public void AddMainTrheadableBehaviour(Action behaviour)
+    public void AddUpdateBehaviour(Action behaviour)
     {
-        _mainThreadBehaviours = behaviour;
+        _updateBehaviours = behaviour;
     }
 
     public void SetTransitionBehaviour(Action behaviour)

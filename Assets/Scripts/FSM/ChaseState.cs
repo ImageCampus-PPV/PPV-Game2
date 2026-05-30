@@ -23,7 +23,7 @@ public sealed class ChaseState : State
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
-        behaviourActions.AddMainTrheadableBehaviour(() =>
+        behaviourActions.AddUpdateBehaviour(() =>
         {
             agentTrnasform.position += (targetTransform.position - agentTrnasform.position).normalized * speed * deltaTime;
         });

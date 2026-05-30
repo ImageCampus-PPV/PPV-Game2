@@ -26,7 +26,7 @@ public sealed class PatrolState : State
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
-        behaviourActions.AddMainTrheadableBehaviour(() =>
+        behaviourActions.AddUpdateBehaviour(() =>
         {
             if (_actualTarget == null)
             {

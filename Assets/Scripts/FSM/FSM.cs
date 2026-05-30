@@ -26,11 +26,7 @@ public class FSM
         ForceState(defaultState);
     }
 
-    public void AddState<TState>(
-        Func<object[]> onTickParameters = null,
-        Func<object[]> onEnterParameters = null,
-        Func<object[]> onExitParameters = null)
-        where TState : State, new()
+    public void AddState<TState>(Func<object[]> onTickParameters = null, Func<object[]> onEnterParameters = null, Func<object[]> onExitParameters = null) where TState : State, new()
     {
         Type stateType = typeof(TState);
 
@@ -73,7 +69,7 @@ public class FSM
         if (behaviourActions.Equals(default))
             return;
 
-        behaviourActions.MainThreadBehaviours?.Invoke();
+        behaviourActions.UpdateBehaviours?.Invoke();
 
         behaviourActions.TransitionBehaviour?.Invoke();
     }
