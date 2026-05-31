@@ -1,3 +1,4 @@
+using ImageCampus.ToolBox.Services;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,6 @@ using UnityEngine;
 public class UnitController : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] protected MyGrid _grid;
     [SerializeField] protected PathfindingController _pathfindingController;
 
     [Header("Spawn")]
@@ -62,7 +62,7 @@ public class UnitController : MonoBehaviour
             _currentPath = path;
             _pathIndex = 1;
 
-            StartCoroutine(FollowPath());           
+            StartCoroutine(FollowPath());
         }
     }
 
@@ -72,20 +72,15 @@ public class UnitController : MonoBehaviour
 
         while (_pathIndex < _currentPath.Count)
         {
-
             Cell targetCell = _currentPath[_pathIndex];
             Vector3 startPos = transform.position;
-
-
 
             //Horizontal movement
             Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
             Vector3 finalTarget;
 
             if (targetCell.Height != _currentCell.Height)
-            {
                 finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
-            }
             else
             {
                 finalTarget = targetCell.transform.position;
@@ -123,7 +118,7 @@ public class UnitController : MonoBehaviour
 
             transform.position = finalTarget;
 
-            _pathIndex++;         
+            _pathIndex++;
 
             if (_timeToStayInCell > 0)
                 yield return new WaitForSeconds(_timeToStayInCell);

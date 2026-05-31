@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public class Cell : MonoBehaviour
@@ -7,7 +8,6 @@ public class Cell : MonoBehaviour
     [SerializeField] private bool _isHeightConnector;
     [SerializeField] private bool _providesCover;
     [SerializeField] private int _height;
-
 
     [Header("Visual")]
     [SerializeField] private float _heightStep = 1f;
@@ -20,18 +20,14 @@ public class Cell : MonoBehaviour
     [HideInInspector] public Cell cameFromCell;
     [HideInInspector] public bool isOccupied;
 
+    private Bounds _bounds;
+
     public bool IsWalkable => _isWalkable;
     public bool IsHeightConnector => _isHeightConnector;
     public bool ProvidesCover => _providesCover;
     public int Height => _height;
     public float WorldHeight => _height * _heightStep;
     public Vector2Int Coordinates => _coordinates;
-
-
-    public void SetCoordinates(Vector2Int coordinates)
-    {
-        _coordinates = coordinates;
-    }
 
     public int CalculateFCost()
     {
@@ -42,6 +38,11 @@ public class Cell : MonoBehaviour
     private void OnValidate()
     {
         ApplyHeight();
+    }
+
+    private void Awake()
+    {
+        _bounds = GetComponentInChildren<Renderer>().bounds;
     }
 
     private void Start()
@@ -56,9 +57,13 @@ public class Cell : MonoBehaviour
 
     public Vector3 GetWorldTopPosition()
     {
-        Renderer rend = GetComponentInChildren<Renderer>();
-
-        return new Vector3(transform.position.x, rend.bounds.max.y, transform.position.z
-        );
+        return new Vector3(transform.position.x, _bounds.max.y, transform.position.z);
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        Handles.Label(transform.position + Vector3.up, $"X: {Coordinates.x}. Z: {Coordinates.y}.");
+    }
+#endif
 }

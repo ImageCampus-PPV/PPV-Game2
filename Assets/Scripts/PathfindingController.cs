@@ -3,12 +3,11 @@ using UnityEngine;
 
 public class PathfindingController : MonoBehaviour
 {
-    [SerializeField] private MyGrid _grid;
     private Pathfinding _pathfinding;
 
     private void Awake()
     {
-        _pathfinding = new Pathfinding(_grid);
+        _pathfinding = new Pathfinding();
     }
 
     public List<Cell> FindPath(Vector2Int start, Vector2Int end)

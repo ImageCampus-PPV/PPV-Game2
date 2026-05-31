@@ -1,9 +1,12 @@
+using ImageCampus.ToolBox.Services;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : UnitController
 {
+    private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+
     [Header("Enemy")]
     [SerializeField] private int _attackRange = 4;
 
@@ -71,15 +74,15 @@ public class EnemyController : UnitController
         float fallbackDist = float.MaxValue;
 
         int minX = Mathf.Max(0, playerCell.Coordinates.x - _attackRange);
-        int maxX = Mathf.Min(_grid.Width - 1, playerCell.Coordinates.x + _attackRange);
+        int maxX = Mathf.Min(MapGrid.Width - 1, playerCell.Coordinates.x + _attackRange);
         int minZ = Mathf.Max(0, playerCell.Coordinates.y - _attackRange);
-        int maxZ = Mathf.Min(_grid.Height - 1, playerCell.Coordinates.y + _attackRange);
+        int maxZ = Mathf.Min(MapGrid.Height - 1, playerCell.Coordinates.y + _attackRange);
 
         for (int x = minX; x <= maxX; x++)
         {
             for (int z = minZ; z <= maxZ; z++)
             {
-                Cell cell = _grid.GetCell(x, z);
+                Cell cell = MapGrid.GetCell(x, z);
 
                 if (!cell.IsWalkable)
                     continue;
