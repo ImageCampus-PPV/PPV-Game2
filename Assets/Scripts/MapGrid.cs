@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class MapGrid : IService
 {
+    public bool IsPersistance => false;
+
     [SerializeField] private int _cellsX;
     [SerializeField] private int _cellsZ;
     [SerializeField] private float _cellsSize;
     public int Width => _cellsX;
     public int Height => _cellsZ;
-
-    public bool IsPersistance => false;
 
     private Cell[,] _gridArray;
     [SerializeField] private GameObject _cellPrefab;
@@ -26,21 +26,7 @@ public class MapGrid : IService
         if (cells.Length == 0)
             return;
 
-        int minX = int.MaxValue;
-        int maxX = int.MinValue;
-        int minZ = int.MaxValue;
-        int maxZ = int.MinValue;
-
-        foreach (Cell cell in cells)
-        {
-            Vector2Int coord = cell.Coordinates;
-
-            if (coord.x < minX) minX = coord.x;
-            if (coord.x > maxX) maxX = coord.x;
-
-            if (coord.y < minZ) minZ = coord.y;
-            if (coord.y > maxZ) maxZ = coord.y;
-        }
+        (int minX, int minZ, int maxX, int maxZ) = GetMinMaxSize();
 
         _cellsX = maxX - minX + 1;
         _cellsZ = maxZ - minZ + 1;
@@ -55,6 +41,27 @@ public class MapGrid : IService
             int z = coord.y - minZ;
 
             _gridArray[x, z] = cell;
+        }
+
+        (int minX, int minZ, int maxX, int maxZ) GetMinMaxSize()
+        {
+            int minX = int.MaxValue;
+            int maxX = int.MinValue;
+            int minZ = int.MaxValue;
+            int maxZ = int.MinValue;
+
+            foreach (Cell cell in cells)
+            {
+                Vector2Int coord = cell.Coordinates;
+
+                if (coord.x < minX) minX = coord.x;
+                if (coord.x > maxX) maxX = coord.x;
+
+                if (coord.y < minZ) minZ = coord.y;
+                if (coord.y > maxZ) maxZ = coord.y;
+            }
+
+            return (minX, minZ, maxX, maxZ);
         }
     }
 
