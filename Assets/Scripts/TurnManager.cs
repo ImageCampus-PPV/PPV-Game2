@@ -17,7 +17,7 @@ public class TurnManager : MonoBehaviour
         foreach (EnemyController enemy in _enemies)
         {
             if (enemy != null)
-                enemy.TakeTurn(_player);
+                enemy.TakeTurn(_player.CurrentCell);
         }
     }
 }

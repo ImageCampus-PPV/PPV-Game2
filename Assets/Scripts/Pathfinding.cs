@@ -3,31 +3,23 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pathfinding
+public sealed class PathFinding : IService
 {
     private const int MOVE_STRAIGHT_COST = 10;
     private const int HEIGHT_DIFFERENCE_TOLERANCE = 1;
 
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+
+    public bool IsPersistance => true;
+
     private List<Cell> _openList;
     private List<Cell> _closedList;
 
 
-    public Pathfinding()
+    public PathFinding()
     {
         _openList = new List<Cell>();
         _closedList = new List<Cell>();
-    }
-
-    [ContextMenu("Test Pathfinding")]
-    private void TestPathfinding()
-    {
-        _openList.Clear();
-        _closedList.Clear();
-
-        Cell startCell = MapGrid.GetCell(0, 0);
-        Cell endCell = MapGrid.GetCell(7, 9);
-        FindPath(startCell.Coordinates, endCell.Coordinates);
     }
 
     public List<Cell> FindPath(Vector2Int startPos, Vector2Int endPos)
