@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3362865511712260745}
   - component: {fileID: 7978878266799957960}
   m_Layer: 0
-  m_Name: TargetCell
+  m_Name: ReachableCell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 91f2414e0cfed6043b5c3b4b765a2034, type: 2}
+  - {fileID: 2100000, guid: f94bf0ba4662c26489e39cb2d4a622c9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

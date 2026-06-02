@@ -16,12 +16,11 @@ public class MovementPreviewRenderer : MonoBehaviour
     [SerializeField] private GameObject _pathCellPrefab;
     [SerializeField] private GameObject _targetCellPrefab;
 
-    [Header("Offsets")]
-    [SerializeField] private float _reachableYOffset = 0.03f;
-    [SerializeField] private float _pathYOffset = 0.06f;
-    [SerializeField] private float _targetYOffset = 0.09f;
+    [Header("Offset")]
+    [SerializeField] private float _YOffset;
 
-    private readonly List<GameObject> _spawnedVisuals = new();
+    private List<GameObject> _spawnedVisuals = new();
+    private List<Cell> _drawnCells = new();
 
     private Cell _lastTarget;
     private int _lastAP;
@@ -50,13 +49,14 @@ public class MovementPreviewRenderer : MonoBehaviour
     private void RefreshVisuals()
     {
         ClearVisuals();
-        DrawReachableCells();
 
         if (_player.SelectedTargetCell != null)
         {
-            DrawPlannedPath();
             DrawSelectedTarget();
+            DrawPlannedPath();
         }
+
+        DrawReachableCells();
     }
 
     private void DrawReachableCells()
@@ -66,6 +66,8 @@ public class MovementPreviewRenderer : MonoBehaviour
             for (int z = 0; z < MapGrid.Height; z++)
             {
                 Cell cell = MapGrid.GetCell(x, z);
+                if (_drawnCells.Contains(cell))
+                    continue;
 
                 int cost = _player.GetPathCostPreview(cell);
 
@@ -75,7 +77,7 @@ public class MovementPreviewRenderer : MonoBehaviour
                 if (cost > APWallet.CurrentAP)
                     continue;
 
-                SpawnVisual(_reachableCellPrefab, cell.GetWorldTopPosition() + Vector3.up * _reachableYOffset);
+                SpawnVisual(_reachableCellPrefab, cell.GetWorldTopPosition() + Vector3.up * _YOffset);
             }
         }
     }
@@ -86,12 +88,19 @@ public class MovementPreviewRenderer : MonoBehaviour
             return;
 
         foreach (Cell cell in _player.PlannedPath)
-            SpawnVisual(_pathCellPrefab, cell.GetWorldTopPosition() + Vector3.up * _pathYOffset);
+        {
+            if (_drawnCells.Contains(cell))
+                continue;
+
+            SpawnVisual(_pathCellPrefab, cell.GetWorldTopPosition() + Vector3.up * _YOffset);
+            _drawnCells.Add(cell);
+        }
     }
 
     private void DrawSelectedTarget()
     {
-        SpawnVisual(_targetCellPrefab, _player.SelectedTargetCell.GetWorldTopPosition() + Vector3.up * _targetYOffset);
+        _drawnCells.Add(_player.SelectedTargetCell);
+        SpawnVisual(_targetCellPrefab, _player.SelectedTargetCell.GetWorldTopPosition() + Vector3.up * _YOffset);
     }
 
     private void SpawnVisual(GameObject prefab, Vector3 position)
@@ -116,6 +125,7 @@ public class MovementPreviewRenderer : MonoBehaviour
                 Destroy(_spawnedVisuals[i]);
 
         _spawnedVisuals.Clear();
+        _drawnCells.Clear();
     }
 
     private void OnDisable()
