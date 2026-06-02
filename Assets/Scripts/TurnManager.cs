@@ -1,21 +1,54 @@
-using System.Collections.Generic;
+using Assets.Scripts.Combat;
+using Assets.Scripts.Entities;
+using ImageCampus.ToolBox.Services;
 using UnityEngine;
 
-public class TurnManager : MonoBehaviour
+public class TurnManager : IService
 {
-    [SerializeField] private List<EnemyController> _enemies = new List<EnemyController>();
-    [SerializeField] private PlayerController _player;
+    public bool IsPersistance => false;
 
-    private void Update()
+    EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
+    APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
+
+    public void Tick()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-            PlayerStep();
+        //The input shouldn't be handle here
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (!IsEndOfTurn())
+                return;
+
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
+            {
+                if (hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
+                    foreach (Player player in EntityRegistry.Players)
+                        player.HandleMovement(clickedCell);
+
+            }
+
+            EnemiesTurn();
+        }
+
     }
 
-    public void PlayerStep()
+    //This should be a controller.
+    private bool IsEndOfTurn()
     {
-        foreach (EnemyController enemy in _enemies)
-            enemy.TakeTurn(_player.CurrentCell);
+        foreach (Unit unit in EntityRegistry.Units)
+        {
+            if (unit.IsMoving)
+                return false;
+        }
 
+        return true;
+    }
+
+    public void EnemiesTurn()
+    {
+        foreach (Enemy enemy in EntityRegistry.Enemies)
+            foreach (Player player in EntityRegistry.Players)
+                enemy.TakeTurn(player.CurrentCell);
     }
 }

@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 20083052}
   - component: {fileID: 20083051}
   - component: {fileID: 20083050}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -268,7 +268,7 @@ GameObject:
   - component: {fileID: 161287936}
   - component: {fileID: 161287935}
   - component: {fileID: 161287934}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -404,7 +404,7 @@ GameObject:
   - component: {fileID: 171492918}
   - component: {fileID: 171492917}
   - component: {fileID: 171492916}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -540,7 +540,7 @@ GameObject:
   - component: {fileID: 195739748}
   - component: {fileID: 195739747}
   - component: {fileID: 195739746}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -676,7 +676,7 @@ GameObject:
   - component: {fileID: 222118457}
   - component: {fileID: 222118456}
   - component: {fileID: 222118455}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -812,7 +812,7 @@ GameObject:
   - component: {fileID: 240222851}
   - component: {fileID: 240222850}
   - component: {fileID: 240222849}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -948,7 +948,7 @@ GameObject:
   - component: {fileID: 245310022}
   - component: {fileID: 245310021}
   - component: {fileID: 245310020}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1084,7 +1084,7 @@ GameObject:
   - component: {fileID: 264687005}
   - component: {fileID: 264687004}
   - component: {fileID: 264687003}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1220,7 +1220,7 @@ GameObject:
   - component: {fileID: 296941892}
   - component: {fileID: 296941891}
   - component: {fileID: 296941890}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1356,7 +1356,7 @@ GameObject:
   - component: {fileID: 301453331}
   - component: {fileID: 301453330}
   - component: {fileID: 301453329}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1492,7 +1492,7 @@ GameObject:
   - component: {fileID: 316942026}
   - component: {fileID: 316942025}
   - component: {fileID: 316942024}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1628,7 +1628,7 @@ GameObject:
   - component: {fileID: 327440152}
   - component: {fileID: 327440151}
   - component: {fileID: 327440150}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1901,7 +1901,7 @@ GameObject:
   - component: {fileID: 330824248}
   - component: {fileID: 330824247}
   - component: {fileID: 330824246}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2037,7 +2037,7 @@ GameObject:
   - component: {fileID: 356436239}
   - component: {fileID: 356436238}
   - component: {fileID: 356436237}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2300,7 +2300,7 @@ GameObject:
   - component: {fileID: 447111258}
   - component: {fileID: 447111257}
   - component: {fileID: 447111256}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2436,7 +2436,7 @@ GameObject:
   - component: {fileID: 464428824}
   - component: {fileID: 464428823}
   - component: {fileID: 464428822}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2709,7 +2709,7 @@ GameObject:
   - component: {fileID: 483165177}
   - component: {fileID: 483165176}
   - component: {fileID: 483165175}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2903,7 +2903,7 @@ PrefabInstance:
     - target: {fileID: 7174478236522732807, guid: 7ee0ba386ed618f45ae53fc847b70e45, type: 3}
       propertyPath: _pathfindingController
       value: 
-      objectReference: {fileID: 1761895299}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2922,7 +2922,7 @@ GameObject:
   - component: {fileID: 521414704}
   - component: {fileID: 521414703}
   - component: {fileID: 521414702}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3189,7 +3189,7 @@ GameObject:
   - component: {fileID: 598186213}
   - component: {fileID: 598186212}
   - component: {fileID: 598186211}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3446,7 +3446,7 @@ GameObject:
   - component: {fileID: 629732609}
   - component: {fileID: 629732608}
   - component: {fileID: 629732607}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3569,17 +3569,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 629732605}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &636247308 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7174478236522732807, guid: 7ee0ba386ed618f45ae53fc847b70e45, type: 3}
-  m_PrefabInstance: {fileID: 8096155713173153496}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e350898ff4d62d34887a1f8186726837, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
 --- !u!1 &639035155
 GameObject:
   m_ObjectHideFlags: 0
@@ -3593,7 +3582,7 @@ GameObject:
   - component: {fileID: 639035159}
   - component: {fileID: 639035158}
   - component: {fileID: 639035157}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3729,7 +3718,7 @@ GameObject:
   - component: {fileID: 643268176}
   - component: {fileID: 643268175}
   - component: {fileID: 643268174}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3865,7 +3854,7 @@ GameObject:
   - component: {fileID: 668458170}
   - component: {fileID: 668458169}
   - component: {fileID: 668458168}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4001,7 +3990,7 @@ GameObject:
   - component: {fileID: 726143255}
   - component: {fileID: 726143254}
   - component: {fileID: 726143253}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4137,7 +4126,7 @@ GameObject:
   - component: {fileID: 737520272}
   - component: {fileID: 737520271}
   - component: {fileID: 737520270}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4273,7 +4262,7 @@ GameObject:
   - component: {fileID: 762281980}
   - component: {fileID: 762281979}
   - component: {fileID: 762281978}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4409,7 +4398,7 @@ GameObject:
   - component: {fileID: 787147712}
   - component: {fileID: 787147711}
   - component: {fileID: 787147710}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4545,7 +4534,7 @@ GameObject:
   - component: {fileID: 804282295}
   - component: {fileID: 804282294}
   - component: {fileID: 804282293}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4681,7 +4670,7 @@ GameObject:
   - component: {fileID: 813675094}
   - component: {fileID: 813675093}
   - component: {fileID: 813675092}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4817,7 +4806,7 @@ GameObject:
   - component: {fileID: 815460794}
   - component: {fileID: 815460793}
   - component: {fileID: 815460792}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4953,7 +4942,7 @@ GameObject:
   - component: {fileID: 829863645}
   - component: {fileID: 829863644}
   - component: {fileID: 829863643}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5138,7 +5127,7 @@ GameObject:
   - component: {fileID: 852026044}
   - component: {fileID: 852026043}
   - component: {fileID: 852026042}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5274,7 +5263,7 @@ GameObject:
   - component: {fileID: 855813760}
   - component: {fileID: 855813759}
   - component: {fileID: 855813758}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5410,7 +5399,7 @@ GameObject:
   - component: {fileID: 862540144}
   - component: {fileID: 862540143}
   - component: {fileID: 862540142}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5546,7 +5535,7 @@ GameObject:
   - component: {fileID: 885274558}
   - component: {fileID: 885274557}
   - component: {fileID: 885274556}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5682,7 +5671,7 @@ GameObject:
   - component: {fileID: 902866042}
   - component: {fileID: 902866041}
   - component: {fileID: 902866040}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5818,7 +5807,7 @@ GameObject:
   - component: {fileID: 939590614}
   - component: {fileID: 939590613}
   - component: {fileID: 939590612}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5954,7 +5943,7 @@ GameObject:
   - component: {fileID: 943620588}
   - component: {fileID: 943620587}
   - component: {fileID: 943620586}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6090,7 +6079,7 @@ GameObject:
   - component: {fileID: 949839687}
   - component: {fileID: 949839686}
   - component: {fileID: 949839685}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6226,7 +6215,7 @@ GameObject:
   - component: {fileID: 960268952}
   - component: {fileID: 960268951}
   - component: {fileID: 960268950}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6362,7 +6351,7 @@ GameObject:
   - component: {fileID: 980881473}
   - component: {fileID: 980881472}
   - component: {fileID: 980881471}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6498,7 +6487,7 @@ GameObject:
   - component: {fileID: 984423731}
   - component: {fileID: 984423730}
   - component: {fileID: 984423729}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6634,7 +6623,7 @@ GameObject:
   - component: {fileID: 989199102}
   - component: {fileID: 989199101}
   - component: {fileID: 989199100}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6770,7 +6759,7 @@ GameObject:
   - component: {fileID: 1007385798}
   - component: {fileID: 1007385797}
   - component: {fileID: 1007385796}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6906,7 +6895,7 @@ GameObject:
   - component: {fileID: 1010877533}
   - component: {fileID: 1010877532}
   - component: {fileID: 1010877531}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7042,7 +7031,7 @@ GameObject:
   - component: {fileID: 1024647127}
   - component: {fileID: 1024647126}
   - component: {fileID: 1024647125}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7178,7 +7167,7 @@ GameObject:
   - component: {fileID: 1032498723}
   - component: {fileID: 1032498722}
   - component: {fileID: 1032498721}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7314,7 +7303,7 @@ GameObject:
   - component: {fileID: 1041861820}
   - component: {fileID: 1041861819}
   - component: {fileID: 1041861818}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7450,7 +7439,7 @@ GameObject:
   - component: {fileID: 1070938272}
   - component: {fileID: 1070938271}
   - component: {fileID: 1070938270}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7586,7 +7575,7 @@ GameObject:
   - component: {fileID: 1077049217}
   - component: {fileID: 1077049216}
   - component: {fileID: 1077049215}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7722,7 +7711,7 @@ GameObject:
   - component: {fileID: 1092402269}
   - component: {fileID: 1092402268}
   - component: {fileID: 1092402267}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7858,7 +7847,7 @@ GameObject:
   - component: {fileID: 1104244451}
   - component: {fileID: 1104244450}
   - component: {fileID: 1104244449}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7994,7 +7983,7 @@ GameObject:
   - component: {fileID: 1138696764}
   - component: {fileID: 1138696763}
   - component: {fileID: 1138696762}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8117,55 +8106,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1138696760}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1155071626
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1155071628}
-  - component: {fileID: 1155071627}
-  m_Layer: 0
-  m_Name: TurnManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1155071627
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1155071626}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 191a1d4cbb20960459630306f9903aa4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TurnManager
-  _enemies:
-  - {fileID: 636247308}
-  - {fileID: 2012363449}
-  - {fileID: 1724147152}
-  _player: {fileID: 1913740772}
---- !u!4 &1155071628
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1155071626}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1168893029
 GameObject:
   m_ObjectHideFlags: 0
@@ -8179,7 +8119,7 @@ GameObject:
   - component: {fileID: 1168893033}
   - component: {fileID: 1168893032}
   - component: {fileID: 1168893031}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8315,7 +8255,7 @@ GameObject:
   - component: {fileID: 1248859874}
   - component: {fileID: 1248859873}
   - component: {fileID: 1248859872}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8451,7 +8391,7 @@ GameObject:
   - component: {fileID: 1256308891}
   - component: {fileID: 1256308890}
   - component: {fileID: 1256308889}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8587,7 +8527,7 @@ GameObject:
   - component: {fileID: 1283668569}
   - component: {fileID: 1283668568}
   - component: {fileID: 1283668567}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8723,7 +8663,7 @@ GameObject:
   - component: {fileID: 1284792877}
   - component: {fileID: 1284792876}
   - component: {fileID: 1284792875}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8859,7 +8799,7 @@ GameObject:
   - component: {fileID: 1287979830}
   - component: {fileID: 1287979829}
   - component: {fileID: 1287979828}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9053,7 +8993,7 @@ PrefabInstance:
     - target: {fileID: 7174478236522732807, guid: 7ee0ba386ed618f45ae53fc847b70e45, type: 3}
       propertyPath: _pathfindingController
       value: 
-      objectReference: {fileID: 1761895299}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9072,7 +9012,7 @@ GameObject:
   - component: {fileID: 1298704898}
   - component: {fileID: 1298704897}
   - component: {fileID: 1298704896}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9208,7 +9148,7 @@ GameObject:
   - component: {fileID: 1366601811}
   - component: {fileID: 1366601810}
   - component: {fileID: 1366601809}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9344,7 +9284,7 @@ GameObject:
   - component: {fileID: 1372559272}
   - component: {fileID: 1372559271}
   - component: {fileID: 1372559270}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9480,7 +9420,7 @@ GameObject:
   - component: {fileID: 1443292676}
   - component: {fileID: 1443292675}
   - component: {fileID: 1443292674}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9616,7 +9556,7 @@ GameObject:
   - component: {fileID: 1470870664}
   - component: {fileID: 1470870663}
   - component: {fileID: 1470870662}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9752,7 +9692,7 @@ GameObject:
   - component: {fileID: 1485061303}
   - component: {fileID: 1485061302}
   - component: {fileID: 1485061301}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9888,7 +9828,7 @@ GameObject:
   - component: {fileID: 1506458784}
   - component: {fileID: 1506458783}
   - component: {fileID: 1506458782}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10024,7 +9964,7 @@ GameObject:
   - component: {fileID: 1512163425}
   - component: {fileID: 1512163424}
   - component: {fileID: 1512163423}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10160,7 +10100,7 @@ GameObject:
   - component: {fileID: 1543240524}
   - component: {fileID: 1543240523}
   - component: {fileID: 1543240522}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10296,7 +10236,7 @@ GameObject:
   - component: {fileID: 1548665864}
   - component: {fileID: 1548665863}
   - component: {fileID: 1548665862}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10432,7 +10372,7 @@ GameObject:
   - component: {fileID: 1569593742}
   - component: {fileID: 1569593741}
   - component: {fileID: 1569593740}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10568,7 +10508,7 @@ GameObject:
   - component: {fileID: 1587137856}
   - component: {fileID: 1587137855}
   - component: {fileID: 1587137854}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10820,7 +10760,7 @@ GameObject:
   - component: {fileID: 1635094899}
   - component: {fileID: 1635094898}
   - component: {fileID: 1635094897}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10956,7 +10896,7 @@ GameObject:
   - component: {fileID: 1639231955}
   - component: {fileID: 1639231954}
   - component: {fileID: 1639231953}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11092,7 +11032,7 @@ GameObject:
   - component: {fileID: 1670192229}
   - component: {fileID: 1670192228}
   - component: {fileID: 1670192227}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11215,17 +11155,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1670192225}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1724147152 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7174478236522732807, guid: 7ee0ba386ed618f45ae53fc847b70e45, type: 3}
-  m_PrefabInstance: {fileID: 1298049128}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e350898ff4d62d34887a1f8186726837, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
 --- !u!1 &1726243044
 GameObject:
   m_ObjectHideFlags: 0
@@ -11239,7 +11168,7 @@ GameObject:
   - component: {fileID: 1726243048}
   - component: {fileID: 1726243047}
   - component: {fileID: 1726243046}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11375,7 +11304,7 @@ GameObject:
   - component: {fileID: 1728740933}
   - component: {fileID: 1728740932}
   - component: {fileID: 1728740931}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 4'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11511,7 +11440,7 @@ GameObject:
   - component: {fileID: 1735237960}
   - component: {fileID: 1735237959}
   - component: {fileID: 1735237958}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11647,7 +11576,7 @@ GameObject:
   - component: {fileID: 1746275258}
   - component: {fileID: 1746275257}
   - component: {fileID: 1746275256}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11770,50 +11699,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1746275254}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1761895298
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1761895300}
-  - component: {fileID: 1761895299}
-  m_Layer: 0
-  m_Name: PathfinderController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1761895299
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1761895298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16851f4d1cfda5d4ea63af9ccc3f0b62, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PathfindingController
---- !u!4 &1761895300
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1761895298}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.85358, y: 0, z: 8.31598}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1778466756
 GameObject:
   m_ObjectHideFlags: 0
@@ -11827,7 +11712,7 @@ GameObject:
   - component: {fileID: 1778466760}
   - component: {fileID: 1778466759}
   - component: {fileID: 1778466758}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11963,7 +11848,7 @@ GameObject:
   - component: {fileID: 1781283619}
   - component: {fileID: 1781283618}
   - component: {fileID: 1781283617}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12099,7 +11984,7 @@ GameObject:
   - component: {fileID: 1792745458}
   - component: {fileID: 1792745457}
   - component: {fileID: 1792745456}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12235,7 +12120,7 @@ GameObject:
   - component: {fileID: 1830105974}
   - component: {fileID: 1830105973}
   - component: {fileID: 1830105972}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12371,7 +12256,7 @@ GameObject:
   - component: {fileID: 1838897807}
   - component: {fileID: 1838897806}
   - component: {fileID: 1838897805}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12507,7 +12392,7 @@ GameObject:
   - component: {fileID: 1841501298}
   - component: {fileID: 1841501297}
   - component: {fileID: 1841501296}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 3'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12643,7 +12528,7 @@ GameObject:
   - component: {fileID: 1852900990}
   - component: {fileID: 1852900989}
   - component: {fileID: 1852900988}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 7'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12779,7 +12664,7 @@ GameObject:
   - component: {fileID: 1854520493}
   - component: {fileID: 1854520492}
   - component: {fileID: 1854520491}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 1, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12915,7 +12800,7 @@ GameObject:
   - component: {fileID: 1854605417}
   - component: {fileID: 1854605416}
   - component: {fileID: 1854605415}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13051,7 +12936,7 @@ GameObject:
   - component: {fileID: 1858252509}
   - component: {fileID: 1858252508}
   - component: {fileID: 1858252507}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13187,7 +13072,7 @@ GameObject:
   - component: {fileID: 1882830754}
   - component: {fileID: 1882830753}
   - component: {fileID: 1882830752}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 2, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13323,7 +13208,7 @@ GameObject:
   - component: {fileID: 1887815167}
   - component: {fileID: 1887815166}
   - component: {fileID: 1887815165}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13478,12 +13363,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9f02d23eba4b17438bc7ccaea443fc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _pathfindingController: {fileID: 1761895299}
   _spawnCell: {fileID: 447111256}
   _timeToMoveCells: 0.2
   _timeToStayInCell: 0.05
   _camera: {fileID: 330585545}
-  _turnManager: {fileID: 1155071627}
 --- !u!136 &1913740773
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -13592,7 +13475,7 @@ GameObject:
   - component: {fileID: 1924007890}
   - component: {fileID: 1924007889}
   - component: {fileID: 1924007888}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 6'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13728,7 +13611,7 @@ GameObject:
   - component: {fileID: 1965150730}
   - component: {fileID: 1965150729}
   - component: {fileID: 1965150728}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 4, 1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13880,6 +13763,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af51e9a3721c294dafaa15358accce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _APWalletConfiguration: {fileID: 11400000, guid: d8ff18a3e66feea42a4d8dc0885c6bd1, type: 2}
 --- !u!4 &1973655150
 Transform:
   m_ObjectHideFlags: 0
@@ -13908,7 +13792,7 @@ GameObject:
   - component: {fileID: 1987518243}
   - component: {fileID: 1987518242}
   - component: {fileID: 1987518241}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 3, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14044,7 +13928,7 @@ GameObject:
   - component: {fileID: 1993534665}
   - component: {fileID: 1993534664}
   - component: {fileID: 1993534663}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 0'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14167,17 +14051,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1993534661}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &2012363449 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7174478236522732807, guid: 7ee0ba386ed618f45ae53fc847b70e45, type: 3}
-  m_PrefabInstance: {fileID: 493638080}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e350898ff4d62d34887a1f8186726837, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
 --- !u!1 &2021750734
 GameObject:
   m_ObjectHideFlags: 0
@@ -14191,7 +14064,7 @@ GameObject:
   - component: {fileID: 2021750738}
   - component: {fileID: 2021750737}
   - component: {fileID: 2021750736}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 5, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14327,7 +14200,7 @@ GameObject:
   - component: {fileID: 2068189638}
   - component: {fileID: 2068189637}
   - component: {fileID: 2068189636}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 7, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14463,7 +14336,7 @@ GameObject:
   - component: {fileID: 2069440983}
   - component: {fileID: 2069440982}
   - component: {fileID: 2069440981}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 6, 2'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14599,7 +14472,7 @@ GameObject:
   - component: {fileID: 2089216964}
   - component: {fileID: 2089216963}
   - component: {fileID: 2089216962}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 8, 8'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14735,7 +14608,7 @@ GameObject:
   - component: {fileID: 2098738511}
   - component: {fileID: 2098738510}
   - component: {fileID: 2098738509}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 0, 5'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14871,7 +14744,7 @@ GameObject:
   - component: {fileID: 2105679167}
   - component: {fileID: 2105679166}
   - component: {fileID: 2105679165}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'Cell: 9, 9'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15144,7 +15017,7 @@ PrefabInstance:
     - target: {fileID: 7174478236522732807, guid: 7ee0ba386ed618f45ae53fc847b70e45, type: 3}
       propertyPath: _pathfindingController
       value: 
-      objectReference: {fileID: 1761895299}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -15157,8 +15030,6 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
-  - {fileID: 1761895300}
-  - {fileID: 1155071628}
   - {fileID: 1913740776}
   - {fileID: 8096155713173153496}
   - {fileID: 493638080}

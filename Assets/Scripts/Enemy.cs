@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : UnitController
+public class Enemy : Unit
 {
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
     private PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
@@ -13,9 +13,6 @@ public class EnemyController : UnitController
 
     public void TakeTurn(Cell playerCell)
     {
-        if (_isMoving)
-            return;
-
         if (IsInGoodCover(playerCell))
         {
             Debug.Log($"{name} holding position");
