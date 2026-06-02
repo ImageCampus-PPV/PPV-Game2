@@ -19,22 +19,12 @@ public class TurnManager : IService
 
     private HabilitiesDurationConfiguration HabilitiesDurationConfiguration => ServiceProvider.Instance.GetService<HabilitiesDurationConfiguration>();
 
-    private Dictionary<uint, Action> _playerAction;
-
     private Dictionary<uint, uint> _stunUnits;
 
     private uint _currenturn = 1;
 
     public TurnManager()
     {
-        _playerAction = new Dictionary<uint, Action>();
-
-        //In case we don't end up using controllers.
-        //This could be trigger by events. 
-        //Depending the ID/Enum the event gives as a parameter we execute correct strategy
-        _playerAction.Add(0, StunAttackAttack);
-        _playerAction.Add(1, Move);
-
         _stunUnits = new Dictionary<uint, uint>();
     }
 
@@ -49,13 +39,22 @@ public class TurnManager : IService
         if (!IsEndOfTurn())
             return;
 
-        Player player = EntityRegistry.Players.First();
-
-        if (player.IsTurnReady)
+        if (Input.GetMouseButtonUp(1))
         {
-            EnemiesTurn();
+            StunAttackAttack();
 
-            player.HandleMovement();
+            EnemiesTurn();
+        }
+        else
+        {
+            Player player = EntityRegistry.Players.First();
+
+            if (player.IsTurnReady)
+            {
+                player.HandleMovement();
+
+                EnemiesTurn();
+            }
         }
     }
 
@@ -79,13 +78,6 @@ public class TurnManager : IService
                 EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
             }
         }
-
-        EnemiesTurn();
-    }
-
-    private void Move()
-    {
-        EntityRegistry.Players.First().HandleMovement();
 
         EnemiesTurn();
     }
@@ -118,6 +110,12 @@ public class TurnManager : IService
             if (!_stunUnits.ContainsKey(enemy.ID))
                 foreach (Player player in EntityRegistry.Players)
                     enemy.TakeTurn(player.CurrentCell);
+
+        foreach (HeavyEnemy heavyenemy in EntityRegistry.HeavyEnemies)
+        {
+            if (IsCellNearUnit(heavyenemy.CurrentCell, EntityRegistry.Players.First().CurrentCell))
+                EntityRegistry.Players.First().ReduceLife(heavyenemy.Damage);
+        }
 
         foreach (HeavyEnemy heavyenemy in EntityRegistry.HeavyEnemies)
         {

@@ -1,5 +1,6 @@
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -10,6 +11,7 @@ public class HudManager : MonoBehaviour
     [SerializeField] private Button _exitButton;
     [SerializeField] private TMP_Text _turnText;
     [SerializeField] private TMP_Text _APText;
+    [SerializeField] private TMP_Text _playerLife;
 
     EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
 
@@ -22,6 +24,12 @@ public class HudManager : MonoBehaviour
     {
         EventBus.Subscribe<TurnChangeEvent>(OnTurnChange);
         EventBus.Subscribe<APWalletChangeEvent>(OnAPChange);
+        EventBus.Subscribe<PlayerChangeLifeEvent>(OnPlayerLifeChange);
+    }
+
+    private void OnPlayerLifeChange(in PlayerChangeLifeEvent playerChangeLifeEvent)
+    {
+        _playerLife.text = $"Life: {playerChangeLifeEvent.currentLife}";
     }
 
     private void OnTurnChange(in TurnChangeEvent turnChangeEvent)

@@ -54,15 +54,7 @@ public class Player : Unit
 
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
                 if (hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
-                {
                     ReactToInput(clickedCell);
-                    Debug.Log($"Cell Clicked: {clickedCell.gameObject}");
-                    if (_selectedTargetCell == null)
-                        Debug.Log($"Target selected is null");
-                    else
-                        Debug.Log($"Target selected {_selectedTargetCell.gameObject}");
-                    Debug.Log($"Is Turn ready {_isTurnReady}");
-                }
         }
     }
 
@@ -123,6 +115,7 @@ public class Player : Unit
         _selectedTargetCell = null;
     }
 
+    /*
     private void OnDrawGizmos()
     {
         if (!Application.isPlaying || IsMoving)
@@ -197,4 +190,5 @@ public class Player : Unit
 
         Gizmos.DrawSphere(pos, 0.3f);
     }
+    */
 }
