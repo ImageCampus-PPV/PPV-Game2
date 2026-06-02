@@ -72,6 +72,7 @@ public class Player : Unit
             if (GetPathCost(clickedCell) <= APWallet.CurrentAP)
             {
                 _plannedAPCost = GetPathCost(clickedCell);
+                EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
                 _plannedPath = GetPathCells(clickedCell);
                 _selectedTargetCell = clickedCell;
             }
@@ -112,83 +113,7 @@ public class Player : Unit
 
         _plannedAPCost = 0;
         EventBus.Raise<APRefillEvent>();
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
         _selectedTargetCell = null;
     }
-
-    /*
-    private void OnDrawGizmos()
-    {
-        if (!Application.isPlaying || IsMoving)
-            return;
-
-        if (_selectedTargetCell == null)
-        {
-            DrawReachableCells();
-        }
-        else
-        {
-            DrawReachableCells();
-            DrawPlannedPath();
-            DrawSelectedTarget();
-        }
-    }
-
-    private void DrawReachableCells()
-    {
-        if (MapGrid == null || APWallet == null)
-            return;
-
-        Gizmos.color = new Color(0f, 1f, 0f, 0.35f);
-
-        for (int x = 0; x < MapGrid.Width; x++)
-        {
-            for (int z = 0; z < MapGrid.Height; z++)
-            {
-                Cell cell = MapGrid.GetCell(x, z);
-
-                int cost = GetPathCost(cell);
-
-                if (cost <= 0)
-                    continue;
-
-                if (cost > APWallet.CurrentAP)
-                    continue;
-
-                Vector3 pos = cell.GetWorldTopPosition();
-                pos.y += 0.05f;
-
-                Gizmos.DrawCube(pos, Vector3.one * 0.35f);
-            }
-        }
-    }
-
-    private void DrawPlannedPath()
-    {
-        if (_plannedPath == null)
-            return;
-
-        Gizmos.color = Color.blue;
-
-        foreach (Cell cell in _plannedPath)
-        {
-            Vector3 pos = cell.GetWorldTopPosition();
-            pos.y += 0.1f;
-
-            Gizmos.DrawCube(pos, Vector3.one * 0.25f);
-        }
-    }
-
-    private void DrawSelectedTarget()
-    {
-        if (_selectedTargetCell == null)
-            return;
-
-        Gizmos.color = Color.yellow;
-
-        Vector3 pos = _selectedTargetCell.GetWorldTopPosition();
-        pos.y += 0.15f;
-
-        Gizmos.DrawSphere(pos, 0.3f);
-    }
-    */
 }
