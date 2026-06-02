@@ -1,12 +1,11 @@
+using ImageCampus.ToolBox.Services;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class UnitController : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] protected MyGrid _grid;
-    [SerializeField] protected PathfindingController _pathfindingController;
+    PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
@@ -24,7 +23,7 @@ public class UnitController : MonoBehaviour
     public Cell CurrentCell => _currentCell;
     public bool IsMoving => _isMoving;
 
-    protected virtual void Awake()
+    protected virtual void Start()
     {
         Spawn();
     }
@@ -53,16 +52,16 @@ public class UnitController : MonoBehaviour
 
         Debug.Log($"Target: {targetCell}");
         Debug.Log($"CurrentCell: {_currentCell}");
-        Debug.Log($"PathfindingController: {_pathfindingController}");
+        Debug.Log($"PathfindingController: {PathFinding}");
 
-        List<Cell> path = _pathfindingController.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
+        List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
 
         if (path != null && path.Count > 1)
         {
             _currentPath = path;
             _pathIndex = 1;
 
-            StartCoroutine(FollowPath());           
+            StartCoroutine(FollowPath());
         }
     }
 
@@ -72,20 +71,15 @@ public class UnitController : MonoBehaviour
 
         while (_pathIndex < _currentPath.Count)
         {
-
             Cell targetCell = _currentPath[_pathIndex];
             Vector3 startPos = transform.position;
-
-
 
             //Horizontal movement
             Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
             Vector3 finalTarget;
 
             if (targetCell.Height != _currentCell.Height)
-            {
                 finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
-            }
             else
             {
                 finalTarget = targetCell.transform.position;
@@ -123,7 +117,7 @@ public class UnitController : MonoBehaviour
 
             transform.position = finalTarget;
 
-            _pathIndex++;         
+            _pathIndex++;
 
             if (_timeToStayInCell > 0)
                 yield return new WaitForSeconds(_timeToStayInCell);

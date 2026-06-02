@@ -1,20 +1,20 @@
+using ImageCampus.ToolBox.Services;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : UnitController
 {
+    private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+    private PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
+
     [Header("Enemy")]
     [SerializeField] private int _attackRange = 4;
 
-    private PlayerController _player;
-    public void TakeTurn(PlayerController player)
+    public void TakeTurn(Cell playerCell)
     {
-        _player = player;
         if (_isMoving)
             return;
-
-        Cell playerCell = player.CurrentCell;
 
         if (IsInGoodCover(playerCell))
         {
@@ -22,7 +22,7 @@ public class EnemyController : UnitController
             return;
         }
 
-        Cell targetCell = FindBestCell();
+        Cell targetCell = FindBestCell(playerCell);
 
         if (targetCell == null)
         {
@@ -30,7 +30,7 @@ public class EnemyController : UnitController
             return;
         }
 
-        List<Cell> path = _pathfindingController.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
+        List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
 
         if (path == null || path.Count <= 1)
             return;
@@ -60,10 +60,8 @@ public class EnemyController : UnitController
         return HasCoverAgainstPlayer(_currentCell, playerCell) && IsInRange(playerCell);
     }
 
-    private Cell FindBestCell()
+    private Cell FindBestCell(Cell playerCell)
     {
-        Cell playerCell = _player.CurrentCell;
-
         Cell bestCoverCell = null;
         float bestCoverDist = float.MaxValue;
 
@@ -71,15 +69,15 @@ public class EnemyController : UnitController
         float fallbackDist = float.MaxValue;
 
         int minX = Mathf.Max(0, playerCell.Coordinates.x - _attackRange);
-        int maxX = Mathf.Min(_grid.Width - 1, playerCell.Coordinates.x + _attackRange);
+        int maxX = Mathf.Min(MapGrid.Width - 1, playerCell.Coordinates.x + _attackRange);
         int minZ = Mathf.Max(0, playerCell.Coordinates.y - _attackRange);
-        int maxZ = Mathf.Min(_grid.Height - 1, playerCell.Coordinates.y + _attackRange);
+        int maxZ = Mathf.Min(MapGrid.Height - 1, playerCell.Coordinates.y + _attackRange);
 
         for (int x = minX; x <= maxX; x++)
         {
             for (int z = minZ; z <= maxZ; z++)
             {
-                Cell cell = _grid.GetCell(x, z);
+                Cell cell = MapGrid.GetCell(x, z);
 
                 if (!cell.IsWalkable)
                     continue;
@@ -93,7 +91,7 @@ public class EnemyController : UnitController
                     continue;
 
                 //Make sure enemy can reach the cell
-                List<Cell> path = _pathfindingController.FindPath(_currentCell.Coordinates, cell.Coordinates);
+                List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, cell.Coordinates);
 
                 if (path == null || path.Count <= 1)
                     continue;

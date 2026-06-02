@@ -1,48 +1,40 @@
+using ImageCampus.ToolBox.Services;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pathfinding
+public sealed class PathFinding : IService
 {
     private const int MOVE_STRAIGHT_COST = 10;
     private const int HEIGHT_DIFFERENCE_TOLERANCE = 1;
 
-    private MyGrid _grid;
+    private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+
+    public bool IsPersistance => true;
+
     private List<Cell> _openList;
     private List<Cell> _closedList;
 
 
-    public Pathfinding(MyGrid grid)
+    public PathFinding()
     {
-        _grid = grid;
         _openList = new List<Cell>();
         _closedList = new List<Cell>();
     }
 
-    [ContextMenu("Test Pathfinding")]
-    private void TestPathfinding()
-    {
-        _openList.Clear();
-        _closedList.Clear();
-
-        Cell startCell = _grid.GetCell(0, 0);
-        Cell endCell = _grid.GetCell(7, 9);
-        FindPath(startCell.Coordinates, endCell.Coordinates);
-    }
-
     public List<Cell> FindPath(Vector2Int startPos, Vector2Int endPos)
     {
-        Cell startCell = _grid.GetCell(startPos);
-        Cell endCell = _grid.GetCell(endPos);
+        Cell startCell = MapGrid.GetCell(startPos);
+        Cell endCell = MapGrid.GetCell(endPos);
 
         _openList = new List<Cell>() { startCell };
         _closedList = new List<Cell>();
 
-        for (int x = 0; x < _grid.Width; x++)
+        for (int x = 0; x < MapGrid.Width; x++)
         {
-            for (int z = 0; z < _grid.Height; z++)
+            for (int z = 0; z < MapGrid.Height; z++)
             {
-                Cell cell = _grid.GetCell(new Vector2Int(x, z));
+                Cell cell = MapGrid.GetCell(new Vector2Int(x, z));
                 cell.gCost = int.MaxValue;
                 cell.hCost = 0;
                 cell.CalculateFCost();
@@ -116,39 +108,39 @@ public class Pathfinding
 
         // Left
         if (x - 1 >= 0)
-            neighbourList.Add(_grid.GetCell(x - 1, y));
+            neighbourList.Add(MapGrid.GetCell(x - 1, y));
 
         // Right
-        if (x + 1 < _grid.Width)
-            neighbourList.Add(_grid.GetCell(x + 1, y));
+        if (x + 1 < MapGrid.Width)
+            neighbourList.Add(MapGrid.GetCell(x + 1, y));
 
         // Down
         if (y - 1 >= 0)
-            neighbourList.Add(_grid.GetCell(x, y - 1));
+            neighbourList.Add(MapGrid.GetCell(x, y - 1));
 
         // Up
-        if (y + 1 < _grid.Height)
-            neighbourList.Add(_grid.GetCell(x, y + 1));
+        if (y + 1 < MapGrid.Height)
+            neighbourList.Add(MapGrid.GetCell(x, y + 1));
 
         //if (oddRow)
         //{
         //    // Up Right
-        //    if (y + 1 < _grid.Height && x + 1 < _grid.Width)
-        //        neighbourList.Add(_grid.GetCell(x + 1, y + 1));
+        //    if (y + 1 < MapGrid.Height && x + 1 < MapGrid.Width)
+        //        neighbourList.Add(MapGrid.GetCell(x + 1, y + 1));
 
         //    // Down Right
-        //    if (y - 1 >= 0 && x + 1 < _grid.Width)
-        //        neighbourList.Add(_grid.GetCell(x + 1, y - 1));
+        //    if (y - 1 >= 0 && x + 1 < MapGrid.Width)
+        //        neighbourList.Add(MapGrid.GetCell(x + 1, y - 1));
         //}
         //else
         //{
         //    // Up Left
-        //    if (y + 1 < _grid.Height && x - 1 >= 0)
-        //        neighbourList.Add(_grid.GetCell(x - 1, y + 1));
+        //    if (y + 1 < MapGrid.Height && x - 1 >= 0)
+        //        neighbourList.Add(MapGrid.GetCell(x - 1, y + 1));
 
         //    // Down Left
         //    if (y - 1 >= 0 && x - 1 >= 0)
-        //        neighbourList.Add(_grid.GetCell(x - 1, y - 1));
+        //        neighbourList.Add(MapGrid.GetCell(x - 1, y - 1));
         //}
 
         return neighbourList;
@@ -190,6 +182,6 @@ public class Pathfinding
     private int CalculateHeurisiticDistanceCost(Cell a, Cell b)
     {
         return Mathf.RoundToInt(
-            MOVE_STRAIGHT_COST * Vector3.Distance(_grid.GetWorldPosition(a.Coordinates.x, a.Coordinates.y), _grid.GetWorldPosition(b.Coordinates.x, b.Coordinates.y)));
+            MOVE_STRAIGHT_COST * Vector3.Distance(MapGrid.GetWorldPosition(a.Coordinates.x, a.Coordinates.y), MapGrid.GetWorldPosition(b.Coordinates.x, b.Coordinates.y)));
     }
 }
