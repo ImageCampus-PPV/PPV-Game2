@@ -16,6 +16,7 @@ public class TurnManager : IService
         if (!IsEndOfTurn())
             return;
 
+        //Change for each for single call
         foreach (Player player in EntityRegistry.Players)
         {
             playerReady = player.IsTurnReady;
@@ -25,6 +26,7 @@ public class TurnManager : IService
 
         if (playerReady)
         {
+            //Change for each for single call
             foreach (Player player in EntityRegistry.Players)
                 player.HandleMovement();
 

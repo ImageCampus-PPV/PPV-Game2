@@ -9,15 +9,17 @@ public class Player : Unit
     APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
 
-    //FOR PATH DEBUGING ONLY
-    MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
-
     private List<Cell> _plannedPath;
     private int _plannedAPCost;
     private Cell _selectedTargetCell = null;
 
     private bool _isTurnReady = false;
     public bool IsTurnReady => _isTurnReady;
+
+    //FOR PATH DEBUGING ONLY
+    MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+    public Cell SelectedTargetCell => _selectedTargetCell;
+    public List<Cell> PlannedPath => _plannedPath;
 
 
     private void Awake()
@@ -80,6 +82,11 @@ public class Player : Unit
         _isTurnReady = false;
         RequestPath(_selectedTargetCell);
         EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
+    }
+
+    public int GetPathCostPreview(Cell targetCell)
+    {
+        return GetPathCost(targetCell);
     }
 
     protected override void OnMovementStarted()
