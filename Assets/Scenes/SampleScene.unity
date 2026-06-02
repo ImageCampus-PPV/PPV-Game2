@@ -13366,7 +13366,6 @@ MonoBehaviour:
   _spawnCell: {fileID: 447111256}
   _timeToMoveCells: 0.2
   _timeToStayInCell: 0.05
-  _camera: {fileID: 330585545}
 --- !u!136 &1913740773
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -13763,7 +13762,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af51e9a3721c294dafaa15358accce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _APWalletConfiguration: {fileID: 11400000, guid: d8ff18a3e66feea42a4d8dc0885c6bd1, type: 2}
+  _APWalletConfiguration: {fileID: 11400000, guid: 1607d20703f07974f9114552afa18576, type: 2}
 --- !u!4 &1973655150
 Transform:
   m_ObjectHideFlags: 0

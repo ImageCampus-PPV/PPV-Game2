@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: APWalletConfiguration
   m_EditorClassIdentifier: Assembly-CSharp:Assets.Scripts.Combat:APWalletConfiguration
-  _maxAP: 0
-  _startingAP: 0
+  _maxAP: 4
+  _startingAP: 4

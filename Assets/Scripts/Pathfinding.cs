@@ -160,10 +160,10 @@ public sealed class PathFinding : IService
 
         path.Reverse();
 
-        for (int i = 0; i < path.Count; i++)
-        {
-            Debug.Log($"Step {i + 1}: {path[i].name}");
-        }
+        //for (int i = 0; i < path.Count; i++)
+        //{
+        //    Debug.Log($"Step {i + 1}: {path[i].name}");
+        //}
 
         return path;
     }

@@ -8,29 +8,28 @@ public class TurnManager : IService
     public bool IsPersistance => false;
 
     EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
-    APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
 
     public void Tick()
     {
-        //The input shouldn't be handle here
-        if (Input.GetMouseButtonDown(0))
+        bool playerReady = true;
+
+        if (!IsEndOfTurn())
+            return;
+
+        foreach (Player player in EntityRegistry.Players)
         {
-            if (!IsEndOfTurn())
-                return;
+            playerReady = player.IsTurnReady;
+            if (!playerReady)
+                break;
+        }
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
-            {
-                if (hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
-                    foreach (Player player in EntityRegistry.Players)
-                        player.HandleMovement(clickedCell);
-
-            }
+        if (playerReady)
+        {
+            foreach (Player player in EntityRegistry.Players)
+                player.HandleMovement();
 
             EnemiesTurn();
         }
-
     }
 
     //This should be a controller.

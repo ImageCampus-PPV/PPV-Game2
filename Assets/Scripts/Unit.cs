@@ -11,7 +11,7 @@ public class Unit : MonoBehaviour
 
     private uint _unitID = NULL_UNIT;
 
-    public uint ID => _unitID; 
+    public uint ID => _unitID;
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
@@ -52,14 +52,11 @@ public class Unit : MonoBehaviour
 
     protected void RequestPath(Cell targetCell)
     {
-        if (targetCell == null)
+        if (!IsCellAvailable(targetCell))
+        {
+            Debug.LogWarning("Target cell unavailable");
             return;
-
-        if (!targetCell.IsWalkable)
-            return;
-
-        if (targetCell.isOccupied)
-            return;
+        }
 
         Debug.Log($"Target: {targetCell}");
         Debug.Log($"CurrentCell: {_currentCell}");
@@ -72,13 +69,50 @@ public class Unit : MonoBehaviour
             _currentPath = path;
             _pathIndex = 1;
 
+            _isMoving = true;
             StartCoroutine(FollowPath());
         }
     }
 
+    protected bool IsCellAvailable(Cell targetCell)
+    {
+        if (targetCell == null)
+            return false;
+
+        if (!targetCell.IsWalkable)
+            return false;
+
+        if (targetCell.isOccupied)
+            return false;
+
+        return true;
+    }
+
+    protected int GetPathCost(Cell targetCell)
+    {
+        if (!IsCellAvailable(targetCell))
+        {
+            Debug.LogWarning("Target cell unavailable");
+            return -1;
+        }
+
+        List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
+        return path.Count - 1;
+    }
+
+    protected List<Cell> GetPathCells(Cell targetCell)
+    {
+        if (!IsCellAvailable(targetCell))
+        {
+            Debug.LogWarning("Target cell unavailable");
+            return null;
+        }
+
+        return PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
+    }
+
     protected IEnumerator FollowPath()
     {
-        _isMoving = true;
 
         while (_pathIndex < _currentPath.Count)
         {
