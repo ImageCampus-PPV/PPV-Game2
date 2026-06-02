@@ -114,16 +114,10 @@ public class TurnManager : IService
                 foreach (Player player in EntityRegistry.Players)
                     enemy.TakeTurn(player.CurrentCell);
 
-        foreach (HeavyEnemy heavyenemy in EntityRegistry.HeavyEnemies)
+        foreach (HeavyEnemy heavyEnemy in EntityRegistry.HeavyEnemies)
         {
-            if (IsCellNearUnit(heavyenemy.CurrentCell, EntityRegistry.Players.First().CurrentCell))
-                EntityRegistry.Players.First().ReduceLife(heavyenemy.Damage);
-        }
-
-        foreach (HeavyEnemy heavyenemy in EntityRegistry.HeavyEnemies)
-        {
-            if (IsCellNearUnit(heavyenemy.CurrentCell, EntityRegistry.Players.First().CurrentCell))
-                EntityRegistry.Players.First().ReduceLife(heavyenemy.Damage);
+            if (IsCellNearUnit(heavyEnemy.CurrentCell, EntityRegistry.Players.First().CurrentCell))
+                EntityRegistry.Players.First().ReduceLife(heavyEnemy.Damage);
         }
 
         CheckStunColdown();

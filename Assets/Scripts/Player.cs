@@ -32,6 +32,7 @@ public class Player : Unit
     public void ReduceLife(uint life)
     {
         _life -= life;
+        EventBus.Raise<PlayerChangeLifeEvent>(_life);
     }
 
     public void AddLife(uint life)
