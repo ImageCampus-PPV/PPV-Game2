@@ -67,6 +67,7 @@ namespace Assets.Scripts.Entities
         }
 
         public IEnumerable<Enemy> Enemies => FilterEntities<Enemy>();
+        public IEnumerable<HeavyEnemy> HeavyEnemies => FilterEntities<HeavyEnemy>();
         public IEnumerable<Player> Players => FilterEntities<Player>();
         public IEnumerable<Unit> Units => FilterEntities<Unit>();
 

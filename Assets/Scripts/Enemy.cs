@@ -8,6 +8,8 @@ public class Enemy : Unit
     private PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
 
     [Header("Enemy")]
+    [SerializeField] private uint _damage = 10;
+    public uint Damage => _damage;
     [SerializeField] private int _attackRange = 4;
 
     public void TakeTurn(Cell playerCell)

@@ -1,9 +1,11 @@
+using Assets.Scripts;
 using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TurnManager
@@ -13,6 +15,7 @@ public class TurnManager
     private EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
+    private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
 
     private HabilitiesDurationConfiguration HabilitiesDurationConfiguration => ServiceProvider.Instance.GetService<HabilitiesDurationConfiguration>();
 
@@ -70,13 +73,12 @@ public class TurnManager
                 if (clickedCell.stander == null)
                     return;
 
-            foreach (Player player in EntityRegistry.Players)
-                if (IsCellNearPlayer(player.CurrentCell, clickedCell))
-                {
-                    APWallet.ConsumeAP(1);
-                    _stunUnits[clickedCell.stander.ID] = _currenturn + HabilitiesDurationConfiguration.stunDuration;
-                    EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
-                }
+            if (IsCellNearUnit(EntityRegistry.Players.First().CurrentCell, clickedCell))
+            {
+                APWallet.ConsumeAP(1);
+                _stunUnits[clickedCell.stander.ID] = _currenturn + HabilitiesDurationConfiguration.stunDuration;
+                EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+            }
         }
 
         EnemiesTurn();
@@ -98,9 +100,9 @@ public class TurnManager
     }
 
     //Should be a part of Player controller
-    private bool IsCellNearPlayer(Cell playerCell, Cell cell)
+    private bool IsCellNearUnit(Cell unitCell, Cell cell)
     {
-        Vector2Int playerCellPos = playerCell.Coordinates;
+        Vector2Int playerCellPos = unitCell.Coordinates;
         Vector2Int cellPos = cell.Coordinates;
 
         return (playerCellPos.x + 1 == cellPos.x && playerCellPos.y == cellPos.y) ||
@@ -125,6 +127,12 @@ public class TurnManager
             if (!_stunUnits.ContainsKey(enemy.ID))
                 foreach (Player player in EntityRegistry.Players)
                     enemy.TakeTurn(player.CurrentCell);
+
+        foreach (HeavyEnemy heavyenemy in EntityRegistry.HeavyEnemies)
+        {
+            if (IsCellNearUnit(heavyenemy.CurrentCell, EntityRegistry.Players.First().CurrentCell))
+                EntityRegistry.Players.First().ReduceLife(heavyenemy.Damage);
+        }
 
         CheckStunColdown();
 

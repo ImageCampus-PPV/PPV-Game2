@@ -14,7 +14,7 @@ public class Player : Unit
         _life += life;
     }
 
-    public void RemoveLife(uint life)
+    public void ReduceLife(uint life)
     {
         _life -= life;
     }
