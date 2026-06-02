@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: APWalletConfiguration
-  m_EditorClassIdentifier: Assembly-CSharp:Assets.Scripts.Combat:APWalletConfiguration
-  _maxAP: 10
-  _APPerTurn: 2
-  _startingAP: 10
+  m_Script: {fileID: 11500000, guid: 2e6bcfda0eb25764a9e048f0d09e8c03, type: 3}
+  m_Name: HabilitiesDurationConfiguration
+  m_EditorClassIdentifier: Assembly-CSharp::HabilitiesDurationConfiguration
+  stunDuration: 1
+  pushDistance: 2

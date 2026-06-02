@@ -1,20 +1,18 @@
 ﻿using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using System;
-using UnityEngine;
 
 namespace Assets.Scripts.Combat
 {
-    public class APWallet : IService, IDisposable
+    public class APWallet : IService
     {
-        EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
         public bool IsPersistance => false;
 
-        private readonly int MAX_AP = 0;
-        private int _currentAP = 0;
+        private readonly uint MAX_AP = 0;
+        private uint _currentAP = 0;
 
-        public int CurrentAP => _currentAP;
-        public int MaxAP => MAX_AP;
+        public uint CurrentAP => _currentAP;
+        public uint MaxAP => MAX_AP;
 
         public APWallet(APWalletConfiguration configuration)
         {
@@ -22,26 +20,14 @@ namespace Assets.Scripts.Combat
             _currentAP = configuration._startingAP;
         }
 
-        public void Init()
+        public void ConsumeAP(uint price)
         {
-            EventBus.Subscribe<APConsumeRequestAceptedEvent>(OnAPConsume);
+            _currentAP -= price;
         }
 
-        private void OnAPConsume(in APConsumeRequestAceptedEvent apConsumeRequestAceptedEvent)
+        public void ResetAP()
         {
-            _currentAP -= apConsumeRequestAceptedEvent._amountConsume;
+            _currentAP = MAX_AP;
         }
-
-        public void Dispose()
-        {
-            EventBus.Unsubscribe<APConsumeRequestAceptedEvent>(OnAPConsume);
-        }
-    }
-
-    [CreateAssetMenu(fileName = "APWalletConfiguration", menuName = "ScriptableObjects/APWalletConfiguration")]
-    public class APWalletConfiguration : ScriptableObject
-    {
-        public int _maxAP = 0;
-        public int _startingAP = 0;
     }
 }

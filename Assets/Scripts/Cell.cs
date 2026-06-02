@@ -18,7 +18,8 @@ public class Cell : MonoBehaviour
     [HideInInspector] public int hCost;
     [HideInInspector] public int fCost;
     [HideInInspector] public Cell cameFromCell;
-    [HideInInspector] public bool isOccupied;
+    [HideInInspector] public bool isOccupied => stander != null;
+    public Unit stander = null;
 
     private Bounds _bounds;
 

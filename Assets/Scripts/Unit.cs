@@ -41,7 +41,7 @@ public class Unit : MonoBehaviour
         if (_currentCell != null)
         {
             transform.position = GetStandPosition(_currentCell.GetWorldTopPosition());
-            _currentCell.isOccupied = true;
+            _currentCell.stander = this;
         }
     }
 
@@ -98,8 +98,8 @@ public class Unit : MonoBehaviour
 
             Cell previousCell = _currentCell;
             _currentCell = targetCell;
-            previousCell.isOccupied = false;
-            _currentCell.isOccupied = true;
+            previousCell.stander = null;
+            _currentCell.stander = this;
             OnMovementStarted();
 
             float elapsed = 0f;
