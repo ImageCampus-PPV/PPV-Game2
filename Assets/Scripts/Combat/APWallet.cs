@@ -25,6 +25,7 @@ namespace Assets.Scripts.Combat
         public void Init()
         {
             EventBus.Subscribe<APConsumeRequestAceptedEvent>(OnAPConsume);
+            EventBus.Subscribe<APRefillEvent>(OnAPRefill);
         }
 
         private void OnAPConsume(in APConsumeRequestAceptedEvent apConsumeRequestAceptedEvent)
@@ -32,9 +33,15 @@ namespace Assets.Scripts.Combat
             _currentAP -= apConsumeRequestAceptedEvent._amountConsume;
         }
 
+        private void OnAPRefill(in APRefillEvent apConsumeRequestAceptedEvent)
+        {
+            _currentAP = MAX_AP;
+        }
+
         public void Dispose()
         {
             EventBus.Unsubscribe<APConsumeRequestAceptedEvent>(OnAPConsume);
+            EventBus.Unsubscribe<APRefillEvent>(OnAPRefill);
         }
     }
 
