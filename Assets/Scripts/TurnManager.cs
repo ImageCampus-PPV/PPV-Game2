@@ -56,6 +56,9 @@ public class TurnManager : IService
                 EnemiesTurn();
             }
         }
+
+        if(Input.GetKeyUp(KeyCode.Space))
+            EnemiesTurn();
     }
 
     private void StunAttackAttack()
