@@ -5,8 +5,8 @@ namespace Assets.Scripts.Combat
     [CreateAssetMenu(fileName = "APWalletConfiguration", menuName = "ScriptableObjects/APWalletConfiguration")]
     public class APWalletConfiguration : ScriptableObject
     {
-        public uint _maxAP = 0;
-        public uint _APPerTurn = 0;
-        public uint _startingAP = 0;
+        public int _maxAP = 0;
+        public int _APPerTurn = 0;
+        public int _startingAP = 0;
     }
 }

@@ -14040,7 +14040,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af51e9a3721c294dafaa15358accce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _APWalletConfiguration: {fileID: 11400000, guid: d8ff18a3e66feea42a4d8dc0885c6bd1, type: 2}
+  _APWalletConfiguration: {fileID: 0}
   _habilitiesDurationConfiguration: {fileID: 11400000, guid: 9bd95554dc7745d44afb09cf0ffb9ea5, type: 2}
 --- !u!4 &1973655150
 Transform:

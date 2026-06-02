@@ -21,6 +21,23 @@ public class Player : Unit
     public Cell SelectedTargetCell => _selectedTargetCell;
     public List<Cell> PlannedPath => _plannedPath;
 
+    private uint _life = 100;
+    public uint Life => _life;
+
+    public void SetLife(uint life)
+    {
+        _life = life;
+    }
+
+    public void ReduceLife(uint life)
+    {
+        _life -= life;
+    }
+
+    public void AddLife(uint life)
+    {
+        _life += life;
+    }
 
     private void Awake()
     {
@@ -28,6 +45,9 @@ public class Player : Unit
     }
     private void Update()
     {
+        if (IsMoving)
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -105,7 +125,7 @@ public class Player : Unit
 
     private void OnDrawGizmos()
     {
-        if (!Application.isPlaying)
+        if (!Application.isPlaying || IsMoving)
             return;
 
         if (_selectedTargetCell == null)

@@ -2,18 +2,18 @@
 
 internal struct APWalletChangeEvent : IEvent
 {
-    public uint currentAPAmount;
-    public uint maxAPamount;
+    public int currentAPAmount;
+    public int maxAPamount;
 
     public void Assign(params object[] parameters)
     {
-        currentAPAmount = (uint)parameters[0];
-        maxAPamount = (uint)parameters[1];
+        currentAPAmount = (int)parameters[0];
+        maxAPamount = (int)parameters[1];
     }
 
     public void Reset()
     {
-        currentAPAmount = default(uint);
-        maxAPamount = default(uint);
+        currentAPAmount = default(int);
+        maxAPamount = default(int);
     }
 }
