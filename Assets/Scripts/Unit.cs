@@ -3,9 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitController : MonoBehaviour
+public class Unit : MonoBehaviour
 {
     PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
+
+    public const uint NULL_UNIT = 0;
+
+    private uint _unitID = NULL_UNIT;
+
+    public uint ID => _unitID; 
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
@@ -35,8 +41,13 @@ public class UnitController : MonoBehaviour
         if (_currentCell != null)
         {
             transform.position = GetStandPosition(_currentCell.GetWorldTopPosition());
-            _currentCell.isOccupied = true;
+            _currentCell.stander = this;
         }
+    }
+
+    public void SetID(uint id)
+    {
+        _unitID = id;
     }
 
     protected void RequestPath(Cell targetCell)
@@ -74,7 +85,6 @@ public class UnitController : MonoBehaviour
             Cell targetCell = _currentPath[_pathIndex];
             Vector3 startPos = transform.position;
 
-            //Horizontal movement
             Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
             Vector3 finalTarget;
 
@@ -88,9 +98,9 @@ public class UnitController : MonoBehaviour
 
             Cell previousCell = _currentCell;
             _currentCell = targetCell;
-            previousCell.isOccupied = false;
-            _currentCell.isOccupied = true;
-            OnMovementStarted(); //Replace with event call
+            previousCell.stander = null;
+            _currentCell.stander = this;
+            OnMovementStarted();
 
             float elapsed = 0f;
             while (elapsed < _timeToMoveCells)
@@ -102,7 +112,6 @@ public class UnitController : MonoBehaviour
                 yield return null;
             }
 
-            //Height adjustment
             elapsed = 0f;
             float heightTime = _timeToMoveCells * 0.5f;
 
