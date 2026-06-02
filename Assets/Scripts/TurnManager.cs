@@ -32,6 +32,7 @@ public class TurnManager : IService
     {
         EventBus.Raise<TurnChangeEvent>(_currenturn);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+        EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.Players.First().Life);
     }
 
     public void Tick()
@@ -57,7 +58,7 @@ public class TurnManager : IService
             }
         }
 
-        if(Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyUp(KeyCode.Space))
             EnemiesTurn();
     }
 
@@ -77,6 +78,7 @@ public class TurnManager : IService
             if (IsCellNearUnit(EntityRegistry.Players.First().CurrentCell, clickedCell))
             {
                 EventBus.Raise<APConsumeRequestAceptedEvent>(1);
+                clickedCell.stander.gameObject.GetComponent<Renderer>().material.color = Color.blue;
                 _stunUnits[clickedCell.stander.ID] = _currenturn + HabilitiesDurationConfiguration.stunDuration;
                 EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
             }
@@ -116,8 +118,9 @@ public class TurnManager : IService
 
         foreach (HeavyEnemy heavyEnemy in EntityRegistry.HeavyEnemies)
         {
-            if (IsCellNearUnit(heavyEnemy.CurrentCell, EntityRegistry.Players.First().CurrentCell))
-                EntityRegistry.Players.First().ReduceLife(heavyEnemy.Damage);
+            if (!_stunUnits.ContainsKey(heavyEnemy.ID))
+                if (IsCellNearUnit(heavyEnemy.CurrentCell, EntityRegistry.Players.First().CurrentCell))
+                    EntityRegistry.Players.First().ReduceLife(heavyEnemy.Damage);
         }
 
         CheckStunColdown();
@@ -131,7 +134,10 @@ public class TurnManager : IService
                     removeFromStunList.Add(stunEntities.Key);
 
             foreach (uint key in removeFromStunList)
+            {
+                EntityRegistry.GetAs<Unit>(key).GetComponent<Renderer>().material.color = Color.red;
                 _stunUnits.Remove(key);
+            }
         }
 
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
