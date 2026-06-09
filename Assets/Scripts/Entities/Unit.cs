@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
+    protected PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
 
     public const uint NULL_UNIT = 0;
 
