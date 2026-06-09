@@ -62,7 +62,7 @@ public class Player : Unit
 
     private void ReactToInput(Cell clickedCell)
     {
-        if (_selectedTargetCell == clickedCell)
+        if (_selectedTargetCell == clickedCell && clickedCell != _currentCell)
         {
             _isTurnReady = true;
             return;

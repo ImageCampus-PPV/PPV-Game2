@@ -15,7 +15,6 @@ public class TurnManager : IService
     private EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
-    private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
 
     private HabilitiesDurationConfiguration HabilitiesDurationConfiguration => ServiceProvider.Instance.GetService<HabilitiesDurationConfiguration>();
 
@@ -48,7 +47,6 @@ public class TurnManager : IService
         }
         else
         {
-
             if (_player.IsTurnReady)
             {
                 _player.HandleMovement();
@@ -75,7 +73,7 @@ public class TurnManager : IService
 
             if (IsCellNearUnit(EntityRegistry.Players.First().CurrentCell, clickedCell))
             {
-                EventBus.Raise<APConsumeRequestAceptedEvent>(1);
+                EventBus.Raise<APConsumeRequestAceptedEvent>(1); //Replace one for ability AP Cost variable
                 clickedCell.stander.gameObject.GetComponent<Renderer>().material.color = Color.blue;
                 _stunUnits[clickedCell.stander.ID] = _currenturn + HabilitiesDurationConfiguration.stunDuration;
                 EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - 1, APWallet.MaxAP);
