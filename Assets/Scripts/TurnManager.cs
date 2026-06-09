@@ -18,10 +18,13 @@ public class TurnManager : IService
     private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
 
     private HabilitiesDurationConfiguration HabilitiesDurationConfiguration => ServiceProvider.Instance.GetService<HabilitiesDurationConfiguration>();
+    private LagSpikeAbility _lagSpikeAbility;
+    private CounterAbility _counterAbility;
 
     private Dictionary<uint, uint> _stunUnits;
 
     private uint _currenturn = 1;
+
 
     public TurnManager()
     {
@@ -34,6 +37,9 @@ public class TurnManager : IService
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
         EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.Players.First().Life);
 
+        _lagSpikeAbility = new LagSpikeAbility();
+        _counterAbility = new CounterAbility();
+
         AbilitySystem.RegisterAbility(new LagSpikeAbility());
         AbilitySystem.RegisterAbility(new CounterAbility());
     }
@@ -44,56 +50,37 @@ public class TurnManager : IService
             return;
 
         if (Input.GetKeyDown(KeyCode.Q))
+            TryUseAbility(_lagSpikeAbility);
+
+        if (Input.GetKeyDown(KeyCode.E))
+            TryUseAbility(_counterAbility);
+
+        Player player = EntityRegistry.Players.First();
+        if (player.IsTurnReady)
         {
-            StunAttackAttack();
-
-            //EnemiesTurn();
-        }
-        else
-        {
-            Player player = EntityRegistry.Players.First();
-
-            if (player.IsTurnReady)
-            {
-                player.HandleMovement();
-
-                EnemiesTurn();
-            }
+            player.HandleMovement();
+            EnemiesTurn();
         }
 
         //if (Input.GetKeyUp(KeyCode.Space))
         //    EnemiesTurn();
     }
 
-    private void StunAttackAttack()
+    private void TryUseAbility(IAbility ability)
     {
-        if (APWallet.CurrentAP == 0)
-            return;
-
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
-        {
-            if (hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
-                if (clickedCell.stander == null)
-                    return;
+        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
+            return;
 
-            Player player = EntityRegistry.Players.First();
+        if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
+            return;
 
-            if (IsCellNearUnit(player.CurrentCell, clickedCell, player.AttackRange))
-            {
-                EventBus.Raise<APConsumeRequestAceptedEvent>(1);
-                clickedCell.stander.gameObject.GetComponent<Renderer>().material.color = Color.blue;
-                _stunUnits[clickedCell.stander.ID] = _currenturn + 1 + HabilitiesDurationConfiguration.stunDuration;
-                clickedCell.stander.Stun();
-                EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - 1, APWallet.MaxAP);
-            }
-        }
-
-        //EnemiesTurn();
+        Player player = EntityRegistry.Players.First();
+        AbilitySystem.UseAbility(ability, player, clickedCell);
     }
 
-    private bool IsCellNearUnit(Cell unitCell, Cell cell, int maxDistance)
+    public bool IsCellNearUnit(Cell unitCell, Cell cell, int maxDistance)
     {
         Vector2Int origin = unitCell.Coordinates;
         Vector2Int target = cell.Coordinates;
@@ -186,5 +173,6 @@ public class TurnManager : IService
     {
         unit.Stun();
         _stunUnits[unit.ID] = _currenturn + 1 + HabilitiesDurationConfiguration.stunDuration;
+        unit.gameObject.GetComponent<Renderer>().material.color = Color.blue;
     }
 }
