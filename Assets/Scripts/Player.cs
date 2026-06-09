@@ -16,8 +16,6 @@ public class Player : Unit
     private bool _isTurnReady = false;
     public bool IsTurnReady => _isTurnReady;
 
-    //FOR PATH DEBUGING ONLY
-    MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
     public Cell SelectedTargetCell => _selectedTargetCell;
     public List<Cell> PlannedPath => _plannedPath;
 
@@ -57,6 +55,9 @@ public class Player : Unit
                 if (hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
                     ReactToInput(clickedCell);
         }
+
+        if(Input.GetKeyUp(KeyCode.Space))
+            _isTurnReady = true;
     }
 
     private void ReactToInput(Cell clickedCell)
@@ -86,6 +87,8 @@ public class Player : Unit
 
     public void HandleMovement()
     {
+        _isTurnReady = false;
+
         if (_selectedTargetCell == null)
             return;
 
@@ -93,7 +96,6 @@ public class Player : Unit
             return;
 
         Debug.Log("HANDLE MOVEMENT CALLED");
-        _isTurnReady = false;
         RequestPath(_selectedTargetCell);
         EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
     }
