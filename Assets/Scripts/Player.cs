@@ -16,8 +16,6 @@ public class Player : Unit
     private bool _isTurnReady = false;
     public bool IsTurnReady => _isTurnReady;
 
-    //FOR PATH DEBUGING ONLY
-    MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
     public Cell SelectedTargetCell => _selectedTargetCell;
     public List<Cell> PlannedPath => _plannedPath;
 
