@@ -5,15 +5,12 @@ using UnityEngine;
 public abstract class Enemy : Unit
 {
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
-
-    [Header("Enemy")]
-    [SerializeField] protected uint _damage = 10;
-    [SerializeField] protected int _attackRange = 4;
-    [SerializeField] protected int _fortitude = 2;
+    private PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
 
 
+    private uint _damage = 10;
     public uint Damage => _damage;
-    public int AttackRange => _attackRange;
+    private int _movementRange = 4;
 
     public void TakeTurn(Cell playerCell)
     {
@@ -50,7 +47,7 @@ public abstract class Enemy : Unit
 
     private bool IsInRange(Cell playerCell)
     {
-        return GetGridDistance(_currentCell, playerCell) <= _attackRange;
+        return GetGridDistance(_currentCell, playerCell) <= _movementRange;
     }
 
     private bool IsInGoodCover(Cell playerCell)
@@ -69,10 +66,10 @@ public abstract class Enemy : Unit
         Cell fallbackCell = null;
         float fallbackDist = float.MaxValue;
 
-        int minX = Mathf.Max(0, playerCell.Coordinates.x - _attackRange);
-        int maxX = Mathf.Min(MapGrid.Width - 1, playerCell.Coordinates.x + _attackRange);
-        int minZ = Mathf.Max(0, playerCell.Coordinates.y - _attackRange);
-        int maxZ = Mathf.Min(MapGrid.Height - 1, playerCell.Coordinates.y + _attackRange);
+        int minX = Mathf.Max(0, playerCell.Coordinates.x - _movementRange);
+        int maxX = Mathf.Min(MapGrid.Width - 1, playerCell.Coordinates.x + _movementRange);
+        int minZ = Mathf.Max(0, playerCell.Coordinates.y - _movementRange);
+        int maxZ = Mathf.Min(MapGrid.Height - 1, playerCell.Coordinates.y + _movementRange);
 
         for (int x = minX; x <= maxX; x++)
         {
@@ -91,7 +88,7 @@ public abstract class Enemy : Unit
 
                 int distToPlayer = GetGridDistance(cell, playerCell);
 
-                if (distToPlayer > _attackRange)
+                if (distToPlayer > _movementRange)
                     continue;
 
                 //Make sure enemy can reach the cell
@@ -117,7 +114,7 @@ public abstract class Enemy : Unit
                 if (!IsInRange(playerCell))
                 {
                     //Try to stay close to attack range
-                    float rangeScore = Mathf.Abs(distToPlayer - _attackRange);
+                    float rangeScore = Mathf.Abs(distToPlayer - _movementRange);
 
                     if (rangeScore < fallbackDist)
                     {

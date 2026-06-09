@@ -48,26 +48,21 @@ namespace Assets.Scripts.Entities
         public EntityType GetAs<EntityType>(uint ID) where EntityType : Unit
         {
             if (ID == Unit.NULL_UNIT)
-            {
                 throw new NullReferenceException("Unit id 0 represents a null entity");
-            }
 
             if (!_entities.ContainsKey(ID))
-            {
                 throw new KeyNotFoundException(ID.ToString());
-            }
 
             if (_entities[ID] is not EntityType)
-            {
                 throw new InvalidCastException($"An attempt was made to obtain a type {_entities[ID].GetType().Name}"
                                              + $"entity as type {typeof(EntityType).Name} from the EntityRegistry");
-            }
 
             return _entities[ID] as EntityType;
         }
 
         public IEnumerable<Enemy> Enemies => FilterEntities<Enemy>();
         public IEnumerable<HeavyEnemy> HeavyEnemies => FilterEntities<HeavyEnemy>();
+        public IEnumerable<LightEnemy> LightEnemies => FilterEntities<LightEnemy>();
         public IEnumerable<Player> Players => FilterEntities<Player>();
         public IEnumerable<Unit> Units => FilterEntities<Unit>();
 

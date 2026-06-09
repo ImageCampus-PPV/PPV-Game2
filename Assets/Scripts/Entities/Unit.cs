@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Unit : MonoBehaviour
+public abstract class Unit : MonoBehaviour
 {
     protected PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
 
@@ -26,6 +26,12 @@ public class Unit : MonoBehaviour
 
     protected Cell _currentCell;
 
+    private int _attackRange = 4;
+    public int AttackRange => _attackRange;
+
+    private bool _isStun = false;
+    public bool IsStun => _isStun;
+
     public Cell CurrentCell => _currentCell;
     public bool IsMoving => _isMoving;
 
@@ -43,6 +49,16 @@ public class Unit : MonoBehaviour
             transform.position = GetStandPosition(_currentCell.GetWorldTopPosition());
             _currentCell.stander = this;
         }
+    }
+
+    public void Stun()
+    {
+        _isStun = true;
+    }
+
+    public void Unstun()
+    {
+        _isStun = false;
     }
 
     public void SetID(uint id)
@@ -180,6 +196,11 @@ public class Unit : MonoBehaviour
     protected virtual void OnMovementStarted() { }
 
     protected virtual void OnMovementFinished() { }
+
+    public virtual IEnumerator<Vector2Int> AttackPattern()
+    {
+
+    }
 
     protected Vector3 GetStandPosition(Vector3 basePosition)
     {
