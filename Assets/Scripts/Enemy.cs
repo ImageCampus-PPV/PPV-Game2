@@ -1,21 +1,19 @@
 using ImageCampus.ToolBox.Services;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : UnitController
+public abstract class Enemy : Unit
 {
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
     private PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
 
     [Header("Enemy")]
+    [SerializeField] private uint _damage = 10;
+    public uint Damage => _damage;
     [SerializeField] private int _attackRange = 4;
 
     public void TakeTurn(Cell playerCell)
     {
-        if (_isMoving)
-            return;
-
         if (IsInGoodCover(playerCell))
         {
             Debug.Log($"{name} holding position");
@@ -78,6 +76,9 @@ public class EnemyController : UnitController
             for (int z = minZ; z <= maxZ; z++)
             {
                 Cell cell = MapGrid.GetCell(x, z);
+
+                if (cell == null)
+                    continue;
 
                 if (!cell.IsWalkable)
                     continue;
