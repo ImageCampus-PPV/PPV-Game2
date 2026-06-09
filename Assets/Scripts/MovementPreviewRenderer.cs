@@ -36,8 +36,8 @@ public class MovementPreviewRenderer : MonoBehaviour
             _lastAP != APWallet.CurrentAP ||
             _lastPlayerCell != _player.CurrentCell;
 
-        if (!shouldRefresh)
-            return;
+        //if (!shouldRefresh)
+        //    return;
 
         RefreshVisuals();
 
