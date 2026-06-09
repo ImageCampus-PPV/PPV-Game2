@@ -6,9 +6,15 @@ public abstract class Enemy : Unit
 {
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
 
-    private uint _damage = 10;
+    protected uint _damage = 10;
+    protected int _movementRange = 1;
+    protected int _fortitude = 2;
+    protected int _pushDistance = 2;
+
     public uint Damage => _damage;
-    private int _movementRange = 4;
+    public int MovementRange => _movementRange;
+    public int Fortitude => _fortitude;
+    public int PushDistance => _pushDistance;
 
     public void TakeTurn(Cell playerCell)
     {

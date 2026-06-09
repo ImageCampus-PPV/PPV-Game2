@@ -193,6 +193,17 @@ public abstract class Unit : MonoBehaviour
         OnMovementFinished();
     }
 
+    public void MoveInstant(Cell targetCell)
+    {
+        if (_currentCell != null)
+            _currentCell.stander = null;
+
+        _currentCell = targetCell;
+        _currentCell.stander = this;
+
+        transform.position = GetStandPosition(targetCell.GetWorldTopPosition());
+    }
+
     protected virtual void OnMovementStarted() { }
 
     protected virtual void OnMovementFinished() { }

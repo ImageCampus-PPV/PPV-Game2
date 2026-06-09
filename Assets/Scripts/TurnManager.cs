@@ -15,6 +15,7 @@ public class TurnManager : IService
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+    private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
 
     private HabilitiesDurationConfiguration HabilitiesDurationConfiguration => ServiceProvider.Instance.GetService<HabilitiesDurationConfiguration>();
 
@@ -32,6 +33,9 @@ public class TurnManager : IService
         EventBus.Raise<TurnChangeEvent>(_currenturn);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
         EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.Players.First().Life);
+
+        AbilitySystem.RegisterAbility(new LagSpikeAbility());
+        AbilitySystem.RegisterAbility(new CounterAbility());
     }
 
     public void Tick()
@@ -39,7 +43,7 @@ public class TurnManager : IService
         if (!IsEndOfTurn())
             return;
 
-        if (Input.GetMouseButtonUp(1))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             StunAttackAttack();
 
@@ -176,5 +180,11 @@ public class TurnManager : IService
         }
 
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
+    }
+
+    public void ApplyStun(Unit unit)
+    {
+        unit.Stun();
+        _stunUnits[unit.ID] = _currenturn + 1 + HabilitiesDurationConfiguration.stunDuration;
     }
 }
