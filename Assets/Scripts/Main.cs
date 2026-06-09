@@ -25,6 +25,7 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
 
         _turnManager = new TurnManager();
+        ServiceProvider.Instance.AddService<TurnManager>(_turnManager);
 
         MapGrid.Init();
         EntityRegistry.Init();

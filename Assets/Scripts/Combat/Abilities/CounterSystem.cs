@@ -46,9 +46,9 @@ public class CounterSystem : IService
             }
 
             current = nextCell;
+            enemy.MoveInstant(current);
         }
 
-        enemy.MoveInstant(current);
     }
 
     private void ResolveCollision(Enemy enemyA, Enemy enemyB, Vector2Int direction, int remainingDistance)

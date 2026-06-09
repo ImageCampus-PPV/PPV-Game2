@@ -74,6 +74,7 @@ public class Player : Unit
             if (GetPathCost(clickedCell) <= APWallet.CurrentAP)
             {
                 _plannedAPCost = GetPathCost(clickedCell);
+                EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
                 EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
                 _plannedPath = GetPathCells(clickedCell);
                 _selectedTargetCell = clickedCell;
@@ -82,6 +83,7 @@ public class Player : Unit
         else if(clickedCell == _currentCell)
         {
             _plannedAPCost = 0;
+            EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
             EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
             _plannedPath.Clear();
             _selectedTargetCell = clickedCell;
@@ -105,6 +107,7 @@ public class Player : Unit
         Debug.Log("HANDLE MOVEMENT CALLED");
         RequestPath(_selectedTargetCell);
         EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
     }
 
     public int GetPathCostPreview(Cell targetCell)

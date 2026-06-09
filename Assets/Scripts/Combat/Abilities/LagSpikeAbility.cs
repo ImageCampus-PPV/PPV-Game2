@@ -1,5 +1,4 @@
 using Assets.Scripts.Combat;
-using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 
@@ -7,12 +6,11 @@ public class LagSpikeAbility : IAbility
 {
     public string Name => "LagSpike";
     public int APCost => 1;
-
-    private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
-
-    private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
+    public int Range => 2;
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
+    private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
+    private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
 
     public bool CanExecute(Player player, Cell targetCell)
     {
@@ -23,6 +21,9 @@ public class LagSpikeAbility : IAbility
             return false;
 
         if (APWallet.CurrentAP < APCost)
+            return false;
+
+        if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
             return false;
 
         return true;

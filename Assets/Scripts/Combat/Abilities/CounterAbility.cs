@@ -1,18 +1,16 @@
 using Assets.Scripts.Combat;
-using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 
 public class CounterAbility : IAbility
 {
     public string Name => "Counter";
-
     public int APCost => 1;
+    public int Range => 1;
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
-
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
-
+    private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
     private CounterSystem CounterSystem => ServiceProvider.Instance.GetService<CounterSystem>();
 
     public bool CanExecute(Player player, Cell targetCell)
@@ -24,6 +22,9 @@ public class CounterAbility : IAbility
             return false;
 
         if (APWallet.CurrentAP < APCost)
+            return false;
+
+        if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
             return false;
 
         return true;
