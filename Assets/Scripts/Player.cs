@@ -79,6 +79,13 @@ public class Player : Unit
                 _selectedTargetCell = clickedCell;
             }
         }
+        else if(clickedCell == _currentCell)
+        {
+            _plannedAPCost = 0;
+            EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
+            _plannedPath.Clear();
+            _selectedTargetCell = clickedCell;
+        }
         else
             _selectedTargetCell = null;
 

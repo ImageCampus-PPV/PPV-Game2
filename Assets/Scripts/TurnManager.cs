@@ -20,8 +20,8 @@ public class TurnManager : IService
     private HabilitiesDurationConfiguration HabilitiesDurationConfiguration => ServiceProvider.Instance.GetService<HabilitiesDurationConfiguration>();
 
     private Dictionary<uint, uint> _stunUnits;
-
     private uint _currenturn = 1;
+    private Player _player;
 
     public TurnManager()
     {
@@ -33,6 +33,7 @@ public class TurnManager : IService
         EventBus.Raise<TurnChangeEvent>(_currenturn);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
         EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.Players.First().Life);
+        _player = EntityRegistry.Players.First();
     }
 
     public void Tick()
@@ -43,17 +44,14 @@ public class TurnManager : IService
         if (Input.GetMouseButtonUp(1))
         {
             StunAttackAttack();
-
-            EnemiesTurn();
+            //EnemiesTurn();
         }
         else
         {
-            Player player = EntityRegistry.Players.First();
 
-            if (player.IsTurnReady)
+            if (_player.IsTurnReady)
             {
-                player.HandleMovement();
-
+                _player.HandleMovement();
                 EnemiesTurn();
             }
         }
@@ -80,11 +78,11 @@ public class TurnManager : IService
                 EventBus.Raise<APConsumeRequestAceptedEvent>(1);
                 clickedCell.stander.gameObject.GetComponent<Renderer>().material.color = Color.blue;
                 _stunUnits[clickedCell.stander.ID] = _currenturn + HabilitiesDurationConfiguration.stunDuration;
-                EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+                EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - 1, APWallet.MaxAP);
             }
         }
 
-        EnemiesTurn();
+        //EnemiesTurn();
     }
 
     private bool IsCellNearUnit(Cell unitCell, Cell cell)
