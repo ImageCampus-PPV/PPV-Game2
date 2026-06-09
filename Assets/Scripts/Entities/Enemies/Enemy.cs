@@ -5,8 +5,6 @@ using UnityEngine;
 public abstract class Enemy : Unit
 {
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
-    private PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
-
 
     private uint _damage = 10;
     public uint Damage => _damage;

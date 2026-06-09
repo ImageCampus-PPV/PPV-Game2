@@ -199,7 +199,7 @@ public abstract class Unit : MonoBehaviour
 
     public virtual IEnumerator<Vector2Int> AttackPattern()
     {
-
+        return null;
     }
 
     protected Vector3 GetStandPosition(Vector3 basePosition)

@@ -43,7 +43,7 @@ public class TurnManager : IService
         {
             StunAttackAttack();
 
-            EnemiesTurn();
+            //EnemiesTurn();
         }
         else
         {
@@ -57,8 +57,8 @@ public class TurnManager : IService
             }
         }
 
-        if (Input.GetKeyUp(KeyCode.Space))
-            EnemiesTurn();
+        //if (Input.GetKeyUp(KeyCode.Space))
+        //    EnemiesTurn();
     }
 
     private void StunAttackAttack()
@@ -82,11 +82,11 @@ public class TurnManager : IService
                 clickedCell.stander.gameObject.GetComponent<Renderer>().material.color = Color.blue;
                 _stunUnits[clickedCell.stander.ID] = _currenturn + 1 + HabilitiesDurationConfiguration.stunDuration;
                 clickedCell.stander.Stun();
-                EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+                EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - 1, APWallet.MaxAP);
             }
         }
 
-        EnemiesTurn();
+        //EnemiesTurn();
     }
 
     private bool IsCellNearUnit(Cell unitCell, Cell cell, int maxDistance)
