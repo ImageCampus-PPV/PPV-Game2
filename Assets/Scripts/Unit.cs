@@ -97,6 +97,10 @@ public class Unit : MonoBehaviour
         }
 
         List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
+
+        if (path == null)
+            return -1;
+
         return path.Count - 1;
     }
 
@@ -113,10 +117,13 @@ public class Unit : MonoBehaviour
 
     protected IEnumerator FollowPath()
     {
-
         while (_pathIndex < _currentPath.Count)
         {
             Cell targetCell = _currentPath[_pathIndex];
+
+            if (targetCell.isOccupied)
+                break;
+
             Vector3 startPos = transform.position;
 
             Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
