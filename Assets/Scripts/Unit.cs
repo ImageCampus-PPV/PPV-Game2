@@ -3,15 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Unit : MonoBehaviour
+public class Unit : BaseEntity
 {
     PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
-
-    public const uint NULL_UNIT = 0;
-
-    private uint _unitID = NULL_UNIT;
-
-    public uint ID => _unitID;
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
@@ -43,11 +37,6 @@ public class Unit : MonoBehaviour
             transform.position = GetStandPosition(_currentCell.GetWorldTopPosition());
             _currentCell.stander = this;
         }
-    }
-
-    public void SetID(uint id)
-    {
-        _unitID = id;
     }
 
     protected void RequestPath(Cell targetCell)
