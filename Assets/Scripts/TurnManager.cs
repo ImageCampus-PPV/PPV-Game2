@@ -32,7 +32,7 @@ public class TurnManager : IService
     {
         EventBus.Raise<TurnChangeEvent>(_currenturn);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
-        EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.Players.First().Life);
+        EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
     }
 
     public void Tick()
@@ -48,7 +48,7 @@ public class TurnManager : IService
         }
         else
         {
-            Player player = EntityRegistry.Players.First();
+            Player player = EntityRegistry.FilterEntities<Player>().First();
 
             if (player.IsTurnReady)
             {
@@ -75,7 +75,7 @@ public class TurnManager : IService
                 if (clickedCell.stander == null)
                     return;
 
-            if (IsCellNearUnit(EntityRegistry.Players.First().CurrentCell, clickedCell))
+            if (IsCellNearUnit(EntityRegistry.FilterEntities<Player>().First().CurrentCell, clickedCell))
             {
                 EventBus.Raise<APConsumeRequestAceptedEvent>(1);
                 clickedCell.stander.gameObject.GetComponent<Renderer>().material.color = Color.blue;
@@ -100,7 +100,7 @@ public class TurnManager : IService
 
     private bool IsEndOfTurn()
     {
-        foreach (Unit unit in EntityRegistry.Units)
+        foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
         {
             if (unit.IsMoving)
                 return false;
@@ -111,16 +111,16 @@ public class TurnManager : IService
 
     public void EnemiesTurn()
     {
-        foreach (Enemy enemy in EntityRegistry.Enemies)
+        foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
             if (!_stunUnits.ContainsKey(enemy.ID))
-                foreach (Player player in EntityRegistry.Players)
+                foreach (Player player in EntityRegistry.FilterEntities<Player>())
                     enemy.TakeTurn(player.CurrentCell);
 
-        foreach (HeavyEnemy heavyEnemy in EntityRegistry.HeavyEnemies)
+        foreach (HeavyEnemy heavyEnemy in EntityRegistry.FilterEntities<HeavyEnemy>())
         {
             if (!_stunUnits.ContainsKey(heavyEnemy.ID))
-                if (IsCellNearUnit(heavyEnemy.CurrentCell, EntityRegistry.Players.First().CurrentCell))
-                    EntityRegistry.Players.First().ReduceLife(heavyEnemy.Damage);
+                if (IsCellNearUnit(heavyEnemy.CurrentCell, EntityRegistry.FilterEntities<Player>().First().CurrentCell))
+                    EntityRegistry.FilterEntities<Player>().First().ReduceLife(heavyEnemy.Damage);
         }
 
         CheckStunColdown();
