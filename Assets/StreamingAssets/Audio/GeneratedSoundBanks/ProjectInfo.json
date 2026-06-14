@@ -1,0 +1,36 @@
+{
+ "ProjectInfo": {
+  "Project": {
+   "Name": "PPV-Game2_WwiseProject",
+   "GUID": "{8E3A2C0D-6AFB-4EF0-B285-78FD5846575C}",
+   "Generator": "2024.1.7.8863"
+  },
+  "CacheRoot": "../../../../PPV-Game2_WwiseProject/.cache",
+  "Platforms": [
+   {
+    "Name": "Mac",
+    "GUID": "{83DBC00D-87A3-48CE-8B27-ED5472D9883A}",
+    "BasePlatform": "Mac",
+    "BasePlatformGUID": "{9C6217D5-DD11-4795-87C1-6CE02853C540}",
+    "Path": "../../../../PPV-Game2_WwiseProject/GeneratedSoundBanks/Mac"
+   },
+   {
+    "Name": "Windows",
+    "GUID": "{FC855028-CEC6-4324-97C1-5720CAA74021}",
+    "BasePlatform": "Windows",
+    "BasePlatformGUID": "{6E0CB257-C6C8-4C5C-8366-2740DFC441EB}",
+    "Path": "../../../../PPV-Game2_WwiseProject/GeneratedSoundBanks/Windows"
+   }
+  ],
+  "Languages": [
+   {
+    "Name": "English(US)",
+    "Id": "684519430",
+    "GUID": "{32591B85-291E-410A-87B1-CA3DDB912409}",
+    "Default": "true",
+    "UseAsStandIn": "true"
+   }
+  ],
+  "FileHash": "{88862A00-9C6B-9761-0BCA-D0A397D36DC1}"
+ }
+}
