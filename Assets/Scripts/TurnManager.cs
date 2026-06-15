@@ -3,7 +3,6 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
