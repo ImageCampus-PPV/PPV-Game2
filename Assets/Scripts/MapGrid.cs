@@ -21,6 +21,10 @@ public class MapGrid : IService, IDisposable
     {
         EventBus.Subscribe<InfectTilesEvent>(OnTileContagiousSpread);
         EventBus.Subscribe<TurnTileHealing>(OnTileTurnHeal);
+        EventBus.Subscribe<TurnsTileContagious>(OnTurnsTileContagious);
+        EventBus.Subscribe<TurnTileIntoUnstable>(OnTurnTileIntoUnstable);
+        EventBus.Subscribe<TurnTileBroken>(OnTurnTileBroken);
+
         Build();
     }
 
@@ -138,6 +142,41 @@ public class MapGrid : IService, IDisposable
             cell.Transition(typeof(Healing));
     }
 
+    private void OnTurnsTileContagious(in TurnsTileContagious turnsTileContagious)
+    {
+        Vector2Int posToCheck = new Vector2Int(turnsTileContagious.coordX, turnsTileContagious.coordY);
+        Cell cell = posToCheck.x >=
+             Width || posToCheck.x < 0 || posToCheck.y >= Height || posToCheck.y < 0 ?
+             null :
+             GetCell(posToCheck);
+
+        if (cell)
+            cell.Transition(typeof(Contagious));
+    }
+
+    private void OnTurnTileIntoUnstable(in TurnTileIntoUnstable turnTileIntoUnstable)
+    {
+        Vector2Int posToCheck = new Vector2Int(turnTileIntoUnstable.coordX, turnTileIntoUnstable.coordY);
+        Cell cell = posToCheck.x >=
+             Width || posToCheck.x < 0 || posToCheck.y >= Height || posToCheck.y < 0 ?
+             null :
+             GetCell(posToCheck);
+
+        if (cell)
+            cell.Transition(typeof(Unstable));
+    }
+    private void OnTurnTileBroken(in TurnTileBroken turnTileIntoUnstable)
+    {
+        Vector2Int posToCheck = new Vector2Int(turnTileIntoUnstable.coordX, turnTileIntoUnstable.coordY);
+        Cell cell = posToCheck.x >=
+             Width || posToCheck.x < 0 || posToCheck.y >= Height || posToCheck.y < 0 ?
+             null :
+             GetCell(posToCheck);
+
+        if (cell)
+            cell.Transition(typeof(Broken));
+    }
+
     public void Dispose()
     {
         EventBus.Unsubscribe<InfectTilesEvent>(OnTileContagiousSpread);
@@ -145,6 +184,60 @@ public class MapGrid : IService, IDisposable
 }
 
 public struct TurnTileHealing : IEvent
+{
+    public int coordX;
+    public int coordY;
+
+    public void Assign(params object[] parameters)
+    {
+        coordX = (int)parameters[0];
+        coordY = (int)parameters[1];
+    }
+
+    public void Reset()
+    {
+        coordX = default(int);
+        coordY = default(int);
+    }
+}
+
+public struct TurnsTileContagious : IEvent
+{
+    public int coordX;
+    public int coordY;
+
+    public void Assign(params object[] parameters)
+    {
+        coordX = (int)parameters[0];
+        coordY = (int)parameters[1];
+    }
+
+    public void Reset()
+    {
+        coordX = default(int);
+        coordY = default(int);
+    }
+}
+
+public struct TurnTileIntoUnstable : IEvent
+{
+    public int coordX;
+    public int coordY;
+
+    public void Assign(params object[] parameters)
+    {
+        coordX = (int)parameters[0];
+        coordY = (int)parameters[1];
+    }
+
+    public void Reset()
+    {
+        coordX = default(int);
+        coordY = default(int);
+    }
+}
+
+public struct TurnTileBroken : IEvent
 {
     public int coordX;
     public int coordY;
