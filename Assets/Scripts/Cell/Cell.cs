@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,12 +24,52 @@ public class Cell : MonoBehaviour
 
     private Bounds _bounds;
 
-    public bool IsWalkable => _isWalkable;
+    private FSM _fsm;
+
+    public bool IsWalkable => _isWalkable && _fsm.GetState() != typeof(Broken);
     public bool IsHeightConnector => _isHeightConnector;
     public bool ProvidesCover => _providesCover;
     public int Height => _height;
     public float WorldHeight => _height * _heightStep;
     public Vector2Int Coordinates => _coordinates;
+
+    //Replace this disgrace.
+    private bool _justTransitioned = false;
+
+    public void Init()
+    {
+        _fsm = new FSM(typeof(DefaultCell));
+
+        _bounds = GetComponentInChildren<Renderer>().bounds;
+
+        Renderer renderer = GetComponent<Renderer>();
+
+        _fsm.AddState<DefaultCell>();
+        _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { renderer });
+        _fsm.AddState<Broken>(onEnterParameters: () => new object[] { renderer });
+        _fsm.AddState<Healing>(onEnterParameters: () => new object[] { renderer }, onTickParameters: () => new object[] { stander });
+        _fsm.AddState<Contagious>(onEnterParameters: () => new object[] { 10u, _coordinates, renderer }, onTickParameters: () => new object[] { stander });
+        _fsm.AddState<Infected>(onEnterParameters: () => new object[] { 10u, renderer }, onTickParameters: () => new object[] { stander });
+    }
+
+    public void Tick(float deltTime)
+    {
+        if (!_justTransitioned)
+            _fsm.Tick();
+
+        _justTransitioned = false;
+    }
+
+    public void Transition(Type type)
+    {
+        _justTransitioned = true;
+        _fsm.Transition(type);
+    }
+
+    public Type GetState()
+    {
+        return _fsm.GetState();
+    }
 
     public int CalculateFCost()
     {
@@ -41,10 +82,6 @@ public class Cell : MonoBehaviour
         ApplyHeight();
     }
 
-    private void Awake()
-    {
-        _bounds = GetComponentInChildren<Renderer>().bounds;
-    }
 
     private void Start()
     {

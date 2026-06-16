@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Unit : BaseEntity
 {
-    PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
+    protected PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
@@ -19,6 +19,12 @@ public class Unit : BaseEntity
     protected bool _isMoving;
 
     protected Cell _currentCell;
+
+    private int _attackRange = 4;
+    public int AttackRange => _attackRange;
+
+    private bool _isStun = false;
+    public bool IsStun => _isStun;
 
     public Cell CurrentCell => _currentCell;
     public bool IsMoving => _isMoving;
@@ -37,6 +43,16 @@ public class Unit : BaseEntity
             transform.position = GetStandPosition(_currentCell.GetWorldTopPosition());
             _currentCell.stander = this;
         }
+    }
+
+    public void Stun()
+    {
+        _isStun = true;
+    }
+
+    public void Unstun()
+    {
+        _isStun = false;
     }
 
     protected void RequestPath(Cell targetCell)
@@ -86,6 +102,10 @@ public class Unit : BaseEntity
         }
 
         List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
+
+        if (path == null)
+            return -1;
+
         return path.Count - 1;
     }
 
@@ -102,10 +122,13 @@ public class Unit : BaseEntity
 
     protected IEnumerator FollowPath()
     {
-
         while (_pathIndex < _currentPath.Count)
         {
             Cell targetCell = _currentPath[_pathIndex];
+
+            if (targetCell.isOccupied)
+                break;
+
             Vector3 startPos = transform.position;
 
             Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
@@ -159,9 +182,25 @@ public class Unit : BaseEntity
         OnMovementFinished();
     }
 
+    public void MoveInstant(Cell targetCell)
+    {
+        if (_currentCell != null)
+            _currentCell.stander = null;
+
+        _currentCell = targetCell;
+        _currentCell.stander = this;
+
+        transform.position = GetStandPosition(targetCell.GetWorldTopPosition());
+    }
+
     protected virtual void OnMovementStarted() { }
 
     protected virtual void OnMovementFinished() { }
+
+    public virtual IEnumerator<Vector2Int> AttackPattern()
+    {
+        return null;
+    }
 
     protected Vector3 GetStandPosition(Vector3 basePosition)
     {

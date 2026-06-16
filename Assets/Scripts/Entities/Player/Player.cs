@@ -16,8 +16,6 @@ public class Player : Unit
     private bool _isTurnReady = false;
     public bool IsTurnReady => _isTurnReady;
 
-    //FOR PATH DEBUGING ONLY
-    MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
     public Cell SelectedTargetCell => _selectedTargetCell;
     public List<Cell> PlannedPath => _plannedPath;
 
@@ -31,7 +29,11 @@ public class Player : Unit
 
     public void ReduceLife(uint life)
     {
-        _life -= life;
+        if ((int)_life - life <= 0)
+            _life = 0;
+        else
+            _life -= life;
+
         EventBus.Raise<PlayerChangeLifeEvent>(_life);
     }
 
@@ -61,7 +63,7 @@ public class Player : Unit
 
     private void ReactToInput(Cell clickedCell)
     {
-        if (_selectedTargetCell == clickedCell)
+        if (_selectedTargetCell == clickedCell && clickedCell != _currentCell)
         {
             _isTurnReady = true;
             return;
@@ -73,10 +75,19 @@ public class Player : Unit
             if (GetPathCost(clickedCell) <= APWallet.CurrentAP)
             {
                 _plannedAPCost = GetPathCost(clickedCell);
+                EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
                 EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
                 _plannedPath = GetPathCells(clickedCell);
                 _selectedTargetCell = clickedCell;
             }
+        }
+        else if(clickedCell == _currentCell)
+        {
+            _plannedAPCost = 0;
+            EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
+            EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
+            _plannedPath.Clear();
+            _selectedTargetCell = clickedCell;
         }
         else
             _selectedTargetCell = null;
@@ -86,6 +97,8 @@ public class Player : Unit
 
     public void HandleMovement()
     {
+        _isTurnReady = false;
+
         if (_selectedTargetCell == null)
             return;
 
@@ -93,9 +106,9 @@ public class Player : Unit
             return;
 
         Debug.Log("HANDLE MOVEMENT CALLED");
-        _isTurnReady = false;
         RequestPath(_selectedTargetCell);
         EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
     }
 
     public int GetPathCostPreview(Cell targetCell)
