@@ -124,7 +124,7 @@ public sealed class Healing : State
             () =>
             {
                 if (unitOnTop is Player player)
-                    player.ReduceLife(_healing);
+                    player.AddLife(_healing);
             }
         );
 
