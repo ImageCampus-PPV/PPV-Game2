@@ -21,7 +21,11 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());
+        ServiceProvider.Instance.AddService<AbilitySystem>(new AbilitySystem());
+        ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
+
         _turnManager = new TurnManager();
+        ServiceProvider.Instance.AddService<TurnManager>(_turnManager);
 
         MapGrid.Init();
         EntityRegistry.Init();
