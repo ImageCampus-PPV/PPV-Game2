@@ -31,7 +31,11 @@ public class Player : Unit
 
     public void ReduceLife(uint life)
     {
-        _life -= life;
+        if (_life - life < 0)
+            life = 0;
+        else
+            _life -= life;
+
         EventBus.Raise<PlayerChangeLifeEvent>(_life);
     }
 
