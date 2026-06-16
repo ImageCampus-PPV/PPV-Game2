@@ -1,0 +1,89 @@
+﻿====================================================
+EVENT
+  Generated: 2026-06-16 18:09:04
+  Total events: 15
+====================================================
+
+EVENT: APConsumeRequestAceptedEvent
+  Parameters (1):
+    - _amountConsume : Int32
+  Usage hint : APConsumeRequestAceptedEvent : <_amountConsume>
+
+EVENT: APRefillEvent
+  Parameters: (none)
+
+EVENT: APWalletChangeEvent
+  Parameters (2):
+    - currentAPAmount : Int32
+    - maxAPamount : Int32
+  Usage hint : APWalletChangeEvent : <currentAPAmount>, <maxAPamount>
+
+EVENT: InfectTilesEvent
+  Parameters (1):
+    - position : Vector2Int
+  Usage hint : InfectTilesEvent : <position>
+
+EVENT: PlayerChangeLifeEvent
+  Parameters (1):
+    - currentLife : UInt32
+  Usage hint : PlayerChangeLifeEvent : <currentLife>
+
+EVENT: PostWwiseEvent
+  Parameters (2):
+    - EventName : String
+    - SoundEmitterGameObjectID : UInt64
+  Usage hint : PostWwiseEvent : <EventName>, <SoundEmitterGameObjectID>
+
+EVENT: RegisterWwiseGameObject
+  Parameters (1):
+    - entityID : UInt32
+  Usage hint : RegisterWwiseGameObject : <entityID>
+
+EVENT: SetWwiseRTPCValue
+  Parameters (2):
+    - RtpcName : String
+    - RtpcValue : Single
+  Usage hint : SetWwiseRTPCValue : <RtpcName>, <RtpcValue>
+
+EVENT: SetWwiseState
+  Parameters (2):
+    - StateGroupName : String
+    - StateName : String
+  Usage hint : SetWwiseState : <StateGroupName>, <StateName>
+
+EVENT: SetWwiseSwitch
+  Parameters (3):
+    - SwitchGroupName : String
+    - SwitchStateName : String
+    - SoundEmitterGameObjectID : UInt64
+  Usage hint : SetWwiseSwitch : <SwitchGroupName>, <SwitchStateName>, <SoundEmitterGameObjectID>
+
+EVENT: TurnChangeEvent
+  Parameters (1):
+    - currentTurn : UInt32
+  Usage hint : TurnChangeEvent : <currentTurn>
+
+EVENT: TurnsTileContagious
+  Parameters (2):
+    - coordX : Int32
+    - coordY : Int32
+  Usage hint : TurnsTileContagious : <coordX>, <coordY>
+
+EVENT: TurnTileBroken
+  Parameters (2):
+    - coordX : Int32
+    - coordY : Int32
+  Usage hint : TurnTileBroken : <coordX>, <coordY>
+
+EVENT: TurnTileHealing
+  Parameters (2):
+    - coordX : Int32
+    - coordY : Int32
+  Usage hint : TurnTileHealing : <coordX>, <coordY>
+
+EVENT: TurnTileIntoUnstable
+  Parameters (2):
+    - coordX : Int32
+    - coordY : Int32
+  Usage hint : TurnTileIntoUnstable : <coordX>, <coordY>
+
