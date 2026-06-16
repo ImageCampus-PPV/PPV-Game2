@@ -33,6 +33,9 @@ public class Cell : MonoBehaviour
     public float WorldHeight => _height * _heightStep;
     public Vector2Int Coordinates => _coordinates;
 
+    //Replace this disgrace.
+    private bool _justTransitioned = false;
+
     public void Init()
     {
         _fsm = new FSM(typeof(DefaultCell));
@@ -51,11 +54,15 @@ public class Cell : MonoBehaviour
 
     public void Tick(float deltTime)
     {
-        _fsm.Tick();
+        if (!_justTransitioned)
+            _fsm.Tick();
+
+        _justTransitioned = false;
     }
 
     public void Transition(Type type)
     {
+        _justTransitioned = true;
         _fsm.Transition(type);
     }
 
