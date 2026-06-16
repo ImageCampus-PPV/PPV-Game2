@@ -29,8 +29,8 @@ public class Player : Unit
 
     public void ReduceLife(uint life)
     {
-        if (_life - life < 0)
-            life = 0;
+        if (_life - life <= 0)
+            _life = 0;
         else
             _life -= life;
 
