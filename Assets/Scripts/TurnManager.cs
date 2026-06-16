@@ -56,7 +56,8 @@ public class TurnManager : IService
         if (Input.GetKeyDown(KeyCode.E))
             TryUseAbility(_counterAbility);
 
-        Player player = EntityRegistry.Players.First();
+        Player player = EntityRegistry.FilterEntities<Player>().First();
+
         if (player.IsTurnReady)
         {
             player.HandleMovement();
@@ -65,8 +66,6 @@ public class TurnManager : IService
         }
         else
         {
-            Player player = EntityRegistry.FilterEntities<Player>().First();
-
             if (player.IsTurnReady)
             {
                 player.HandleMovement();
@@ -93,7 +92,7 @@ public class TurnManager : IService
         if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
             return;
 
-        Player player = EntityRegistry.Players.First();
+        Player player = EntityRegistry.FilterEntities<Player>().First();
         AbilitySystem.UseAbility(ability, player, clickedCell);
     }
 
@@ -148,17 +147,17 @@ public class TurnManager : IService
                 foreach (Player player in EntityRegistry.FilterEntities<Player>())
                     enemy.TakeTurn(player.CurrentCell);
 
-        foreach (HeavyEnemy heavyEnemy in EntityRegistry.HeavyEnemies)
+        foreach (HeavyEnemy heavyEnemy in EntityRegistry.FilterEntities<HeavyEnemy>())
             if (!heavyEnemy.IsStun)
-                if (IsCellNearUnit(heavyEnemy.CurrentCell, EntityRegistry.Players.First().CurrentCell, heavyEnemy.AttackRange))
-                    EntityRegistry.Players.First().ReduceLife(heavyEnemy.Damage);
+                if (IsCellNearUnit(heavyEnemy.CurrentCell, EntityRegistry.FilterEntities<Player>().First().CurrentCell, heavyEnemy.AttackRange))
+                    EntityRegistry.FilterEntities<Player>().First().ReduceLife(heavyEnemy.Damage);
 
-        foreach (LightEnemy lightEnemy in EntityRegistry.LightEnemies)
+        foreach (LightEnemy lightEnemy in EntityRegistry.FilterEntities<LightEnemy>())
             if (!lightEnemy.IsStun)
-                if (IsCellNearUnit(lightEnemy.CurrentCell, EntityRegistry.Players.First().CurrentCell, lightEnemy.AttackRange))
+                if (IsCellNearUnit(lightEnemy.CurrentCell, EntityRegistry.FilterEntities<Player>().First().CurrentCell, lightEnemy.AttackRange))
                 {
                     if (lightEnemy.IsChargedAttack)
-                        EntityRegistry.Players.First().ReduceLife(lightEnemy.Damage);
+                        EntityRegistry.FilterEntities<Player>().First().ReduceLife(lightEnemy.Damage);
                     else
                         lightEnemy.ChargeAttack();
                 }

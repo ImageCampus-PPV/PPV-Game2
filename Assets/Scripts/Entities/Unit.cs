@@ -55,11 +55,6 @@ public class Unit : BaseEntity
         _isStun = false;
     }
 
-    public void SetID(uint id)
-    {
-        _unitID = id;
-    }
-
     protected void RequestPath(Cell targetCell)
     {
         if (!IsCellAvailable(targetCell))
