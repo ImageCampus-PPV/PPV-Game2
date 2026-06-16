@@ -29,7 +29,7 @@ public class Player : Unit
 
     public void ReduceLife(uint life)
     {
-        if (_life - life <= 0)
+        if ((int)_life - life <= 0)
             _life = 0;
         else
             _life -= life;
@@ -59,9 +59,6 @@ public class Player : Unit
                 if (hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
                     ReactToInput(clickedCell);
         }
-
-        if(Input.GetKeyUp(KeyCode.Space))
-            _isTurnReady = true;
     }
 
     private void ReactToInput(Cell clickedCell)
