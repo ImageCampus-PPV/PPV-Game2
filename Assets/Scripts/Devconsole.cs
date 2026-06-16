@@ -3,10 +3,10 @@ using ImageCampus.ToolBox.Services;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(InputField))]
 public class Devconsole : MonoBehaviour
 {
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
@@ -16,7 +16,7 @@ public class Devconsole : MonoBehaviour
     private Dictionary<string, Type> _eventsTypeByName;
     private Dictionary<Type, List<Type>> _variablesTypeByEventType;
 
-    InputField inputField;
+    private TMP_InputField inputField;
 
     public Devconsole()
     {
@@ -24,7 +24,7 @@ public class Devconsole : MonoBehaviour
 
     private void Start()
     {
-        inputField = GetComponent<InputField>();
+        inputField = GetComponent<TMP_InputField>();
 
         _eventsTypeByName = new Dictionary<string, Type>();
         _variablesTypeByEventType = new Dictionary<Type, List<Type>>();
