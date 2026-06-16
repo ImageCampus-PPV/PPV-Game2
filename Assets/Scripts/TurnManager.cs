@@ -44,6 +44,7 @@ public class TurnManager : IService
             StunAttackAttack();
 
             EnemiesTurn();
+            MapGrid.Tick(Time.deltaTime);
         }
         else
         {
@@ -54,11 +55,15 @@ public class TurnManager : IService
                 player.HandleMovement();
 
                 EnemiesTurn();
+                MapGrid.Tick(Time.deltaTime);
             }
         }
 
         if (Input.GetKeyUp(KeyCode.Space))
+        {
             EnemiesTurn();
+            MapGrid.Tick(Time.deltaTime);
+        }
     }
 
     private void StunAttackAttack()

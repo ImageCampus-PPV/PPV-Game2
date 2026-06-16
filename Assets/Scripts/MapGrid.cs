@@ -1,13 +1,16 @@
+using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using UnityEngine;
 
-public class MapGrid : IService
+public class MapGrid : IService, IDisposable
 {
     public bool IsPersistance => false;
 
+    EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
+
     [SerializeField] private int _cellsX;
     [SerializeField] private int _cellsZ;
-    [SerializeField] private float _cellsSize;
     public int Width => _cellsX;
     public int Height => _cellsZ;
 
@@ -16,12 +19,13 @@ public class MapGrid : IService
 
     public void Init()
     {
-        RebuildGrid();
+        EventBus.Subscribe<InfectTilesEvent>(OnTileContagiousSpread);
+        Build();
     }
 
-    private void RebuildGrid()
+    private void Build()
     {
-        Cell[] cells = Object.FindObjectsOfType<Cell>();
+        Cell[] cells = UnityEngine.Object.FindObjectsOfType<Cell>();
 
         if (cells.Length == 0)
             return;
@@ -41,7 +45,11 @@ public class MapGrid : IService
             int z = coord.y - minZ;
 
             _gridArray[x, z] = cell;
+
+            cell.Init();
         }
+
+        GetCell(new Vector2Int(_cellsX - 1, _cellsZ - 1)).Transition(typeof(Contagious));
 
         (int minX, int minZ, int maxX, int maxZ) GetMinMaxSize()
         {
@@ -65,6 +73,12 @@ public class MapGrid : IService
         }
     }
 
+    public void Tick(float deltaTime)
+    {
+        foreach (Cell cell in _gridArray)
+            cell.Tick(deltaTime);
+    }
+
     public Cell GetCell(Vector2Int coordinates)
     {
         return _gridArray[coordinates.x, coordinates.y];
@@ -84,4 +98,35 @@ public class MapGrid : IService
         //    ((Mathf.Abs(z) % 2) == 1 ? new Vector3(1, 0, 0) * _cellsSize * .5f : Vector3.zero);
     }
 
+    private void OnTileContagiousSpread(in InfectTilesEvent infectTilesEvent)
+    {
+        Vector2Int[] directions =
+       {
+        Vector2Int.up,
+        Vector2Int.down,
+        Vector2Int.left,
+        Vector2Int.right
+    };
+
+
+        Vector2Int posToCheck;
+
+        foreach (Vector2Int dir in directions)
+        {
+            posToCheck = infectTilesEvent.position + dir;
+
+            Cell neighbor = posToCheck.x >=
+                Width || posToCheck.x < 0 || posToCheck.y >= Height || posToCheck.y < 0 ?
+                null :
+                GetCell(infectTilesEvent.position + dir);
+
+            if (neighbor != null && neighbor.IsWalkable && neighbor.GetState() != typeof(Infected) && neighbor.GetState() != typeof(Contagious))
+                neighbor.Transition(typeof(Contagious));
+        }
+    }
+
+    public void Dispose()
+    {
+        EventBus.Unsubscribe<InfectTilesEvent>(OnTileContagiousSpread);
+    }
 }
