@@ -1,7 +1,11 @@
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using Unity.VisualScripting;
 using UnityEngine;
+using EventBus = ImageCampus.ToolBox.Events.EventBus;
 
 public class MapGrid : IService, IDisposable
 {
@@ -30,6 +34,17 @@ public class MapGrid : IService, IDisposable
 
     private void Build()
     {
+        Dictionary<string, Type> cellTypesPerName = new Dictionary<string, Type>();
+
+        foreach (Type type in GetType().Assembly.GetTypes())
+        {
+            if (type.GetAttribute<CellStateAttribute>() == null)
+                continue;
+
+            cellTypesPerName.Add(type.Name, type);
+        }
+
+
         Cell[] cells = UnityEngine.Object.FindObjectsOfType<Cell>();
 
         if (cells.Length == 0)
@@ -51,10 +66,8 @@ public class MapGrid : IService, IDisposable
 
             _gridArray[x, z] = cell;
 
-            cell.Init();
+            cell.Init(cellTypesPerName[cell.InitialState]);
         }
-
-        GetCell(new Vector2Int(_cellsX - 1, _cellsZ - 1)).Transition(typeof(Contagious));
 
         (int minX, int minZ, int maxX, int maxZ) GetMinMaxSize()
         {

@@ -2,6 +2,7 @@
 using ImageCampus.ToolBox.Services;
 using UnityEngine;
 
+[CellState(1,1,1,1)]
 public sealed class DefaultCell : State
 {
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
@@ -20,6 +21,7 @@ public sealed class DefaultCell : State
     }
 }
 
+[CellState(0,0,0,1)]
 public sealed class Broken : State
 {
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
@@ -44,6 +46,7 @@ public sealed class Broken : State
     }
 }
 
+[CellState(0.5f, 0.5f, 0.5f, 1)]
 public sealed class Unstable : State
 {
     private int _turnToBeDestroy = 0;
@@ -87,6 +90,7 @@ public sealed class Unstable : State
     }
 }
 
+[CellState(1.0f, 0.92f, 0.016f, 1.0f)]
 public sealed class Healing : State
 {
     private uint _healing = 20;
@@ -132,6 +136,7 @@ public sealed class Healing : State
     }
 }
 
+[CellState(0.62f, 0.125f, 0.94f, 1.0f)]
 public class Infected : State
 {
     protected uint _damage = 0;
@@ -172,6 +177,7 @@ public class Infected : State
     }
 }
 
+[CellState(1.0f, 0.078f, 0.5764f, 1.0f)]
 public class Contagious : Infected
 {
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();

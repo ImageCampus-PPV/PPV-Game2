@@ -24,6 +24,10 @@ public class Cell : MonoBehaviour
 
     private Bounds _bounds;
 
+    [SerializeField] private string _initialState = nameof(DefaultCell);
+
+    public string InitialState => _initialState;
+
     private FSM _fsm;
 
     public bool IsWalkable => _isWalkable && _fsm.GetState() != typeof(Broken);
@@ -33,14 +37,23 @@ public class Cell : MonoBehaviour
     public float WorldHeight => _height * _heightStep;
     public Vector2Int Coordinates => _coordinates;
 
-    //Replace this disgrace.
     private bool _justTransitioned = false;
 
-    public void Init()
+    public void SetCoordinate(Vector2Int coordinates)
     {
-        _fsm = new FSM(typeof(DefaultCell));
+        _coordinates = coordinates;
+    }
 
-        _bounds = GetComponentInChildren<Renderer>().bounds;
+    public void SetInitialState(string typeName)
+    {
+        _initialState = typeName;
+    }
+
+    public void Init(Type initialState)
+    {
+        _fsm = new FSM(initialState);
+
+        _bounds = GetComponent<MeshRenderer>().bounds;
 
         Renderer renderer = GetComponent<Renderer>();
 
