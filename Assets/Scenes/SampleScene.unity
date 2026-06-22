@@ -4040,7 +4040,8 @@ MonoBehaviour:
   _reachableCellPrefab: {fileID: 7279457351147869013, guid: 0e0fb0ecb6533cf4caf5a5237f32fcdf, type: 3}
   _pathCellPrefab: {fileID: 7279457351147869013, guid: c074060e29b4d5949b4bd82ee81f1cd7, type: 3}
   _targetCellPrefab: {fileID: 7279457351147869013, guid: c2f9c8fa2bc88394789c1b12bffc239b, type: 3}
-  _YOffset: 0.03
+  _waypointCellPrefab: {fileID: 7279457351147869013, guid: 04de7be8bf3f7b74bacb0ddfe7eabf76, type: 3}
+  _yOffset: 0.1
 --- !u!4 &667709797
 Transform:
   m_ObjectHideFlags: 0
@@ -14363,6 +14364,7 @@ MonoBehaviour:
   _spawnCell: {fileID: 447111256}
   _timeToMoveCells: 0.2
   _timeToStayInCell: 0.05
+  _maxTicksPerTurn: 7
 --- !u!136 &1913740773
 CapsuleCollider:
   m_ObjectHideFlags: 0
