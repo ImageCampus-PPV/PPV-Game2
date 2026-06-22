@@ -109,6 +109,22 @@ public class Unit : BaseEntity
         return path.Count - 1;
     }
 
+    protected int GetPathCost(Cell originCell, Cell targetCell)
+    {
+        if (!IsCellAvailable(targetCell))
+        {
+            Debug.LogWarning("Target cell unavailable");
+            return -1;
+        }
+
+        List<Cell> path = PathFinding.FindPath(originCell.Coordinates, targetCell.Coordinates);
+
+        if (path == null)
+            return -1;
+
+        return path.Count - 1;
+    }
+
     protected List<Cell> GetPathCells(Cell targetCell)
     {
         if (!IsCellAvailable(targetCell))
@@ -120,8 +136,85 @@ public class Unit : BaseEntity
         return PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
     }
 
+    protected List<Cell> GetPathCells(Cell originCell, Cell targetCell)
+    {
+        if (!IsCellAvailable(targetCell))
+        {
+            Debug.LogWarning("Target cell unavailable");
+            return null;
+        }
+
+        return PathFinding.FindPath(originCell.Coordinates, targetCell.Coordinates);
+    }
+
     protected IEnumerator FollowPath()
     {
+        while (_pathIndex < _currentPath.Count)
+        {
+            Cell targetCell = _currentPath[_pathIndex];
+
+            if (targetCell.isOccupied)
+                break;
+
+            Vector3 startPos = transform.position;
+
+            Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
+            Vector3 finalTarget;
+
+            if (targetCell.Height != _currentCell.Height)
+                finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
+            else
+            {
+                finalTarget = targetCell.transform.position;
+                finalTarget.y = transform.position.y;
+            }
+
+            Cell previousCell = _currentCell;
+            _currentCell = targetCell;
+            previousCell.stander = null;
+            _currentCell.stander = this;
+            OnMovementStarted();
+
+            float elapsed = 0f;
+            while (elapsed < _timeToMoveCells)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / _timeToMoveCells;
+
+                transform.position = Vector3.Lerp(startPos, flatTarget, t);
+                yield return null;
+            }
+
+            elapsed = 0f;
+            float heightTime = _timeToMoveCells * 0.5f;
+
+            while (elapsed < heightTime)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / heightTime;
+
+                transform.position = Vector3.Lerp(flatTarget, finalTarget, t);
+                yield return null;
+            }
+
+            transform.position = finalTarget;
+
+            _pathIndex++;
+
+            if (_timeToStayInCell > 0)
+                yield return new WaitForSeconds(_timeToStayInCell);
+        }
+
+        _isMoving = false;
+        OnMovementFinished();
+    }
+
+    protected IEnumerator FollowPath(List<Cell> path)
+    {
+        _currentPath = new List<Cell>(path);
+        _pathIndex = 0;
+        _isMoving = true;
+
         while (_pathIndex < _currentPath.Count)
         {
             Cell targetCell = _currentPath[_pathIndex];
