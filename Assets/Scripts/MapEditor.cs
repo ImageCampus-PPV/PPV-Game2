@@ -385,6 +385,7 @@ public class CellEditorWindow : EditorWindow
     private Action<CellData> onStateChanged;
     private Dictionary<string, Type> _cellStatesPerName;
     private DropdownField cellTypeDropdown;
+    private Toggle playerCanSpawnThereField;
     private Label cellInfoLabel;
 
     public static void ShowWindow(CellData inCell, Action<CellData> onChanged = null)
@@ -436,12 +437,23 @@ public class CellEditorWindow : EditorWindow
             defaultIndex: 0
         );
 
+        playerCanSpawnThereField = new Toggle("Player Spawn Point");
+
         cellTypeDropdown.RegisterValueChangedCallback(evt =>
         {
             cell._initialState = evt.newValue;
             onStateChanged?.Invoke(cell);
         });
 
+        playerCanSpawnThereField.RegisterValueChangedCallback(evt =>
+        {
+
+            cell._spawnPlayer = evt.newValue;
+
+            onStateChanged?.Invoke(cell);
+        });
+
+        root.Add(playerCanSpawnThereField);
         root.Add(cellTypeDropdown);
 
         RefreshGUI();

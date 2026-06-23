@@ -1,4 +1,5 @@
 using Assets.Scripts.Combat;
+using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using System.Collections.Generic;
@@ -10,7 +11,6 @@ public class Player : Unit
     private int _plannedTicks;
     public int MaxTicksPerTurn => _maxTicksPerTurn;
     public int PlannedTicks => _plannedTicks;
-
     APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
 
@@ -42,6 +42,8 @@ public class Player : Unit
     public void SetLife(uint life)
     {
         _life = life;
+
+        EventBus.Raise<PlayerChangeLifeEvent>(_life);
     }
 
     public void ReduceLife(uint life)
@@ -57,6 +59,15 @@ public class Player : Unit
     public void AddLife(uint life)
     {
         _life += life;
+
+        EventBus.Raise<PlayerChangeLifeEvent>(_life);
+
+    }
+
+    public override void Init()
+    {
+        base.Init();
+        ServiceProvider.Instance.GetService<EntityRegistry>().Add(this);
     }
 
     private void Update()

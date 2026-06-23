@@ -21,11 +21,14 @@ public class MapGrid : IService, IDisposable
     //This should be optimize.
     private CellsMaps _cellMap;
 
+    private GameObject _playerPrefab;
+
     private Cell[,] _gridArray;
     [SerializeField] private GameObject _cellPrefab;
 
-    public MapGrid(CellsMaps cellsMaps)
+    public MapGrid(GameObject playerPrefab, CellsMaps cellsMaps)
     {
+        _playerPrefab = playerPrefab;
         _cellMap = cellsMaps;
     }
 
@@ -44,6 +47,10 @@ public class MapGrid : IService, IDisposable
     {
         _cellsX = _cellMap.size.x;
         _cellsZ = _cellMap.size.y;
+
+        GameObject goPlayer = UnityEngine.Object.Instantiate(_playerPrefab);
+
+        Player player = goPlayer.AddComponent<Player>();
 
         Dictionary<string, Type> cellStatesPerName = new Dictionary<string, Type>();
 
@@ -66,7 +73,13 @@ public class MapGrid : IService, IDisposable
 
             cellObject.SetCoordinate(cell._coordinates);
             cellObject.Init(cellStatesPerName[cell._initialState]);
+
+            if (cell._spawnPlayer && player.SpawnCell == null)
+                player.SetSpawnCell(cellObject);
         }
+
+        player.Init();
+
     }
 
     public void Tick(float deltaTime)

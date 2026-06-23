@@ -10,6 +10,9 @@ public class Unit : BaseEntity
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
 
+    public Cell SpawnCell => _spawnCell;
+    public void SetSpawnCell(Cell spawnCell) => _spawnCell = spawnCell;
+
     [Header("Movement")]
     [SerializeField] protected float _timeToMoveCells = 0.2f;
     [SerializeField] protected float _timeToStayInCell = 0.05f;
@@ -29,7 +32,7 @@ public class Unit : BaseEntity
     public Cell CurrentCell => _currentCell;
     public bool IsMoving => _isMoving;
 
-    protected virtual void Start()
+    public virtual void Init()
     {
         Spawn();
     }

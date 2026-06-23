@@ -10,6 +10,7 @@ public class Main : MonoBehaviour
     private EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
     private TurnManager _turnManager;
 
+    [SerializeField] private GameObject playerPrefab;
     [SerializeField] private APWalletConfiguration _APWalletConfiguration;
     [SerializeField] private HabilitiesDurationConfiguration _habilitiesDurationConfiguration;
     [SerializeField] private CellsMaps _cellMap;
@@ -19,7 +20,7 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<EventBus>(new EventBus());
-        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(_cellMap));
+        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(playerPrefab, _cellMap));
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());

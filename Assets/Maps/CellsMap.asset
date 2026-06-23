@@ -16,7 +16,7 @@ MonoBehaviour:
   _cellsData:
   - _initialState: Healing
     _coordinates: {x: 0, y: 0}
-    _spawnPlayer: 0
+    _spawnPlayer: 1
     _spawnEnemy: 
   - _initialState: DefaultCell
     _coordinates: {x: 0, y: 1}
