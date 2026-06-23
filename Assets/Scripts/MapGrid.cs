@@ -1,7 +1,11 @@
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using Unity.VisualScripting;
 using UnityEngine;
+using EventBus = ImageCampus.ToolBox.Events.EventBus;
 
 public class MapGrid : IService, IDisposable
 {
@@ -14,8 +18,16 @@ public class MapGrid : IService, IDisposable
     public int Width => _cellsX;
     public int Height => _cellsZ;
 
+    //This should be optimize.
+    private CellsMaps _cellMap;
+
     private Cell[,] _gridArray;
     [SerializeField] private GameObject _cellPrefab;
+
+    public MapGrid(CellsMaps cellsMaps)
+    {
+        _cellMap = cellsMaps;
+    }
 
     public void Init()
     {
@@ -30,51 +42,30 @@ public class MapGrid : IService, IDisposable
 
     private void Build()
     {
-        Cell[] cells = UnityEngine.Object.FindObjectsOfType<Cell>();
+        _cellsX = _cellMap.size.x;
+        _cellsZ = _cellMap.size.y;
 
-        if (cells.Length == 0)
-            return;
+        Dictionary<string, Type> cellStatesPerName = new Dictionary<string, Type>();
 
-        (int minX, int minZ, int maxX, int maxZ) = GetMinMaxSize();
-
-        _cellsX = maxX - minX + 1;
-        _cellsZ = maxZ - minZ + 1;
-
-        _gridArray = new Cell[_cellsX, _cellsZ];
-
-        foreach (Cell cell in cells)
+        foreach (Type type in GetType().Assembly.GetTypes())
         {
-            Vector2Int coord = cell.Coordinates;
-
-            int x = coord.x - minX;
-            int z = coord.y - minZ;
-
-            _gridArray[x, z] = cell;
-
-            cell.Init();
+            if (typeof(State).IsAssignableFrom(type) && type.GetCustomAttribute<CellStateAttribute>() != null)
+                cellStatesPerName.Add(type.Name, type);
         }
 
-        GetCell(new Vector2Int(_cellsX - 1, _cellsZ - 1)).Transition(typeof(Contagious));
+        _gridArray = new Cell[_cellMap.size.x, _cellMap.size.y];
 
-        (int minX, int minZ, int maxX, int maxZ) GetMinMaxSize()
+        foreach (CellData cell in _cellMap._cellsData)
         {
-            int minX = int.MaxValue;
-            int maxX = int.MinValue;
-            int minZ = int.MaxValue;
-            int maxZ = int.MinValue;
+            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.transform.position = new Vector3(cell._coordinates.x * 1.25f, 0.0f, cell._coordinates.y * 1.25f);
 
-            foreach (Cell cell in cells)
-            {
-                Vector2Int coord = cell.Coordinates;
+            Cell cellObject = go.AddComponent<Cell>();
 
-                if (coord.x < minX) minX = coord.x;
-                if (coord.x > maxX) maxX = coord.x;
+            _gridArray[cell._coordinates.x, cell._coordinates.y] = cellObject;
 
-                if (coord.y < minZ) minZ = coord.y;
-                if (coord.y > maxZ) maxZ = coord.y;
-            }
-
-            return (minX, minZ, maxX, maxZ);
+            cellObject.SetCoordinate(cell._coordinates);
+            cellObject.Init(cellStatesPerName[cell._initialState]);
         }
     }
 

@@ -12,12 +12,14 @@ public class Main : MonoBehaviour
 
     [SerializeField] private APWalletConfiguration _APWalletConfiguration;
     [SerializeField] private HabilitiesDurationConfiguration _habilitiesDurationConfiguration;
+    [SerializeField] private CellsMaps _cellMap;
 
     private void Awake()
     {
         ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
+        ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<EventBus>(new EventBus());
-        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid());
+        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(_cellMap));
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());

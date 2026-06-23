@@ -33,23 +33,29 @@ public class Cell : MonoBehaviour
     public float WorldHeight => _height * _heightStep;
     public Vector2Int Coordinates => _coordinates;
 
-    //Replace this disgrace.
     private bool _justTransitioned = false;
 
-    public void Init()
+    public void SetCoordinate(Vector2Int coordinates)
+    {
+        _coordinates = coordinates;
+    }
+
+    public void Init(Type initialState)
     {
         _fsm = new FSM(typeof(DefaultCell));
 
-        _bounds = GetComponentInChildren<Renderer>().bounds;
+        _bounds = GetComponent<MeshRenderer>().bounds;
 
         Renderer renderer = GetComponent<Renderer>();
 
         _fsm.AddState<DefaultCell>();
-        _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { renderer });
+        _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { renderer, 1 });
         _fsm.AddState<Broken>(onEnterParameters: () => new object[] { renderer });
         _fsm.AddState<Healing>(onEnterParameters: () => new object[] { renderer }, onTickParameters: () => new object[] { stander });
         _fsm.AddState<Contagious>(onEnterParameters: () => new object[] { 10u, _coordinates, renderer }, onTickParameters: () => new object[] { stander });
         _fsm.AddState<Infected>(onEnterParameters: () => new object[] { 10u, renderer }, onTickParameters: () => new object[] { stander });
+
+        _fsm.Transition(initialState);
     }
 
     public void Tick(float deltTime)

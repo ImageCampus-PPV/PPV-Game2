@@ -59,10 +59,6 @@ public class Player : Unit
         _life += life;
     }
 
-    private void Awake()
-    {
-        Debug.Log($"Spawn Cell: {_spawnCell.gameObject}");
-    }
     private void Update()
     {
         if (IsMoving)
