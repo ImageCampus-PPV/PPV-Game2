@@ -24,10 +24,6 @@ public class Cell : MonoBehaviour
 
     private Bounds _bounds;
 
-    [SerializeField] private string _initialState = nameof(DefaultCell);
-
-    public string InitialState => _initialState;
-
     private FSM _fsm;
 
     public bool IsWalkable => _isWalkable && _fsm.GetState() != typeof(Broken);
@@ -44,25 +40,22 @@ public class Cell : MonoBehaviour
         _coordinates = coordinates;
     }
 
-    public void SetInitialState(string typeName)
-    {
-        _initialState = typeName;
-    }
-
     public void Init(Type initialState)
     {
-        _fsm = new FSM(initialState);
+        _fsm = new FSM(typeof(DefaultCell));
 
         _bounds = GetComponent<MeshRenderer>().bounds;
 
         Renderer renderer = GetComponent<Renderer>();
 
         _fsm.AddState<DefaultCell>();
-        _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { renderer });
+        _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { renderer, 1 });
         _fsm.AddState<Broken>(onEnterParameters: () => new object[] { renderer });
         _fsm.AddState<Healing>(onEnterParameters: () => new object[] { renderer }, onTickParameters: () => new object[] { stander });
         _fsm.AddState<Contagious>(onEnterParameters: () => new object[] { 10u, _coordinates, renderer }, onTickParameters: () => new object[] { stander });
         _fsm.AddState<Infected>(onEnterParameters: () => new object[] { 10u, renderer }, onTickParameters: () => new object[] { stander });
+
+        _fsm.Transition(initialState);
     }
 
     public void Tick(float deltTime)

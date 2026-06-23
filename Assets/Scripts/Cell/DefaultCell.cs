@@ -2,7 +2,7 @@
 using ImageCampus.ToolBox.Services;
 using UnityEngine;
 
-[CellState(1,1,1,1)]
+[CellState(1, 1, 1, 1)]
 public sealed class DefaultCell : State
 {
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
@@ -21,7 +21,7 @@ public sealed class DefaultCell : State
     }
 }
 
-[CellState(0,0,0,1)]
+[CellState(0, 0, 0, 1)]
 public sealed class Broken : State
 {
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
@@ -49,18 +49,18 @@ public sealed class Broken : State
 [CellState(0.5f, 0.5f, 0.5f, 1)]
 public sealed class Unstable : State
 {
-    private int _turnToBeDestroy = 0;
-
+    private int _maxTurnsAlive = 0;
+    private int _turnsSinceCreated = 0;
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
     {
-        int turnToBeDestroy = (int)parameters[0];
-        Renderer renderer = (Renderer)parameters[1];
+        Renderer renderer = (Renderer)parameters[0];
+        int turnToBeDestroy = (int)parameters[1];
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
         behaviourActions.AddUpdateBehaviour
         (
-          () => { this._turnToBeDestroy = turnToBeDestroy; renderer.material.color = Color.gray; }
+          () => { this._maxTurnsAlive = turnToBeDestroy; renderer.material.color = Color.gray; }
         );
 
         return behaviourActions;
@@ -73,15 +73,13 @@ public sealed class Unstable : State
 
     public override BehaviourActions GetOnTickBehaviour(params object[] parameters)
     {
-        int currentTurn = (int)parameters[0];
-
         BehaviourActions behaviourActions = new BehaviourActions();
 
         behaviourActions.AddUpdateBehaviour
             (
             () =>
             {
-                if (_turnToBeDestroy == currentTurn)
+                if (_maxTurnsAlive == ++_turnsSinceCreated)
                     changeState.Invoke(typeof(Broken));
             }
             );

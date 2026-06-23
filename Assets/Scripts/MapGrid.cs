@@ -18,8 +18,16 @@ public class MapGrid : IService, IDisposable
     public int Width => _cellsX;
     public int Height => _cellsZ;
 
+    //This should be optimize.
+    private CellsMaps _cellMap;
+
     private Cell[,] _gridArray;
     [SerializeField] private GameObject _cellPrefab;
+
+    public MapGrid(CellsMaps cellsMaps)
+    {
+        _cellMap = cellsMaps;
+    }
 
     public void Init()
     {
@@ -34,60 +42,30 @@ public class MapGrid : IService, IDisposable
 
     private void Build()
     {
-        Dictionary<string, Type> cellTypesPerName = new Dictionary<string, Type>();
+        _cellsX = _cellMap.size.x;
+        _cellsZ = _cellMap.size.y;
+
+        Dictionary<string, Type> cellStatesPerName = new Dictionary<string, Type>();
 
         foreach (Type type in GetType().Assembly.GetTypes())
         {
-            if (type.GetAttribute<CellStateAttribute>() == null)
-                continue;
-
-            cellTypesPerName.Add(type.Name, type);
+            if (typeof(State).IsAssignableFrom(type) && type.GetCustomAttribute<CellStateAttribute>() != null)
+                cellStatesPerName.Add(type.Name, type);
         }
 
+        _gridArray = new Cell[_cellMap.size.x, _cellMap.size.y];
 
-        Cell[] cells = UnityEngine.Object.FindObjectsOfType<Cell>();
-
-        if (cells.Length == 0)
-            return;
-
-        (int minX, int minZ, int maxX, int maxZ) = GetMinMaxSize();
-
-        _cellsX = maxX - minX + 1;
-        _cellsZ = maxZ - minZ + 1;
-
-        _gridArray = new Cell[_cellsX, _cellsZ];
-
-        foreach (Cell cell in cells)
+        foreach (CellData cell in _cellMap._cellsData)
         {
-            Vector2Int coord = cell.Coordinates;
+            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.transform.position = new Vector3(cell._coordinates.x * 1.25f, 0.0f, cell._coordinates.y * 1.25f);
 
-            int x = coord.x - minX;
-            int z = coord.y - minZ;
+            Cell cellObject = go.AddComponent<Cell>();
 
-            _gridArray[x, z] = cell;
+            _gridArray[cell._coordinates.x, cell._coordinates.y] = cellObject;
 
-            cell.Init(cellTypesPerName[cell.InitialState]);
-        }
-
-        (int minX, int minZ, int maxX, int maxZ) GetMinMaxSize()
-        {
-            int minX = int.MaxValue;
-            int maxX = int.MinValue;
-            int minZ = int.MaxValue;
-            int maxZ = int.MinValue;
-
-            foreach (Cell cell in cells)
-            {
-                Vector2Int coord = cell.Coordinates;
-
-                if (coord.x < minX) minX = coord.x;
-                if (coord.x > maxX) maxX = coord.x;
-
-                if (coord.y < minZ) minZ = coord.y;
-                if (coord.y > maxZ) maxZ = coord.y;
-            }
-
-            return (minX, minZ, maxX, maxZ);
+            cellObject.SetCoordinate(cell._coordinates);
+            cellObject.Init(cellStatesPerName[cell._initialState]);
         }
     }
 
