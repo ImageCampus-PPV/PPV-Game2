@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-public class Cell : MonoBehaviour
+public class Cell : BaseEntity
 {
     [Header("Config")]
     [SerializeField] private bool _isWalkable = true;
