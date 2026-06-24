@@ -36,8 +36,7 @@ public class TurnManager : IService
         EventBus.Raise<TurnChangeEvent>(_currenturn);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
 
-        if (EntityRegistry.ContainsType(typeof(Player)))
-            EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
+        EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
 
         _lagSpikeAbility = new LagSpikeAbility();
         _counterAbility = new CounterAbility();
@@ -50,17 +49,6 @@ public class TurnManager : IService
     {
         if (!IsEndOfTurn())
             return;
-
-        if (!EntityRegistry.ContainsType(typeof(Player)))
-        {
-            if (Input.GetKeyUp(KeyCode.Space))
-            {
-                EnemiesTurn();
-                MapGrid.Tick(Time.deltaTime);
-            }
-
-            return;
-        }
 
         if (Input.GetKeyDown(KeyCode.Q))
             TryUseAbility(_lagSpikeAbility);
