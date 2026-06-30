@@ -77,6 +77,7 @@ public class Player : Unit
 
         if (Input.GetMouseButtonUp(0))
         {
+            Debug.Log("LEFT INPUT DETECTED");
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
@@ -87,6 +88,8 @@ public class Player : Unit
         //Right click removes last waypoint
         if (Input.GetMouseButtonUp(1))
         {
+            Debug.Log("RIGHHT INPUT DETECTED");
+
             Cell previousWaypoint;
             Cell waypointToRemove;
             if (_waypoints.Count == 1)

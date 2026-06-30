@@ -1,15 +1,18 @@
 using Assets.Scripts.Combat;
+using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Services;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MovementPreviewRenderer : MonoBehaviour
 {
     APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+    EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
 
     [Header("References")]
-    [SerializeField] private Player _player;
+    private Player _player => EntityRegistry.FilterEntities<Player>().First();
 
     [Header("Visual Prefabs")]
     [SerializeField] private GameObject _reachableCellPrefab;

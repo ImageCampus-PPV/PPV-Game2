@@ -79,6 +79,7 @@ public class MapGrid : IService, IDisposable
             goCell.transform.position = new Vector3(cell._coordinates.x * 1.25f, 0.0f, cell._coordinates.y * 1.25f);
 
             Cell cellObject = goCell.AddComponent<Cell>();
+            goCell.layer = 6;
 
             _gridArray[cell._coordinates.x, cell._coordinates.y] = cellObject;
 
@@ -116,7 +117,8 @@ public class MapGrid : IService, IDisposable
                 goEnemyScript.Init();
             }
 
-
+            goEnemyScript = null;
+            goEnemy = null;
         }
 
         player.Init();

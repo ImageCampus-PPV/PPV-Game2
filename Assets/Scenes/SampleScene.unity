@@ -794,7 +794,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &667709796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -807,7 +807,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80ac7858f3ab4ef4db74c946d60b8f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovementPreviewRenderer
-  _player: {fileID: 0}
   _reachableCellPrefab: {fileID: 7279457351147869013, guid: 0e0fb0ecb6533cf4caf5a5237f32fcdf, type: 3}
   _pathCellPrefab: {fileID: 7279457351147869013, guid: c074060e29b4d5949b4bd82ee81f1cd7, type: 3}
   _targetCellPrefab: {fileID: 7279457351147869013, guid: c2f9c8fa2bc88394789c1b12bffc239b, type: 3}
