@@ -74,6 +74,7 @@ public class FloorEditor : EditorWindow
         Button saveCellsMapButton = new Button(SaveGridAsCellsMap) { text = "Save Grid As Cells Map" };
         Button loadCellsMapButton = new Button(LoadGridFromCellsMap) { text = "Load Grid From Cells Map" };
         Button selectCellsMapButton = new Button(SelectCellsMapAsset) { text = "Select Asset" };
+        Button clearMapButton = new Button(ClearFloor) { text = "Clear Floor" };
 
         root.Add(_rowsField);
         root.Add(_colsField);
@@ -84,6 +85,7 @@ public class FloorEditor : EditorWindow
         root.Add(saveCellsMapButton);
         root.Add(loadCellsMapButton);
         root.Add(selectCellsMapButton);
+        root.Add(clearMapButton);
 
         _rowsField.RegisterValueChangedCallback(evt => _rows = Mathf.Max(1, evt.newValue));
         _colsField.RegisterValueChangedCallback(evt => _cols = Mathf.Max(1, evt.newValue));
@@ -130,6 +132,18 @@ public class FloorEditor : EditorWindow
         _scrollView.Add(_gridContainer);
 
         RebuildGrid();
+    }
+
+    private void ClearFloor()
+    {
+        for (int i = 0; i < _rows; ++i)
+            for (int j = 0; j < _cols; ++j)
+            {
+                _cells[i, j]._spawnUnit = "None";
+                _cells[i, j]._initialState = nameof(DefaultCell);
+
+                ApplyCellVisual(_cellButtons[_cells[i, j]._coordinates], _cells[i, j]);
+            }
     }
 
     private bool TryValidateCellsMapPath()
