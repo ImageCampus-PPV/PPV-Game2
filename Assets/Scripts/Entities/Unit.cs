@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Unit : BaseEntity
+public abstract class Unit : BaseEntity
 {
     protected PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
 

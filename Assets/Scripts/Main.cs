@@ -11,16 +11,20 @@ public class Main : MonoBehaviour
     private TurnManager _turnManager;
 
     [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private GameObject heavyEngine;
+    [SerializeField] private GameObject lightEnemy;
+    [SerializeField] private GameObject normalEnemy;
+
     [SerializeField] private APWalletConfiguration _APWalletConfiguration;
     [SerializeField] private HabilitiesDurationConfiguration _habilitiesDurationConfiguration;
-    [SerializeField] private CellsMaps _cellMap;
+    [SerializeField] private Floor _cellMap;
 
     private void Awake()
     {
         ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<EventBus>(new EventBus());
-        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(playerPrefab, _cellMap));
+        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(playerPrefab, heavyEngine, lightEnemy, normalEnemy, _cellMap));
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());

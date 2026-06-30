@@ -7,7 +7,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class MapEditor : EditorWindow
+public class FloorEditor : EditorWindow
 {
     private int _rows = 10;
     private int _cols = 10;
@@ -25,14 +25,14 @@ public class MapEditor : EditorWindow
     private Dictionary<Vector2Int, Button> _cellButtons;
 
     private string _cellsMapSavePath = "Assets/Maps/CellsMap.asset";
-    private CellsMaps _cellsMapAsset;
+    private Floor _cellsMapAsset;
 
     private Dictionary<string, Color> _cellsColorPerState;
 
-    [MenuItem("Tools/Map Editor")]
+    [MenuItem("Tools/Floor Editor")]
     public static void ShowWindow()
     {
-        GetWindow<MapEditor>("Map Editor");
+        GetWindow<FloorEditor>("Floor Editor");
     }
 
     public void CreateGUI()
@@ -65,10 +65,10 @@ public class MapEditor : EditorWindow
 
         ObjectField cellsMapObjectField = new ObjectField("Cells Map")
         {
-            objectType = typeof(CellsMaps),
+            objectType = typeof(Floor),
             allowSceneObjects = false
         };
-        cellsMapObjectField.SetValueWithoutNotify(AssetDatabase.LoadAssetAtPath<CellsMaps>(_cellsMapSavePath));
+        cellsMapObjectField.SetValueWithoutNotify(AssetDatabase.LoadAssetAtPath<Floor>(_cellsMapSavePath));
 
         TextField cellsMapPathField = new TextField("Cells Map Path") { value = _cellsMapSavePath };
         Button saveCellsMapButton = new Button(SaveGridAsCellsMap) { text = "Save Grid As Cells Map" };
@@ -90,7 +90,7 @@ public class MapEditor : EditorWindow
 
         cellsMapObjectField.RegisterValueChangedCallback(evt =>
         {
-            CellsMaps droppedAsset = evt.newValue as CellsMaps;
+            Floor droppedAsset = evt.newValue as Floor;
             if (droppedAsset == null)
                 return;
 
@@ -112,7 +112,7 @@ public class MapEditor : EditorWindow
         cellsMapPathField.RegisterValueChangedCallback(evt =>
         {
             _cellsMapSavePath = evt.newValue;
-            _cellsMapAsset = AssetDatabase.LoadAssetAtPath<CellsMaps>(_cellsMapSavePath);
+            _cellsMapAsset = AssetDatabase.LoadAssetAtPath<Floor>(_cellsMapSavePath);
             cellsMapObjectField.SetValueWithoutNotify(_cellsMapAsset);
         });
 
@@ -203,12 +203,12 @@ public class MapEditor : EditorWindow
             AssetDatabase.Refresh();
         }
 
-        CellsMaps asset = AssetDatabase.LoadAssetAtPath<CellsMaps>(_cellsMapSavePath);
+        Floor asset = AssetDatabase.LoadAssetAtPath<Floor>(_cellsMapSavePath);
         bool isNewAsset = asset == null;
 
         if (isNewAsset)
         {
-            asset = ScriptableObject.CreateInstance<CellsMaps>();
+            asset = ScriptableObject.CreateInstance<Floor>();
         }
 
         asset._cellsData = FlattenCells();
@@ -235,7 +235,7 @@ public class MapEditor : EditorWindow
         if (!TryValidateCellsMapPath())
             return;
 
-        CellsMaps asset = AssetDatabase.LoadAssetAtPath<CellsMaps>(_cellsMapSavePath);
+        Floor asset = AssetDatabase.LoadAssetAtPath<Floor>(_cellsMapSavePath);
         if (asset == null)
         {
             Debug.LogWarning($"No CellsMaps asset found at {_cellsMapSavePath}");
@@ -264,7 +264,7 @@ public class MapEditor : EditorWindow
         if (!TryValidateCellsMapPath())
             return;
 
-        CellsMaps asset = AssetDatabase.LoadAssetAtPath<CellsMaps>(_cellsMapSavePath);
+        Floor asset = AssetDatabase.LoadAssetAtPath<Floor>(_cellsMapSavePath);
         if (asset == null)
         {
             Debug.LogWarning($"No CellsMaps asset found at {_cellsMapSavePath}");
@@ -278,6 +278,9 @@ public class MapEditor : EditorWindow
     private void RebuildGrid()
     {
         _gridContainer.Clear();
+
+        if (_cellsMapAsset == null)
+            _cellsMapAsset = new Floor();
 
         _cellsMapAsset.size = new Vector2Int(_rows, _cols);
 
@@ -375,111 +378,9 @@ public class MapEditor : EditorWindow
         }
 
         btn.style.backgroundColor = bg;
-        btn.style.color = (bg == Color.yellow || bg == Color.white) ? Color.black : Color.white;
-    }
-}
-
-public class CellEditorWindow : EditorWindow
-{
-    private CellData cell;
-    private Action<CellData> onStateChanged;
-    private Dictionary<string, Type> _cellStatesPerName;
-    private DropdownField cellTypeDropdown;
-    private Toggle playerCanSpawnThereField;
-    private Label cellInfoLabel;
-
-    public static void ShowWindow(CellData inCell, Action<CellData> onChanged = null)
-    {
-        CellEditorWindow window = GetWindow<CellEditorWindow>("Cell Editor");
-        window.SetCell(inCell, onChanged);
-    }
-
-    private void SetCell(CellData inCell, Action<CellData> onChanged)
-    {
-        cell = inCell;
-        onStateChanged = onChanged;
-        RefreshGUI();
-    }
-
-    private void RefreshGUI()
-    {
-        if (cellTypeDropdown == null)
-            return;
-
-        cellTypeDropdown.SetValueWithoutNotify(cell._initialState);
-        cellInfoLabel.text = $"Editing Cell ({cell._coordinates.x}, {cell._coordinates.y})";
-    }
-
-    private void CreateGUI()
-    {
-        _cellStatesPerName = new Dictionary<string, Type>();
-
-        foreach (Type type in GetType().Assembly.GetTypes())
-        {
-            if (type.GetCustomAttribute<CellStateAttribute>() == null)
-                continue;
-
-            _cellStatesPerName.Add(type.Name, type);
-        }
-
-        List<string> cellStatesNames = new List<string>(_cellStatesPerName.Count);
-        foreach (KeyValuePair<string, Type> stateType in _cellStatesPerName)
-            cellStatesNames.Add(stateType.Key);
-
-        VisualElement root = rootVisualElement;
-
-        cellInfoLabel = new Label();
-        root.Add(cellInfoLabel);
-
-        cellTypeDropdown = new DropdownField(
-            label: "Starting State",
-            choices: cellStatesNames,
-            defaultIndex: 0
-        );
-
-        playerCanSpawnThereField = new Toggle("Player Spawn Point");
-
-        cellTypeDropdown.RegisterValueChangedCallback(evt =>
-        {
-            cell._initialState = evt.newValue;
-            onStateChanged?.Invoke(cell);
-        });
-
-        playerCanSpawnThereField.RegisterValueChangedCallback(evt =>
-        {
-
-            cell._spawnPlayer = evt.newValue;
-
-            onStateChanged?.Invoke(cell);
-        });
-
-        root.Add(playerCanSpawnThereField);
-        root.Add(cellTypeDropdown);
-
-        RefreshGUI();
-    }
-
-    private void OnGUI()
-    {
-        if (GUI.changed)
-        {
-            EditorUtility.SetDirty(this);
-        }
-    }
-}
-
-public class CellStateAttribute : Attribute
-{
-    public float r;
-    public float g;
-    public float b;
-    public float a;
-    public CellStateAttribute(float r, float g, float b, float a)
-    {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
+        btn.style.color = cell._initialState == nameof(DefaultCell) ||
+            cell._initialState == nameof(Healing) ||
+            cell._initialState == nameof(Empty) ? Color.black : Color.white;
     }
 }
 

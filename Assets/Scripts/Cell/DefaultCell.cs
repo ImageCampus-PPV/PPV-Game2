@@ -2,7 +2,7 @@
 using ImageCampus.ToolBox.Services;
 using UnityEngine;
 
-[CellState(1, 1, 1, 1)]
+[CellState(0.50f, 0.50f, 0.50f, 1)]
 public sealed class DefaultCell : State
 {
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
@@ -46,7 +46,32 @@ public sealed class Broken : State
     }
 }
 
-[CellState(0.5f, 0.5f, 0.5f, 1)]
+[CellState(1, 1, 1, 1f)]
+public sealed class Empty : State
+{
+    public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
+    {
+        Renderer renderer = (Renderer)parameters[0];
+
+        BehaviourActions behaviourActions = new BehaviourActions();
+
+        behaviourActions.AddUpdateBehaviour(() => { renderer.material.color = Color.black; });
+
+        return behaviourActions;
+    }
+
+    public override BehaviourActions GetOnExitBehaviour(params object[] parameters)
+    {
+        return default(BehaviourActions);
+    }
+
+    public override BehaviourActions GetOnTickBehaviour(params object[] parameters)
+    {
+        return default(BehaviourActions);
+    }
+}
+
+[CellState(1, 0.6f, 0f, 1)]
 public sealed class Unstable : State
 {
     private int _maxTurnsAlive = 0;
@@ -88,7 +113,7 @@ public sealed class Unstable : State
     }
 }
 
-[CellState(1.0f, 0.92f, 0.016f, 1.0f)]
+[CellState(0, 1f, 0f, 1.0f)]
 public sealed class Healing : State
 {
     private uint _healing = 20;
@@ -190,7 +215,7 @@ public class Contagious : Infected
         BehaviourActions behaviourActions = new BehaviourActions();
 
         behaviourActions.AddUpdateBehaviour
-            (
+        (
             () =>
             {
                 renderer.material.color = Color.deepPink;
