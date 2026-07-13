@@ -111,6 +111,28 @@ public class MapGrid : IService, IDisposable
                     break;
             }
 
+            if (cell._assetToSpawn != null)
+            {
+                GameObject decoration = UnityEngine.Object.Instantiate(cell._assetToSpawn, goCell.transform);
+
+                float cellTopY = 0.5f * goCell.transform.localScale.y;
+
+                Renderer[] renderers = decoration.GetComponentsInChildren<Renderer>();
+                if (renderers.Length > 0)
+                {
+                    Bounds bounds = renderers[0].bounds;
+                    for (int i = 1; i < renderers.Length; i++)
+                        bounds.Encapsulate(renderers[i].bounds);
+
+                    float pivotToBottom = decoration.transform.position.y - bounds.min.y;
+                    decoration.transform.localPosition = new Vector3(0f, cellTopY + pivotToBottom, 0f);
+                }
+                else
+                {
+                    decoration.transform.localPosition = new Vector3(0f, cellTopY, 0f);
+                }
+            }
+
             if (goEnemyScript != null)
             {
                 goEnemyScript.SetSpawnCell(cellObject);
