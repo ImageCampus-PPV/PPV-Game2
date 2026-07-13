@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,7 +14,6 @@ public class CellEditorWindow : EditorWindow
     private Dictionary<string, Type> _cellStatesPerName;
     private DropdownField cellTypeDropdown;
     private DropdownField unitSpawnType;
-    private Toggle playerCanSpawnThereField;
     private Label cellInfoLabel;
 
     public static void ShowWindow(CellData inCell, Action<CellData> onChanged = null)
@@ -69,6 +69,29 @@ public class CellEditorWindow : EditorWindow
 
         VisualElement root = rootVisualElement;
 
+        ObjectField spawnDecorationField = new ObjectField("Decoration")
+        {
+            objectType = typeof(GameObject),
+            allowSceneObjects = false
+        };
+
+        spawnDecorationField.RegisterValueChangedCallback(evt =>
+        {
+            GameObject gameObject = evt.newValue as GameObject;
+            bool isPrefabAsset = gameObject != null
+                && PrefabUtility.GetPrefabAssetType(gameObject) != PrefabAssetType.NotAPrefab;
+
+            if (!isPrefabAsset)
+            {
+                Debug.LogWarning("Drop a Prefab asset from the Project window, not a scene object or non-prefab asset.");
+                spawnDecorationField.SetValueWithoutNotify(null);
+                gameObject = null;
+            }
+
+            cell._assetToSpawn = gameObject;
+            onStateChanged?.Invoke(cell);
+        });
+
         cellInfoLabel = new Label();
         root.Add(cellInfoLabel);
 
@@ -84,8 +107,6 @@ public class CellEditorWindow : EditorWindow
             defaultIndex: 0
         );
 
-        playerCanSpawnThereField = new Toggle("Player Spawn Point");
-
         unitSpawnType.RegisterValueChangedCallback(evt =>
         {
             cell._spawnUnit = evt.newValue;
@@ -100,6 +121,7 @@ public class CellEditorWindow : EditorWindow
 
         root.Add(unitSpawnType);
         root.Add(cellTypeDropdown);
+        root.Add(spawnDecorationField);
 
         RefreshGUI();
     }
