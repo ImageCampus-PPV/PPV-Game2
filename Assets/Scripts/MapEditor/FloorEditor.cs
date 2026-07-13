@@ -391,6 +391,12 @@ public class FloorEditor : EditorWindow
             bg = Color.magenta;
         }
 
+        Texture2D preview = cell._assetToSpawn != null ? AssetPreview.GetAssetPreview(cell._assetToSpawn) : null;
+
+        Background icon = btn.iconImage;
+        icon.texture = preview != null ? preview : null;
+        btn.iconImage = icon;
+
         btn.style.backgroundColor = bg;
         btn.style.color = cell._initialState == nameof(DefaultCell) ||
             cell._initialState == nameof(Healing) ||
