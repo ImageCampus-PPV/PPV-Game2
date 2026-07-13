@@ -278,6 +278,54 @@ public abstract class Unit : BaseEntity
         OnMovementFinished();
     }
 
+    public IEnumerator MoveTo(Cell targetCell)
+    {
+        _isMoving = true;
+
+        Vector3 startPos = transform.position;
+        Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
+        Vector3 finalTarget;
+
+        if (targetCell.Height != _currentCell.Height)
+        {
+            finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
+        }
+        else
+        {
+            finalTarget = targetCell.transform.position;
+            finalTarget.y = startPos.y;
+        }
+
+        Cell previous = _currentCell;
+        previous.stander = null;
+
+        _currentCell = targetCell;
+        _currentCell.stander = this;
+
+        float elapsed = 0;
+
+        while (elapsed < _timeToMoveCells)
+        {
+            elapsed += Time.deltaTime;
+            transform.position = Vector3.Lerp(startPos, flatTarget, elapsed / _timeToMoveCells);
+            yield return null;
+        }
+
+        elapsed = 0;
+
+        while (elapsed < _timeToMoveCells * .5f)
+        {
+            elapsed += Time.deltaTime;
+            transform.position = Vector3.Lerp(flatTarget, finalTarget, elapsed / (_timeToMoveCells * 0.5f));
+
+            yield return null;
+        }
+
+        transform.position = finalTarget;
+
+        _isMoving = false;
+    }
+
     public void MoveInstant(Cell targetCell)
     {
         if (_currentCell != null)
