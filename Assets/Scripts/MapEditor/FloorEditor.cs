@@ -141,6 +141,7 @@ public class FloorEditor : EditorWindow
             {
                 _cells[i, j]._spawnUnit = "None";
                 _cells[i, j]._initialState = nameof(DefaultCell);
+                _cells[i, j]._terminalType = "None";
 
                 ApplyCellVisual(_cellButtons[_cells[i, j]._coordinates], _cells[i, j]);
             }

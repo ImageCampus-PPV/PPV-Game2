@@ -8,6 +8,7 @@ public struct CellData
     public Vector2Int _coordinates;
     public string _spawnUnit;
     public GameObject _assetToSpawn;
+    public string _terminalType;
 
     public CellData(Vector2Int coordinates, string initialState)
     {
@@ -15,5 +16,6 @@ public struct CellData
         _initialState = initialState;
         _spawnUnit = "None";
         _assetToSpawn = null;
+        _terminalType = "None";
     }
 }

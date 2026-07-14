@@ -19,6 +19,13 @@ public class Player : Unit
     private int _plannedAPCost;
     public int PlannedAPCost => _plannedAPCost;
 
+    // MEC-02 - Hackeo de Terminales: hackeo planificado para este turno, si hay uno.
+    private Terminal _plannedHackTerminal;
+    private int _plannedHackTicks;
+    private int _plannedHackAPCost;
+    public Terminal PlannedHackTerminal => _plannedHackTerminal;
+    HackSystem HackSystem => ServiceProvider.Instance.GetService<HackSystem>();
+
     private bool _isTurnReady = false;
     public bool IsTurnReady => _isTurnReady;
 
@@ -106,7 +113,7 @@ public class Player : Unit
                 RemoveWaypoint(previousWaypoint, waypointToRemove);
             }
 
-            EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
+            RaiseAPPreview();
         }
 
         //R removes all waypoints
@@ -156,7 +163,7 @@ public class Player : Unit
             {
                 _plannedAPCost += segmentCost;
                 //EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
-                EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
+                RaiseAPPreview();
                 //_plannedPath = GetPathCells(clickedCell);
 
                 _waypoints.Add(clickedCell);
@@ -192,6 +199,54 @@ public class Player : Unit
 
     }
 
+    // MEC-02 - Hackeo de Terminales: declara, durante la fase de planeamiento,
+    // la intencion de hackear una terminal. Se resuelve mas adelante en
+    // HandleMovement(), junto con el resto de las acciones del turno.
+    public bool TryPlanHack(Terminal terminal)
+    {
+        if (terminal == null)
+            return false;
+
+        if (_plannedHackTerminal != null)
+        {
+            Debug.Log("[Player] Ya hay un hackeo planificado este turno. Confirma el turno (Space) o cancela el plan (R) antes de planificar otro.");
+            return false;
+        }
+
+        bool isFreshStart = terminal.CurrentTicks == 0;
+        int hackAPCost = isFreshStart ? terminal.APCost : 0;
+
+        int remainingTickBudget = _maxTicksPerTurn - _plannedTicks;
+        int ticksNeeded = Mathf.Min(remainingTickBudget, terminal.RequiredTicks - terminal.CurrentTicks);
+
+        if (ticksNeeded <= 0)
+        {
+            Debug.Log($"[Player] No queda presupuesto de ticks este turno para hackear ({_plannedTicks}/{_maxTicksPerTurn} ya planificados). Confirma el turno o saca movimiento planificado.");
+            return false;
+        }
+
+        int totalPlannedAPCost = _plannedAPCost + _plannedHackAPCost + hackAPCost;
+
+        if (!HackSystem.CanStartHack(CurrentPlanningOrigin, terminal, totalPlannedAPCost))
+            return false; // HackSystem ya loguea la razon especifica
+
+        _plannedHackTerminal = terminal;
+        _plannedHackTicks = ticksNeeded;
+        _plannedHackAPCost = hackAPCost;
+        _plannedTicks += ticksNeeded;
+
+        RaiseAPPreview();
+
+        Debug.Log($"[Player] Hackeo planificado: {terminal.Type} en {terminal.Cell.Coordinates} ({hackAPCost} AP, {ticksNeeded} ticks). Confirma con Space para ejecutarlo.");
+
+        return true;
+    }
+
+    private void RaiseAPPreview()
+    {
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost - _plannedHackAPCost, APWallet.MaxAP);
+    }
+
     private void RebuildPath()
     {
         _plannedPath.Clear();
@@ -215,17 +270,33 @@ public class Player : Unit
     {
         _isTurnReady = false;
 
-        if (_plannedPath.Count <= 0)
-            return;
-
         if (_isMoving)
             return;
 
+        bool hasMovement = _plannedPath.Count > 0;
+        bool hasHack = _plannedHackTerminal != null;
+
+        if (!hasMovement && !hasHack)
+            return;
+
         Debug.Log("HANDLE MOVEMENT CALLED");
-        //RequestPath(_selectedTargetCell);
-        StartCoroutine(FollowPath(_plannedPath));
-        EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
+
+        if (hasMovement)
+        {
+            //RequestPath(_selectedTargetCell);
+            StartCoroutine(FollowPath(_plannedPath));
+            EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
+        }
+
+        if (hasHack)
+            HackSystem.ResolvePlannedHack(this, _plannedHackTerminal, _plannedHackTicks);
+
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+
+        // Si no hubo movimiento, ningun coroutine va a llamar OnMovementFinished(),
+        // asi que el reseteo del plan del turno hay que hacerlo aca mismo.
+        if (!hasMovement)
+            ResetVariables();
     }
 
     private void RemoveWaypoint(Cell previousWaypoint, Cell waypointToRemove)
@@ -243,6 +314,9 @@ public class Player : Unit
         _plannedTicks = 0;
         _plannedAPCost = 0;
         _waypoints.Clear();
+        _plannedHackTerminal = null;
+        _plannedHackTicks = 0;
+        _plannedHackAPCost = 0;
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 

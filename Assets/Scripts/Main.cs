@@ -18,18 +18,26 @@ public class Main : MonoBehaviour
     [SerializeField] private APWalletConfiguration _APWalletConfiguration;
     [SerializeField] private HabilitiesDurationConfiguration _habilitiesDurationConfiguration;
     [SerializeField] private Floor _cellMap;
+    [SerializeField] private TerminalConfiguration _terminalConfiguration;
 
     private void Awake()
     {
         ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<EventBus>(new EventBus());
-        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(playerPrefab, heavyEngine, lightEnemy, normalEnemy, _cellMap));
+        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(playerPrefab, heavyEngine, lightEnemy, normalEnemy, _cellMap, _terminalConfiguration));
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());
         ServiceProvider.Instance.AddService<AbilitySystem>(new AbilitySystem());
         ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
+        ServiceProvider.Instance.AddService<HackSystem>(new HackSystem());
+
+        // NOTA: antes de este cambio, APWallet.Init() nunca se llamaba, lo que significa que
+        // APWallet nunca se suscribia a APConsumeRequestAceptedEvent/APRefillEvent: el AP
+        // gastado por movimiento (y ahora por hackeos) no se estaba descontando realmente del
+        // pozo. Se agrega el Init() que faltaba para que el consumo de AP funcione de verdad.
+        ServiceProvider.Instance.GetService<APWallet>().Init();
 
         _turnManager = new TurnManager();
         ServiceProvider.Instance.AddService<TurnManager>(_turnManager);

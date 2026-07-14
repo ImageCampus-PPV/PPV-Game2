@@ -29,13 +29,16 @@ public class MapGrid : IService, IDisposable
     private Cell[,] _gridArray;
     [SerializeField] private GameObject _cellPrefab;
 
-    public MapGrid(GameObject playerPrefab, GameObject heavyEngine, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps)
+    private TerminalConfiguration _terminalConfiguration;
+
+    public MapGrid(GameObject playerPrefab, GameObject heavyEngine, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps, TerminalConfiguration terminalConfiguration = null)
     {
         _playerPrefab = playerPrefab;
         _heavyEngine = heavyEngine;
         _lightEnemy = lightEnemy;
         _normalEnemy = normalEnemy;
         _cellMap = cellsMaps;
+        _terminalConfiguration = terminalConfiguration;
     }
 
     public void Init()
@@ -109,6 +112,21 @@ public class MapGrid : IService, IDisposable
 
                 default:
                     break;
+            }
+
+            if (!string.IsNullOrEmpty(cell._terminalType) && cell._terminalType != "None")
+            {
+                if (Enum.TryParse(cell._terminalType, out TerminalType terminalType))
+                {
+                    Terminal terminal = goCell.AddComponent<Terminal>();
+                    terminal.SetType(terminalType);
+                    terminal.Init(cellObject, _terminalConfiguration);
+                    cellObject.Terminal = terminal;
+                }
+                else
+                {
+                    Debug.LogWarning($"[MapGrid] Tipo de terminal desconocido '{cell._terminalType}' en la celda {cell._coordinates}.");
+                }
             }
 
             if (cell._assetToSpawn != null)

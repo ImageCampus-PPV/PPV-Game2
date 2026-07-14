@@ -5,9 +5,22 @@ using UnityEngine;
 [CellState(0.50f, 0.50f, 0.50f, 1)]
 public sealed class DefaultCell : State
 {
+    // Antes esto no hacia nada, asi que una Cell que volvia a DefaultCell
+    // (ej. via Purificacion de una Terminal, MEC-02) se quedaba visualmente
+    // con el color de su estado anterior (Infected/Contagious/etc) aunque
+    // logicamente ya no estuviera corrupta. Se agrega el reset de color para
+    // que coincida con el resto de los estados (Broken, Healing, etc), que si
+    // aplican su color en GetOnEnterBehaviour.
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
     {
-        return default(BehaviourActions);
+        if (parameters == null || parameters.Length == 0 || parameters[0] is not Renderer renderer)
+            return default(BehaviourActions);
+
+        BehaviourActions behaviourActions = new BehaviourActions();
+
+        behaviourActions.AddUpdateBehaviour(() => { renderer.material.color = new Color(0.5f, 0.5f, 0.5f, 1f); });
+
+        return behaviourActions;
     }
 
     public override BehaviourActions GetOnExitBehaviour(params object[] parameters)

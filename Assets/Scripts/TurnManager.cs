@@ -56,6 +56,9 @@ public class TurnManager : IService
         if (Input.GetKeyDown(KeyCode.E))
             TryUseAbility(_counterAbility);
 
+        if (Input.GetKeyDown(KeyCode.F)) // MEC-02 - Hackeo de Terminales
+            TryPlanHack();
+
         Player player = EntityRegistry.FilterEntities<Player>().First();
 
         if (player.IsTurnReady)
@@ -94,6 +97,30 @@ public class TurnManager : IService
 
         Player player = EntityRegistry.FilterEntities<Player>().First();
         AbilitySystem.UseAbility(ability, player, clickedCell);
+    }
+
+    // MEC-02 - Hackeo de Terminales: declara el hackeo de la terminal bajo el cursor, si hay una.
+    private void TryPlanHack()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
+        {
+            Debug.Log("[TurnManager] F: no hay ninguna celda bajo el cursor.");
+            return;
+        }
+
+        if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
+            return;
+
+        if (clickedCell.Terminal == null)
+        {
+            Debug.Log($"[TurnManager] F: la celda {clickedCell.Coordinates} bajo el cursor no tiene ninguna Terminal.");
+            return;
+        }
+
+        Player player = EntityRegistry.FilterEntities<Player>().First();
+        player.TryPlanHack(clickedCell.Terminal);
     }
 
     public bool IsCellNearUnit(Cell unitCell, Cell cell, int maxDistance)

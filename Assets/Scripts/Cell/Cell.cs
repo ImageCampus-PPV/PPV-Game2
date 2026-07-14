@@ -22,6 +22,9 @@ public class Cell : BaseEntity
     [HideInInspector] public bool isOccupied => stander != null;
     public Unit stander = null;
 
+    // Terminal hackeable ubicada sobre esta Cell (MEC-02), si es que tiene una. Asignada por MapGrid.Build().
+    public Terminal Terminal { get; set; }
+
     private Bounds _bounds;
 
     private FSM _fsm;
@@ -48,7 +51,7 @@ public class Cell : BaseEntity
 
         Renderer renderer = GetComponent<Renderer>();
 
-        _fsm.AddState<DefaultCell>();
+        _fsm.AddState<DefaultCell>(onEnterParameters: () => new object[] { renderer });
         _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { renderer, 1 });
         _fsm.AddState<Broken>(onEnterParameters: () => new object[] { renderer });
         _fsm.AddState<Healing>(onEnterParameters: () => new object[] { renderer }, onTickParameters: () => new object[] { stander });
