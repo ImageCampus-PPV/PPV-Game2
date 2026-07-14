@@ -26,6 +26,13 @@ namespace Assets.Scripts.Combat
         {
             EventBus.Subscribe<APConsumeRequestAceptedEvent>(OnAPConsume);
             EventBus.Subscribe<APRefillEvent>(OnAPRefill);
+            EventBus.Subscribe<DevSetAPEvent>(OnDevSetAP);
+        }
+
+        private void OnDevSetAP(in DevSetAPEvent setAPEvent)
+        {
+            _currentAP = Mathf.Clamp(setAPEvent.amount, 0, MAX_AP);
+            EventBus.Raise<APWalletChangeEvent>(_currentAP, MAX_AP);
         }
 
         private void OnAPConsume(in APConsumeRequestAceptedEvent apConsumeRequestAceptedEvent)

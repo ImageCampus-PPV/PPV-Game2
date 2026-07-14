@@ -40,6 +40,7 @@ public class Main : MonoBehaviour
 
     private void Start()
     {
+        ServiceProvider.Instance.GetService<APWallet>().Init();
         _turnManager.Init();
     }
 

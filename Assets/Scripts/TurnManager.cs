@@ -35,14 +35,29 @@ public class TurnManager : IService
     {
         EventBus.Raise<TurnChangeEvent>(_currenturn);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
-
         EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
+        EventBus.Subscribe<DevMovePlayerEvent>(OnDevMovePlayer);
 
         _lagSpikeAbility = new LagSpikeAbility();
         _counterAbility = new CounterAbility();
 
         AbilitySystem.RegisterAbility(new LagSpikeAbility());
         AbilitySystem.RegisterAbility(new CounterAbility());
+    }
+
+    private void OnDevMovePlayer(in DevMovePlayerEvent movePlayerEvent)
+    {
+        if (movePlayerEvent.coordX < 0 || movePlayerEvent.coordX >= MapGrid.Width || 
+            movePlayerEvent.coordY < 0 || movePlayerEvent.coordY >= MapGrid.Height) 
+            return;
+
+        Cell target = MapGrid.GetCell(movePlayerEvent.coordX, movePlayerEvent.coordY);
+
+        if (target == null) 
+            return;
+
+        //TODO: Limpiar este linq
+        EntityRegistry.FilterEntities<Player>().First().MoveInstant(target);
     }
 
     public void Tick()
