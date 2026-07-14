@@ -1,8 +1,10 @@
 using Assets.Scripts;
+using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using EventBus = ImageCampus.ToolBox.Events.EventBus;
@@ -15,22 +17,22 @@ public class MapGrid : IService, IDisposable
 
     [SerializeField] private int _cellsX;
     [SerializeField] private int _cellsZ;
+    [SerializeField] private GameObject _cellPrefab;
+
     public int Width => _cellsX;
     public int Height => _cellsZ;
 
     //This should be optimize.
     private Floor _cellMap;
-
     private GameObject _playerPrefab;
     private GameObject _heavyEngine;
     private GameObject _lightEnemy;
     private GameObject _normalEnemy;
-
     private Cell[,] _gridArray;
-    [SerializeField] private GameObject _cellPrefab;
-
     private TerminalConfiguration _terminalConfiguration;
-
+ 
+    private Dictionary<string, Type> _cellStatesPerName = new Dictionary<string, Type>();
+    
     public MapGrid(GameObject playerPrefab, GameObject heavyEngine, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps, TerminalConfiguration terminalConfiguration = null)
     {
         _playerPrefab = playerPrefab;
@@ -48,8 +50,168 @@ public class MapGrid : IService, IDisposable
         EventBus.Subscribe<TurnsTileContagious>(OnTurnsTileContagious);
         EventBus.Subscribe<TurnTileIntoUnstable>(OnTurnTileIntoUnstable);
         EventBus.Subscribe<TurnTileBroken>(OnTurnTileBroken);
+        EventBus.Subscribe<DevChangeCellStateEvent>(OnDevChangeCellState);
+        EventBus.Subscribe<DevSpawnEnemyEvent>(OnDevSpawnEnemy);
+        EventBus.Subscribe<DevRemoveEntityAtCellEvent>(OnDevRemoveEntity);
+        EventBus.Subscribe<DevResizeGridEvent>(OnDevResizeGrid);
 
         Build();
+    }
+
+    private void OnDevResizeGrid(in DevResizeGridEvent resizeGridEvent)
+    {
+        int newWidth = Mathf.Max(1, resizeGridEvent.width);
+        int newHeight = Mathf.Max(1, resizeGridEvent.height);
+
+        EntityRegistry registry = ServiceProvider.Instance.GetService<EntityRegistry>();
+        Player player = registry.FilterEntities<Player>().First();
+
+        if (player == null)
+        {
+            Debug.LogError("Cannot find player in entity registry.");
+            return;
+        }
+
+        if (player.CurrentCell == null)
+        {
+            Debug.LogError("Player's current cell is null");
+            return;
+        }
+
+        Vector2Int playerCoord = player.CurrentCell.Coordinates;
+
+        List<(Type enemyType, Vector2Int coord)> survivors = new();
+
+        List<Enemy> enemies = new();
+
+        foreach (Enemy enemy in registry.FilterEntities<Enemy>())
+            enemies.Add(enemy);
+
+        foreach (Enemy enemy in enemies)
+        {
+            Vector2Int coord = enemy.CurrentCell.Coordinates;
+
+            if (coord.x < newWidth && coord.y < newHeight)
+                survivors.Add((enemy.GetType(), coord));
+
+            registry.Remove(enemy);
+            UnityEngine.Object.Destroy(enemy.gameObject);
+        }
+
+        foreach (Cell cell in _gridArray)
+            if (cell != null)
+                UnityEngine.Object.Destroy(cell.gameObject);
+
+        _cellsX = newWidth;
+        _cellsZ = newHeight;
+        _gridArray = new Cell[_cellsX, _cellsZ];
+
+        Type defaultState = _cellStatesPerName.Values.First();
+
+        for (int x = 0; x < _cellsX; x++)
+        {
+            for (int z = 0; z < _cellsZ; z++)
+            {
+                GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                goCell.transform.position = new Vector3(x * 1.25f, 0f, z * 1.25f);
+                goCell.layer = 6;
+
+                Cell cellObject = goCell.AddComponent<Cell>();
+                cellObject.SetCoordinate(new Vector2Int(x, z));
+                cellObject.Init(defaultState);
+
+                _gridArray[x, z] = cellObject;
+            }
+        }
+
+        Vector2Int clamped = new Vector2Int(
+            Mathf.Clamp(playerCoord.x, 0, _cellsX - 1),
+            Mathf.Clamp(playerCoord.y, 0, _cellsZ - 1));
+
+        player.MoveInstant(GetCell(clamped));
+
+        foreach ((Type enemyType, Vector2Int coord) in survivors)
+        {
+            GameObject prefab = enemyType == typeof(HeavyEnemy) ? _heavyEngine
+                : enemyType == typeof(LightEnemy) ? _lightEnemy
+                : enemyType == typeof(NormalEnemy) ? _normalEnemy
+                : null;
+
+            if (prefab == null) 
+                continue;
+
+            GameObject go = UnityEngine.Object.Instantiate(prefab);
+            Unit unit = (Unit)go.AddComponent(enemyType);
+            unit.SetSpawnCell(GetCell(coord));
+            unit.Init();
+            registry.Add(unit);
+        }
+    }
+
+    private void OnDevChangeCellState(in DevChangeCellStateEvent changeCellEvent)
+    {
+        if (changeCellEvent.coordX < 0 || changeCellEvent.coordX >= Width || changeCellEvent.coordY < 0 || changeCellEvent.coordY >= Height) 
+            return;
+
+        if (!_cellStatesPerName.ContainsKey(changeCellEvent.stateName)) 
+            return;
+
+        GetCell(changeCellEvent.coordX, changeCellEvent.coordY).Transition(_cellStatesPerName[changeCellEvent.stateName]);
+    }
+
+    private void OnDevSpawnEnemy(in DevSpawnEnemyEvent spawnEnemyEvent)
+    {
+        Cell cell = (spawnEnemyEvent.coordX < 0 || spawnEnemyEvent.coordX >= Width || spawnEnemyEvent.coordY < 0 || spawnEnemyEvent.coordY >= Height)
+            ? null : GetCell(spawnEnemyEvent.coordX, spawnEnemyEvent.coordY);
+
+        if (cell == null || cell.isOccupied || !cell.IsWalkable) 
+            return;
+
+        GameObject prefab = spawnEnemyEvent.enemyTypeName switch
+        {
+            nameof(HeavyEnemy) => _heavyEngine,
+            nameof(LightEnemy) => _lightEnemy,
+            nameof(NormalEnemy) => _normalEnemy,
+            _ => null
+        };
+
+        if (prefab == null)
+            return;
+
+        GameObject go = UnityEngine.Object.Instantiate(prefab);
+
+        Unit unit = spawnEnemyEvent.enemyTypeName switch
+        {
+            nameof(HeavyEnemy) => go.AddComponent<HeavyEnemy>(),
+            nameof(LightEnemy) => go.AddComponent<LightEnemy>(),
+            nameof(NormalEnemy) => go.AddComponent<NormalEnemy>(),
+            _ => null
+        };
+
+        unit.SetSpawnCell(cell);
+        unit.Init();
+
+        ServiceProvider.Instance.GetService<EntityRegistry>().Add(unit);
+    }
+
+    private void OnDevRemoveEntity(in DevRemoveEntityAtCellEvent removeEntityEvent)
+    {
+        if (removeEntityEvent.coordX < 0 || removeEntityEvent.coordX >= Width || removeEntityEvent.coordY < 0 || removeEntityEvent.coordY >= Height) 
+            return;
+
+        Cell cell = GetCell(removeEntityEvent.coordX, removeEntityEvent.coordY);
+        Unit unit = cell?.stander;
+
+        if (unit == null) 
+            return;
+
+        if (unit is Player) 
+            return;
+
+        EntityRegistry registry = ServiceProvider.Instance.GetService<EntityRegistry>();
+        cell.stander = null;
+        registry.Remove(unit);
+        UnityEngine.Object.Destroy(unit.gameObject);
     }
 
     private void Build()
@@ -61,12 +223,12 @@ public class MapGrid : IService, IDisposable
 
         Player player = goPlayer.AddComponent<Player>();
 
-        Dictionary<string, Type> cellStatesPerName = new Dictionary<string, Type>();
+        _cellStatesPerName.Clear();
 
         foreach (Type type in GetType().Assembly.GetTypes())
         {
             if (typeof(State).IsAssignableFrom(type) && type.GetCustomAttribute<CellStateAttribute>() != null)
-                cellStatesPerName.Add(type.Name, type);
+                _cellStatesPerName.Add(type.Name, type);
         }
 
         Dictionary<string, Type> enemiesType = new Dictionary<string, Type>();
@@ -87,7 +249,7 @@ public class MapGrid : IService, IDisposable
             _gridArray[cell._coordinates.x, cell._coordinates.y] = cellObject;
 
             cellObject.SetCoordinate(cell._coordinates);
-            cellObject.Init(cellStatesPerName[cell._initialState]);
+            cellObject.Init(_cellStatesPerName[cell._initialState]);
 
             switch (cell._spawnUnit)
             {

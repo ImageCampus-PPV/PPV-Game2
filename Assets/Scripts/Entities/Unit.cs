@@ -116,7 +116,13 @@ public abstract class Unit : BaseEntity
     {
         if (!IsCellAvailable(targetCell))
         {
-            Debug.LogWarning("Target cell unavailable");
+            Debug.LogWarning($"Target cell unavailable: {targetCell}");
+            return -1;
+        }
+
+        if (!IsCellAvailable(originCell))
+        {
+            Debug.LogWarning($"Origin cell unavailable: {originCell}");
             return -1;
         }
 
