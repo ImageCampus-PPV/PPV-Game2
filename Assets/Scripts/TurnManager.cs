@@ -3,6 +3,7 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,16 +16,14 @@ public class TurnManager : IService
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
-    private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
 
-    private HabilitiesDurationConfiguration HabilitiesDurationConfiguration => ServiceProvider.Instance.GetService<HabilitiesDurationConfiguration>();
-    private LagSpikeAbility _lagSpikeAbility;
-    private CounterAbility _counterAbility;
+    private AbilitiesDurationConfiguration HabilitiesDurationConfiguration => ServiceProvider.Instance.GetService<AbilitiesDurationConfiguration>();
 
     private Dictionary<uint, uint> _stunUnits;
 
     private uint _currenturn = 1;
-
+    private bool _executing;
+    private Player _player;
 
     public TurnManager()
     {
@@ -35,14 +34,7 @@ public class TurnManager : IService
     {
         EventBus.Raise<TurnChangeEvent>(_currenturn);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
-
         EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
-
-        _lagSpikeAbility = new LagSpikeAbility();
-        _counterAbility = new CounterAbility();
-
-        AbilitySystem.RegisterAbility(new LagSpikeAbility());
-        AbilitySystem.RegisterAbility(new CounterAbility());
     }
 
     public void Tick()
@@ -50,51 +42,55 @@ public class TurnManager : IService
         if (!IsEndOfTurn())
             return;
 
-        if (Input.GetKeyDown(KeyCode.Q))
-            TryUseAbility(_lagSpikeAbility);
+        if(_player == null)
+            _player = EntityRegistry.FilterEntities<Player>().First();
 
-        if (Input.GetKeyDown(KeyCode.E))
-            TryUseAbility(_counterAbility);
-
-        Player player = EntityRegistry.FilterEntities<Player>().First();
-
-        if (player.IsTurnReady)
+        if (_player.IsTurnReady)
         {
-            player.HandleMovement();
-            EnemiesTurn();
-            MapGrid.Tick(Time.deltaTime);
+            ExecuteTurn();
+            //player.HandleMovement();
+            //EnemiesTurn();
+            //MapGrid.Tick(Time.deltaTime);
         }
-        else
-        {
-            if (player.IsTurnReady)
-            {
-                player.HandleMovement();
+    }
 
-                EnemiesTurn();
+
+    private IEnumerator ExecuteTurn()
+    {
+        _executing = true;
+
+        foreach (TurnAction action in _player.PlannedActions)
+        {
+            _player.ConsumeAP(action);
+
+            IEnumerator routine = action.Execute(_player);
+
+            while (routine.MoveNext())
+            {
+                yield return routine.Current;
+
+                //EnemyTick();
                 MapGrid.Tick(Time.deltaTime);
             }
+
+            //yield return action.Execute(player);
+            //
+            //player.ConsumeAP(action);
+            //
+            ////EnemyTick();
+            //
+            //if (APWallet.CurrentAP <= 0)
+            //{
+            //    //Defeat condition
+            //    yield break;
+            //}
         }
 
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            EnemiesTurn();
-            MapGrid.Tick(Time.deltaTime);
-        }
+        _player.ClearPlan();
+
+        _executing = false;
     }
 
-    private void TryUseAbility(IAbility ability)
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
-            return;
-
-        if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
-            return;
-
-        Player player = EntityRegistry.FilterEntities<Player>().First();
-        AbilitySystem.UseAbility(ability, player, clickedCell);
-    }
 
     public bool IsCellNearUnit(Cell unitCell, Cell cell, int maxDistance)
     {

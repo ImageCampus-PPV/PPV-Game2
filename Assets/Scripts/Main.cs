@@ -16,13 +16,13 @@ public class Main : MonoBehaviour
     [SerializeField] private GameObject normalEnemy;
 
     [SerializeField] private APWalletConfiguration _APWalletConfiguration;
-    [SerializeField] private HabilitiesDurationConfiguration _habilitiesDurationConfiguration;
+    [SerializeField] private AbilitiesDurationConfiguration _habilitiesDurationConfiguration;
     [SerializeField] private Floor _cellMap;
 
     private void Awake()
     {
-        ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
-        ServiceProvider.Instance.AddService<HabilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
+        ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
+        ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<EventBus>(new EventBus());
         ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(playerPrefab, heavyEngine, lightEnemy, normalEnemy, _cellMap));
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());

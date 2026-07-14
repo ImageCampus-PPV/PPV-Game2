@@ -2,23 +2,21 @@ using System.Collections;
 
 public class MoveAction : TurnAction
 {
-    private readonly Cell _targetCell;
     private readonly Cell _originCell;
+    private readonly Cell _targetCell;
 
-    public MoveAction(Cell originCell, Cell targetCell)
+    public MoveAction(Cell originCell, Cell targetCell, int apCost) : base(apCost, 1)
     {
         _originCell = originCell;
         _targetCell = targetCell;
     }
 
-    public override int APCost => 1;
-    public override int TickCost => 1;
-
     public Cell TargetCell => _targetCell;
-    public Cell OriginCell => _originCell;
 
     public override IEnumerator Execute(Player player)
     {
         yield return player.MoveTo(_targetCell);
+
+        AdvanceTick();
     }
 }

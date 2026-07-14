@@ -2,10 +2,21 @@ using System.Collections;
 
 public abstract class TurnAction
 {
-    public abstract int APCost { get; }
-    public abstract int TickCost { get; }
+    public int TotalTicks { get; }
+    public int APCost { get; }
+    public int CurrentTick { get; private set; }
+    public bool IsFinished => CurrentTick >= TotalTicks;
 
-    public virtual bool CanExecute(Unit unit) => true;
+    protected TurnAction(int totalTicks, int APCost)
+    {
+        TotalTicks = totalTicks;
+        this.APCost = APCost;
+    }
+
+    protected void AdvanceTick()
+    {
+        CurrentTick++;
+    }
 
     public abstract IEnumerator Execute(Player player);
 }
