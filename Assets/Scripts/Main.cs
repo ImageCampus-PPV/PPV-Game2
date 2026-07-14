@@ -33,10 +33,7 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
         ServiceProvider.Instance.AddService<HackSystem>(new HackSystem());
 
-        // NOTA: antes de este cambio, APWallet.Init() nunca se llamaba, lo que significa que
-        // APWallet nunca se suscribia a APConsumeRequestAceptedEvent/APRefillEvent: el AP
-        // gastado por movimiento (y ahora por hackeos) no se estaba descontando realmente del
-        // pozo. Se agrega el Init() que faltaba para que el consumo de AP funcione de verdad.
+      
         ServiceProvider.Instance.GetService<APWallet>().Init();
 
         _turnManager = new TurnManager();

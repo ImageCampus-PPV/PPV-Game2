@@ -3,20 +3,7 @@ using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using UnityEngine;
 
-// MEC-02 - GDD de Hackeo de Terminales
-// Orquesta la accion de "Hackeo" sobre una Terminal: valida condiciones,
-// cobra el AP y resuelve el progreso por ticks durante la fase de Execution.
-//
-// LIMITACION CONOCIDA: SIS-01 (Turnos Simultaneos) todavia no separa
-// Planning/Execution en ticks discretos e intercalados con los enemigos (ver
-// TurnManager.Tick / EnemiesTurn). Por eso, hoy los ticks de un hackeo se
-// resuelven de un tiro dentro de Player.HandleMovement(), en vez de
-// intercalarse tick a tick con las acciones enemigas. El costeo en AP y en
-// ticks (contra el pool de _maxTicksPerTurn del Player) SI es fiel al GDD, y
-// un hackeo que no alcanza a completarse en el budget de ticks del turno
-// queda correctamente "En Proceso" para retomar en el siguiente turno.
-// Cuando se resuelva SIS-01, ResolvePlannedHack es el lugar a refactorizar
-// para que avance de a un tick por llamada real del motor de turnos.
+
 public class HackSystem : IService
 {
     public bool IsPersistance => false;
@@ -28,11 +15,6 @@ public class HackSystem : IService
     private Terminal _activeTerminal;
     public Terminal ActiveTerminal => _activeTerminal;
 
-    // Condiciones para iniciar un Hackeo (ver GDD):
-    // - la terminal esta en un estado hackeable (Active / InProgress / Corrupted)
-    // - esta dentro del rango de interaccion
-    // - el jugador tiene AP suficiente (incluyendo lo ya reservado en el plan actual)
-    // - no hay otro hackeo distinto ya en curso este turno
     public bool CanStartHack(Cell originCell, Terminal terminal, int totalPlannedAPCost)
     {
         if (terminal == null || originCell == null)
@@ -65,17 +47,11 @@ public class HackSystem : IService
         return true;
     }
 
-    // Llamado desde Player.HandleMovement() al ejecutar el plan del turno.
-    // ticksToResolve es el presupuesto de ticks que el jugador tenia
-    // disponible para el hackeo dentro de su _maxTicksPerTurn.
     public void ResolvePlannedHack(Player player, Terminal terminal, int ticksToResolve)
     {
         if (terminal == null || ticksToResolve <= 0)
             return;
 
-        // Condiciones de fallo / interrupcion: si el jugador quedo stuneado o
-        // sin vida antes de que el hackeo llegue a resolverse, se interrumpe
-        // sin consumir progreso extra.
         if (player.IsStun || player.Life == 0)
         {
             terminal.Interrupt();

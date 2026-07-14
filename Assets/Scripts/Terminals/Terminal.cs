@@ -4,11 +4,6 @@ using ImageCampus.ToolBox.Services;
 using UnityEngine;
 using UnityEngine.Events;
 
-// MEC-02 - GDD de Hackeo de Terminales
-// Representa una terminal hackeable ubicada sobre una Cell de la grilla.
-// El "Hackeo" en si (declarar la accion, gastar AP/ticks, resolverla) lo maneja
-// HackSystem; esta clase modela el objeto/estado de la terminal (ver
-// "Diferencia entre Terminal y Hackeo" en el GDD).
 public class Terminal : BaseEntity
 {
     [Header("Config")]
@@ -35,11 +30,6 @@ public class Terminal : BaseEntity
 
     private bool _initialized;
 
-    // Marcador visual simple (placeholder de programador) para poder
-    // distinguir a simple vista una celda con Terminal del resto: una esferita
-    // flotando arriba del tile, coloreada segun EffectiveState. No toca el
-    // Renderer de la Cell (ese lo maneja la FSM de Cell/DefaultCell.cs) para
-    // no pisarle el color a la corrupcion/estados de la celda.
     private GameObject _marker;
     private Renderer _markerRenderer;
 
@@ -52,13 +42,9 @@ public class Terminal : BaseEntity
     public int RequiredTicks => _requiredTicks;
     public int Range => _range;
 
-    // Estado "crudo" (el que se setea explicitamente).
     public TerminalState RawState => _state;
 
-    // Estado que efectivamente deberia mostrar/usar la UI: si la Cell esta
-    // corrupta (Infected/Contagious, ver Cell/DefaultCell.cs) y la terminal no
-    // esta en medio de un hackeo ni completada, se reporta como Corrupted.
-    // Esto evita duplicar el estado de corrupcion en dos lugares distintos.
+
     public TerminalState EffectiveState
     {
         get
@@ -116,20 +102,15 @@ public class Terminal : BaseEntity
 
         Collider markerCollider = _marker.GetComponent<Collider>();
         if (markerCollider != null)
-            Destroy(markerCollider); // no debe interceptar los raycasts de movimiento/abilities/hack
+            Destroy(markerCollider);
 
         _marker.transform.SetParent(transform, worldPositionStays: false);
-        _marker.transform.localPosition = new Vector3(0f, 0.9f, 0f); // flota arriba del cubo de la celda
+        _marker.transform.localPosition = new Vector3(0f, 0.9f, 0f);
         _marker.transform.localScale = Vector3.one * 0.35f;
 
         _markerRenderer = _marker.GetComponent<Renderer>();
     }
 
-    // NOTA: esto solo se re-evalua cuando se llama a SetState() (Init, avance
-    // de hackeo, etc). Si la Cell se corrompe despues por su cuenta (spread de
-    // Contagious) sin que la Terminal reciba un SetState, el marcador puede
-    // quedar visualmente desactualizado un instante aunque CanBeHacked()/
-    // EffectiveState ya reflejen la corrupcion correctamente para el gameplay.
     private void UpdateMarkerVisual()
     {
         if (_markerRenderer == null)
@@ -163,10 +144,6 @@ public class Terminal : BaseEntity
         _markerRenderer.material.color = color;
     }
 
-    // Condiciones para iniciar un Hackeo (ver GDD): la terminal debe estar
-    // activa, en proceso (retomando un hackeo interrumpido) o corrupta
-    // (hackeable igual, con riesgo extra). Inactiva y Bloqueada no se pueden
-    // hackear.
     public bool CanBeHacked()
     {
         TerminalState effective = EffectiveState;
@@ -176,7 +153,6 @@ public class Terminal : BaseEntity
             || effective == TerminalState.Corrupted;
     }
 
-    // Avanza un tick de progreso. Devuelve true si con este tick se completo el hackeo.
     public bool AdvanceProgress()
     {
         if (_currentTicks == 0)
@@ -197,11 +173,6 @@ public class Terminal : BaseEntity
         return true;
     }
 
-    // El progreso NO se revierte al interrumpir (ver "Hackeos Interrumpidos" /
-    // "Break DESPUES de que empiece el hackeo" en el GDD): la terminal queda
-    // "En Proceso" y se retoma en una proxima fase de planeamiento.
-    // TODO(MEC-06 - Break): cuando se implemente Break, este es el punto de
-    // enganche para interrumpir un hackeo en curso.
     public void Interrupt()
     {
         if (_state != TerminalState.InProgress)
@@ -220,13 +191,6 @@ public class Terminal : BaseEntity
         return cellState == typeof(Infected) || cellState == typeof(Contagious);
     }
 
-    // Efectos "built-in" para los tipos de terminal que ya tienen un sistema
-    // real para apoyarse (corrupcion de Cell y stun de TurnManager). El resto
-    // de los tipos (Access, Reward, FloorObjective, Influence "global") no
-    // tienen todavia un sistema propio (puertas, buffs, objetivos de piso,
-    // Influencia de la IDOL - SIS-05) asi que se resuelven unicamente via el
-    // UnityEvent _onHackCompleted, para que se puedan enganchar desde el nivel
-    // sin inventar sistemas que no existen aun.
     private void ApplyBuiltInEffect()
     {
         switch (_type)
@@ -290,11 +254,6 @@ public class Terminal : BaseEntity
             if (enemy.CurrentCell == null)
                 continue;
 
-            // OJO: IsCellNearUnit solo busca en linea recta (N/S/E/O) desde la
-            // celda de la Terminal, no en diagonal ni por distancia Manhattan
-            // general (mismo chequeo que usan Counter/LagSpike). Un enemigo
-            // que se movio fuera de esa linea, aunque este "cerca" en
-            // distancia real, no cuenta como en rango.
             if (turnManager.IsCellNearUnit(_cell, enemy.CurrentCell, _range))
             {
                 turnManager.ApplyStun(enemy);

@@ -22,7 +22,6 @@ public class Cell : BaseEntity
     [HideInInspector] public bool isOccupied => stander != null;
     public Unit stander = null;
 
-    // Terminal hackeable ubicada sobre esta Cell (MEC-02), si es que tiene una. Asignada por MapGrid.Build().
     public Terminal Terminal { get; set; }
 
     private Bounds _bounds;

@@ -56,7 +56,7 @@ public class TurnManager : IService
         if (Input.GetKeyDown(KeyCode.E))
             TryUseAbility(_counterAbility);
 
-        if (Input.GetKeyDown(KeyCode.F)) // MEC-02 - Hackeo de Terminales
+        if (Input.GetKeyDown(KeyCode.F))
             TryPlanHack();
 
         Player player = EntityRegistry.FilterEntities<Player>().First();
@@ -99,7 +99,6 @@ public class TurnManager : IService
         AbilitySystem.UseAbility(ability, player, clickedCell);
     }
 
-    // MEC-02 - Hackeo de Terminales: declara el hackeo de la terminal bajo el cursor, si hay una.
     private void TryPlanHack()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);

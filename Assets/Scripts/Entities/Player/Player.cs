@@ -19,7 +19,6 @@ public class Player : Unit
     private int _plannedAPCost;
     public int PlannedAPCost => _plannedAPCost;
 
-    // MEC-02 - Hackeo de Terminales: hackeo planificado para este turno, si hay uno.
     private Terminal _plannedHackTerminal;
     private int _plannedHackTicks;
     private int _plannedHackAPCost;
@@ -199,9 +198,6 @@ public class Player : Unit
 
     }
 
-    // MEC-02 - Hackeo de Terminales: declara, durante la fase de planeamiento,
-    // la intencion de hackear una terminal. Se resuelve mas adelante en
-    // HandleMovement(), junto con el resto de las acciones del turno.
     public bool TryPlanHack(Terminal terminal)
     {
         if (terminal == null)
@@ -228,7 +224,7 @@ public class Player : Unit
         int totalPlannedAPCost = _plannedAPCost + _plannedHackAPCost + hackAPCost;
 
         if (!HackSystem.CanStartHack(CurrentPlanningOrigin, terminal, totalPlannedAPCost))
-            return false; // HackSystem ya loguea la razon especifica
+            return false;
 
         _plannedHackTerminal = terminal;
         _plannedHackTicks = ticksNeeded;
@@ -293,8 +289,6 @@ public class Player : Unit
 
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
 
-        // Si no hubo movimiento, ningun coroutine va a llamar OnMovementFinished(),
-        // asi que el reseteo del plan del turno hay que hacerlo aca mismo.
         if (!hasMovement)
             ResetVariables();
     }

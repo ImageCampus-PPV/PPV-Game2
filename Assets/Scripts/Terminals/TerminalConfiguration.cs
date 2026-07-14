@@ -1,10 +1,7 @@
 using System;
 using UnityEngine;
 
-// Balance por defecto de cada tipo de terminal (AP, ticks y rango).
-// Ver "Coste y Duracion del Hackeo" en MEC-02 - referirse a la planilla de
-// balance de Hackeo de Terminales para los valores finales:
-// https://docs.google.com/spreadsheets/d/18MzORZ__stUr4dxP7f76QjLdmnyHWNhl-u703041BXY
+
 [Serializable]
 public struct TerminalBalanceData
 {
