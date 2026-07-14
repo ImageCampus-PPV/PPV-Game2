@@ -63,6 +63,9 @@ public class TurnManager : IService
 
     public IEnumerator ExecuteTurn()
     {
+        foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
+            enemy.PlanTurn(_player.CurrentCell);
+
         CheckStunColdown();
         _executing = true;
 
@@ -71,8 +74,7 @@ public class TurnManager : IService
             if (unit.PlannedActions.Count > maxActions)
                 maxActions = unit.PlannedActions.Count;
 
-
-        for (int i = 0; i < maxActions; i++)
+        for (int i = 0; i < maxActions; i++) //Ticks
         {
             MapGrid.Tick(Time.deltaTime);
             foreach (Unit unit in _units)
@@ -84,6 +86,7 @@ public class TurnManager : IService
                     continue;
 
                 IEnumerator routine = unit.PlannedActions[i].Execute(unit);
+                unit.ConsumeAP(unit.PlannedActions[i]);
 
                 while (routine.MoveNext())
                     yield return routine.Current;

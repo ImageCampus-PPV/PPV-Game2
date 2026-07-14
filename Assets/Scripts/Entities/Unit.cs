@@ -1,3 +1,4 @@
+using Assets.Scripts.Combat;
 using ImageCampus.ToolBox.Services;
 using System.Collections;
 using System.Collections.Generic;
@@ -282,6 +283,12 @@ public abstract class Unit : BaseEntity
 
     public IEnumerator MoveTo(Cell targetCell)
     {
+        if (targetCell.isOccupied)
+        {
+            ClearPlan();
+            yield break;
+        }
+
         _isMoving = true;
 
         Vector3 startPos = transform.position;
@@ -298,10 +305,9 @@ public abstract class Unit : BaseEntity
             finalTarget.y = startPos.y;
         }
 
-        Cell previous = _currentCell;
-        previous.stander = null;
-
+        Cell previousCell = _currentCell;
         _currentCell = targetCell;
+        previousCell.stander = null;
         _currentCell.stander = this;
 
         float elapsed = 0;
@@ -358,5 +364,7 @@ public abstract class Unit : BaseEntity
         _plannedActions.Clear();
     }
 
-
+    public virtual void ConsumeAP(TurnAction action)
+    {
+    }
 }
