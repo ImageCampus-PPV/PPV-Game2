@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -178,3 +180,5 @@ public class MapEditor : EditorWindow
         return true;
     }
 }
+
+#endif
