@@ -33,7 +33,7 @@ public class CounterAbility : IAbility
     {
         Enemy enemy = targetCell.stander as Enemy;
 
-        EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
+        //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
         CounterSystem.Execute(player, enemy);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }

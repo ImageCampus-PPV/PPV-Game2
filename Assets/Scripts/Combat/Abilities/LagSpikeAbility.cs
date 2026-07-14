@@ -33,7 +33,7 @@ public class LagSpikeAbility : IAbility
     {
         Enemy enemy = targetCell.stander as Enemy;
 
-        EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
+        //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
 
         TurnManager.ApplyStun(enemy);
 

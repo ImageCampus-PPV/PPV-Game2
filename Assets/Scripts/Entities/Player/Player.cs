@@ -8,16 +8,14 @@ using UnityEngine;
 public class Player : Unit
 {
     [SerializeField] private int _maxTicksPerTurn = 7;
-    private int _plannedTicks;
     public int MaxTicksPerTurn => _maxTicksPerTurn;
-    public int PlannedTicks => _plannedTicks;
+    public int PlannedTicks => GetPlannedTickCost();
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
 
-    private int _plannedAPCost;
-    public int PlannedAPCost => _plannedAPCost;
+    public int PlannedAPCost => GetPlannedAPCost();
 
     private bool _isTurnReady = false;
     public bool IsTurnReady => _isTurnReady;
@@ -52,6 +50,7 @@ public class Player : Unit
     public override void Init()
     {
         base.Init();
+        APWallet.Init();
         ServiceProvider.Instance.GetService<EntityRegistry>().Add(this);
         AbilitySystem.RegisterAbility(new LagSpikeAbility());
         AbilitySystem.RegisterAbility(new CounterAbility());
@@ -85,9 +84,6 @@ public class Player : Unit
         //FinishTurn
         if (Input.GetKeyUp(KeyCode.Space))
             _isTurnReady = true;
-
-
-        Debug.Log("Planned ticks: " + _plannedTicks);
     }
 
 
@@ -143,6 +139,7 @@ public class Player : Unit
         //AbilitySystem.UseAbility(ability, this, clickedCell);
         AbilityAction abilityAction = new AbilityAction(this, ability, clickedCell, 1, ability.APCost);
         _plannedActions.Add(abilityAction);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
     private int GetPlannedAPCost()
@@ -179,8 +176,6 @@ public class Player : Unit
     private void ResetVariables()
     {
         _isTurnReady = false;
-        _plannedTicks = 0;
-        _plannedAPCost = 0;
         _plannedActions.Clear();
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
@@ -218,9 +213,10 @@ public class Player : Unit
     {
     }
 
-    public void ConsumeAP(TurnAction action)
+    public override void ConsumeAP(TurnAction action)
     {
         EventBus.Raise<APConsumeRequestAceptedEvent>(action.APCost);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 
     public override void ClearPlan()
