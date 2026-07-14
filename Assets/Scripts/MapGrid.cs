@@ -1,7 +1,11 @@
+using Assets.Scripts;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
+using EventBus = ImageCampus.ToolBox.Events.EventBus;
 
 public class MapGrid : IService, IDisposable
 {
@@ -14,8 +18,25 @@ public class MapGrid : IService, IDisposable
     public int Width => _cellsX;
     public int Height => _cellsZ;
 
+    //This should be optimize.
+    private Floor _cellMap;
+
+    private GameObject _playerPrefab;
+    private GameObject _heavyEngine;
+    private GameObject _lightEnemy;
+    private GameObject _normalEnemy;
+
     private Cell[,] _gridArray;
     [SerializeField] private GameObject _cellPrefab;
+
+    public MapGrid(GameObject playerPrefab, GameObject heavyEngine, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps)
+    {
+        _playerPrefab = playerPrefab;
+        _heavyEngine = heavyEngine;
+        _lightEnemy = lightEnemy;
+        _normalEnemy = normalEnemy;
+        _cellMap = cellsMaps;
+    }
 
     public void Init()
     {
@@ -30,52 +51,78 @@ public class MapGrid : IService, IDisposable
 
     private void Build()
     {
-        Cell[] cells = UnityEngine.Object.FindObjectsOfType<Cell>();
+        _cellsX = _cellMap.size.x;
+        _cellsZ = _cellMap.size.y;
 
-        if (cells.Length == 0)
-            return;
+        GameObject goPlayer = UnityEngine.Object.Instantiate(_playerPrefab);
 
-        (int minX, int minZ, int maxX, int maxZ) = GetMinMaxSize();
+        Player player = goPlayer.AddComponent<Player>();
 
-        _cellsX = maxX - minX + 1;
-        _cellsZ = maxZ - minZ + 1;
+        Dictionary<string, Type> cellStatesPerName = new Dictionary<string, Type>();
 
-        _gridArray = new Cell[_cellsX, _cellsZ];
-
-        foreach (Cell cell in cells)
+        foreach (Type type in GetType().Assembly.GetTypes())
         {
-            Vector2Int coord = cell.Coordinates;
-
-            int x = coord.x - minX;
-            int z = coord.y - minZ;
-
-            _gridArray[x, z] = cell;
-
-            cell.Init();
+            if (typeof(State).IsAssignableFrom(type) && type.GetCustomAttribute<CellStateAttribute>() != null)
+                cellStatesPerName.Add(type.Name, type);
         }
 
-        GetCell(new Vector2Int(_cellsX - 1, _cellsZ - 1)).Transition(typeof(Contagious));
+        Dictionary<string, Type> enemiesType = new Dictionary<string, Type>();
 
-        (int minX, int minZ, int maxX, int maxZ) GetMinMaxSize()
+        GameObject goEnemy = null;
+        Unit goEnemyScript = null;
+
+        _gridArray = new Cell[_cellMap.size.x, _cellMap.size.y];
+
+        foreach (CellData cell in _cellMap._cellsData)
         {
-            int minX = int.MaxValue;
-            int maxX = int.MinValue;
-            int minZ = int.MaxValue;
-            int maxZ = int.MinValue;
+            GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            goCell.transform.position = new Vector3(cell._coordinates.x * 1.25f, 0.0f, cell._coordinates.y * 1.25f);
 
-            foreach (Cell cell in cells)
+            Cell cellObject = goCell.AddComponent<Cell>();
+            goCell.layer = 6;
+
+            _gridArray[cell._coordinates.x, cell._coordinates.y] = cellObject;
+
+            cellObject.SetCoordinate(cell._coordinates);
+            cellObject.Init(cellStatesPerName[cell._initialState]);
+
+            switch (cell._spawnUnit)
             {
-                Vector2Int coord = cell.Coordinates;
+                case nameof(Player):
+                    player.SetSpawnCell(cellObject);
+                    break;
 
-                if (coord.x < minX) minX = coord.x;
-                if (coord.x > maxX) maxX = coord.x;
+                case nameof(HeavyEnemy):
+                    goEnemy = UnityEngine.Object.Instantiate(_heavyEngine);
+                    goEnemyScript = goEnemy.AddComponent<HeavyEnemy>();
+                    break;
 
-                if (coord.y < minZ) minZ = coord.y;
-                if (coord.y > maxZ) maxZ = coord.y;
+                case nameof(LightEnemy):
+                    goEnemy = UnityEngine.Object.Instantiate(_lightEnemy);
+                    goEnemyScript = goEnemy.AddComponent<LightEnemy>();
+                    break;
+
+                case nameof(NormalEnemy):
+                    goEnemy = UnityEngine.Object.Instantiate(_normalEnemy);
+                    goEnemyScript = goEnemy.AddComponent<NormalEnemy>();
+                    break;
+
+                default:
+                    break;
             }
 
-            return (minX, minZ, maxX, maxZ);
+            if (goEnemyScript != null)
+            {
+                goEnemyScript.SetSpawnCell(cellObject);
+                goEnemyScript.Init();
+            }
+
+            goEnemyScript = null;
+            goEnemy = null;
         }
+
+        player.Init();
+
     }
 
     public void Tick(float deltaTime)
