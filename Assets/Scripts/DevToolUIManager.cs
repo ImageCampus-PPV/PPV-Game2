@@ -22,6 +22,8 @@ public class DevToolUIManager : MonoBehaviour
     [SerializeField] private TMP_InputField _cellX;
     [SerializeField] private TMP_InputField _cellY;
     [SerializeField] private TMP_Dropdown _stateDropdown;
+    [SerializeField] private TMP_InputField _gridWidth;
+    [SerializeField] private TMP_InputField _gridHeight;
 
     [Header("Entities")]
     [SerializeField] private TMP_InputField _enemyX;
@@ -44,6 +46,7 @@ public class DevToolUIManager : MonoBehaviour
     [SerializeField] private Button _APActivationButton;
     [SerializeField] private Button _activationButton;
     [SerializeField] private Button _applyCellStateButton;
+    [SerializeField] private Button _resizeGridButton;
     [SerializeField] private Button _spawnEnemyButton;
     [SerializeField] private Button _removeEntityButton;
     [SerializeField] private Button _movePlayerButton;
@@ -68,6 +71,7 @@ public class DevToolUIManager : MonoBehaviour
         _APActivationButton.onClick.AddListener(() => ToggleSection(_apSection, _APActivationButton));
 
         _applyCellStateButton.onClick.AddListener(ApplyCellState);
+        _resizeGridButton.onClick.AddListener(ResizeGrid);
         _spawnEnemyButton.onClick.AddListener(SpawnEnemy);
         _removeEntityButton.onClick.AddListener(RemoveEntity);
         _movePlayerButton.onClick.AddListener(MovePlayer);
@@ -137,6 +141,11 @@ public class DevToolUIManager : MonoBehaviour
             IntValue(_cellX),
             IntValue(_cellY),
             _stateDropdown.options[_stateDropdown.value].text);
+    }
+
+    public void ResizeGrid()
+    {
+        EventBus.Raise<DevResizeGridEvent>(IntValue(_gridWidth), IntValue(_gridHeight));
     }
 
     public void SpawnEnemy()

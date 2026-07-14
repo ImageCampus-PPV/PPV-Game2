@@ -56,7 +56,6 @@ public class TurnManager : IService
         if (target == null) 
             return;
 
-        //TODO: Limpiar este linq
         EntityRegistry.FilterEntities<Player>().First().MoveInstant(target);
     }
 
