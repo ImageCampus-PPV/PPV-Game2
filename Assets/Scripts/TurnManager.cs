@@ -25,7 +25,7 @@ public class TurnManager : IService
     private bool _executing;
     public bool IsExecuting => _executing;
     private Player _player;
-    private List<Unit> _units = new List<Unit>();
+
 
     public TurnManager()
     {
@@ -41,12 +41,6 @@ public class TurnManager : IService
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
         EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
         EventBus.Subscribe<DevMovePlayerEvent>(OnDevMovePlayer);
-
-        _lagSpikeAbility = new LagSpikeAbility();
-        _counterAbility = new CounterAbility();
-
-        AbilitySystem.RegisterAbility(new LagSpikeAbility());
-        AbilitySystem.RegisterAbility(new CounterAbility());
     }
 
     private void OnDevMovePlayer(in DevMovePlayerEvent movePlayerEvent)
@@ -71,19 +65,17 @@ public class TurnManager : IService
         if (_player == null)
             _player = EntityRegistry.FilterEntities<Player>().First();
 
-        if (Input.GetKeyDown(KeyCode.E))
-            TryUseAbility(_counterAbility);
 
         if (Input.GetKeyDown(KeyCode.F))
             TryPlanHack();
 
         Player player = EntityRegistry.FilterEntities<Player>().First();
 
-        if (player.IsTurnReady)
-        {
-            _units.Add(_player);
-            _units.AddRange(EntityRegistry.FilterEntities<Enemy>());
-        }
+        //if (player.IsTurnReady)
+        //{
+        //    _units.Add(_player);
+        //    _units.AddRange(EntityRegistry.FilterEntities<Enemy>());
+        //}
 
         _isTurnReady = _player.IsTurnReady;
     }
@@ -99,14 +91,15 @@ public class TurnManager : IService
 
         int maxActions = 0;
         
-        foreach (Unit unit in _units)
+        foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
             if (unit.PlannedActions.Count > maxActions)
                 maxActions = unit.PlannedActions.Count;
 
         for (int i = 0; i < maxActions; i++) //Ticks
         {
             MapGrid.Tick(Time.deltaTime);
-            foreach (Unit unit in _units)
+
+            foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
             {
                 if (unit.IsStun)
                     continue;
@@ -122,21 +115,10 @@ public class TurnManager : IService
             }
         }
 
-        foreach (Unit unit in _units)
+        foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
             unit.ClearPlan();
         _executing = false;
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
-    
-
-
-        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
-            return;
-
-        if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
-            return;
-
-        Player player = EntityRegistry.FilterEntities<Player>().First();
-        AbilitySystem.UseAbility(ability, player, clickedCell);
     }
 
     private void TryPlanHack()

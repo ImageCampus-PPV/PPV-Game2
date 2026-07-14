@@ -132,6 +132,54 @@ public class Player : Unit
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - futureAP, APWallet.MaxAP);
     }
 
+    // --- Terminales / Hackeo ---------------------------------------------
+
+    public bool TryPlanHack(Terminal terminal)
+    {
+        if (terminal == null)
+            return false;
+
+        if (_plannedHackTerminal != null)
+        {
+            Debug.Log("[Player] Ya hay un hackeo planificado este turno. Confirma el turno (Space) o cancela el plan (R) antes de planificar otro.");
+            return false;
+        }
+
+        bool isFreshStart = terminal.CurrentTicks == 0;
+        int hackAPCost = isFreshStart ? terminal.APCost : 0;
+
+        int remainingTickBudget = _maxTicksPerTurn - GetPlannedTickCost();
+        int ticksNeeded = Mathf.Min(remainingTickBudget, terminal.RequiredTicks - terminal.CurrentTicks);
+
+        if (ticksNeeded <= 0)
+        {
+            Debug.Log($"[Player] No queda presupuesto de ticks este turno para hackear ({GetPlannedTickCost()}/{_maxTicksPerTurn} ya planificados). Confirma el turno o saca movimiento planificado.");
+            return false;
+        }
+
+        int totalPlannedAPCost = GetPlannedAPCost() + hackAPCost;
+
+        Cell originCell = GetLastPlannedCell();
+
+        if (!HackSystem.CanStartHack(originCell, terminal, totalPlannedAPCost))
+            return false;
+
+        _plannedHackTerminal = terminal;
+        _plannedHackTicks = ticksNeeded;
+        _plannedHackAPCost = hackAPCost;
+
+        HackAction hackAction = new HackAction(this, terminal, ticksNeeded, hackAPCost);
+        _plannedActions.Add(hackAction);
+
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
+
+        Debug.Log($"[Player] Hackeo planificado: {terminal.Type} en {terminal.Cell.Coordinates} ({hackAPCost} AP, {ticksNeeded} ticks). Confirma con Space para ejecutarlo.");
+
+        return true;
+    }
+
+    // -----------------------------------------------------------------------
+
     private void TryUseAbility(IAbility ability)
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -182,10 +230,6 @@ public class Player : Unit
     private void ResetVariables()
     {
         _isTurnReady = false;
-        _plannedPath.Clear();
-        _plannedTicks = 0;
-        _plannedAPCost = 0;
-        _waypoints.Clear();
         _plannedHackTerminal = null;
         _plannedHackTicks = 0;
         _plannedHackAPCost = 0;
