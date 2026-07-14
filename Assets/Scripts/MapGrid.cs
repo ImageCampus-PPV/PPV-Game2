@@ -15,9 +15,9 @@ public class MapGrid : IService, IDisposable
 
     EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
 
-    [SerializeField] private int _cellsX;
-    [SerializeField] private int _cellsZ;
-    [SerializeField] private GameObject _cellPrefab;
+    private int _cellsX;
+    private int _cellsZ;
+    private Material _defaultMat;
 
     public int Width => _cellsX;
     public int Height => _cellsZ;
@@ -32,8 +32,7 @@ public class MapGrid : IService, IDisposable
     private TerminalConfiguration _terminalConfiguration;
  
     private Dictionary<string, Type> _cellStatesPerName = new Dictionary<string, Type>();
-    
-    public MapGrid(GameObject playerPrefab, GameObject heavyEngine, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps, TerminalConfiguration terminalConfiguration = null)
+    public MapGrid(GameObject playerPrefab, GameObject heavyEngine, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps, TerminalConfiguration terminalConfiguration, Material defaultMat)
     {
         _playerPrefab = playerPrefab;
         _heavyEngine = heavyEngine;
@@ -41,6 +40,7 @@ public class MapGrid : IService, IDisposable
         _normalEnemy = normalEnemy;
         _cellMap = cellsMaps;
         _terminalConfiguration = terminalConfiguration;
+        _defaultMat = defaultMat;
     }
 
     public void Init()
@@ -114,6 +114,7 @@ public class MapGrid : IService, IDisposable
             {
                 GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 goCell.transform.position = new Vector3(x * 1.25f, 0f, z * 1.25f);
+                goCell.GetComponent<MeshRenderer>().material = _defaultMat;
                 goCell.layer = 6;
 
                 Cell cellObject = goCell.AddComponent<Cell>();
@@ -137,7 +138,7 @@ public class MapGrid : IService, IDisposable
                 : enemyType == typeof(NormalEnemy) ? _normalEnemy
                 : null;
 
-            if (prefab == null) 
+            if (prefab == null)
                 continue;
 
             GameObject go = UnityEngine.Object.Instantiate(prefab);
@@ -150,10 +151,10 @@ public class MapGrid : IService, IDisposable
 
     private void OnDevChangeCellState(in DevChangeCellStateEvent changeCellEvent)
     {
-        if (changeCellEvent.coordX < 0 || changeCellEvent.coordX >= Width || changeCellEvent.coordY < 0 || changeCellEvent.coordY >= Height) 
+        if (changeCellEvent.coordX < 0 || changeCellEvent.coordX >= Width || changeCellEvent.coordY < 0 || changeCellEvent.coordY >= Height)
             return;
 
-        if (!_cellStatesPerName.ContainsKey(changeCellEvent.stateName)) 
+        if (!_cellStatesPerName.ContainsKey(changeCellEvent.stateName))
             return;
 
         GetCell(changeCellEvent.coordX, changeCellEvent.coordY).Transition(_cellStatesPerName[changeCellEvent.stateName]);
@@ -164,7 +165,7 @@ public class MapGrid : IService, IDisposable
         Cell cell = (spawnEnemyEvent.coordX < 0 || spawnEnemyEvent.coordX >= Width || spawnEnemyEvent.coordY < 0 || spawnEnemyEvent.coordY >= Height)
             ? null : GetCell(spawnEnemyEvent.coordX, spawnEnemyEvent.coordY);
 
-        if (cell == null || cell.isOccupied || !cell.IsWalkable) 
+        if (cell == null || cell.isOccupied || !cell.IsWalkable)
             return;
 
         GameObject prefab = spawnEnemyEvent.enemyTypeName switch
@@ -196,16 +197,16 @@ public class MapGrid : IService, IDisposable
 
     private void OnDevRemoveEntity(in DevRemoveEntityAtCellEvent removeEntityEvent)
     {
-        if (removeEntityEvent.coordX < 0 || removeEntityEvent.coordX >= Width || removeEntityEvent.coordY < 0 || removeEntityEvent.coordY >= Height) 
+        if (removeEntityEvent.coordX < 0 || removeEntityEvent.coordX >= Width || removeEntityEvent.coordY < 0 || removeEntityEvent.coordY >= Height)
             return;
 
         Cell cell = GetCell(removeEntityEvent.coordX, removeEntityEvent.coordY);
         Unit unit = cell?.stander;
 
-        if (unit == null) 
+        if (unit == null)
             return;
 
-        if (unit is Player) 
+        if (unit is Player)
             return;
 
         EntityRegistry registry = ServiceProvider.Instance.GetService<EntityRegistry>();
@@ -216,6 +217,12 @@ public class MapGrid : IService, IDisposable
 
     private void Build()
     {
+        if (_defaultMat == null)
+        {
+            Debug.LogError("No default material provided");
+            return;
+        }
+
         _cellsX = _cellMap.size.x;
         _cellsZ = _cellMap.size.y;
 
@@ -242,6 +249,7 @@ public class MapGrid : IService, IDisposable
         {
             GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
             goCell.transform.position = new Vector3(cell._coordinates.x * 1.25f, 0.0f, cell._coordinates.y * 1.25f);
+            goCell.GetComponent<MeshRenderer>().material = _defaultMat;
 
             Cell cellObject = goCell.AddComponent<Cell>();
             goCell.layer = 6;

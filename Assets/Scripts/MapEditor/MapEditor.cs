@@ -180,5 +180,4 @@ public class MapEditor : EditorWindow
         return true;
     }
 }
-
 #endif

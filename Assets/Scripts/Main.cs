@@ -20,12 +20,20 @@ public class Main : MonoBehaviour
     [SerializeField] private Floor _cellMap;
     [SerializeField] private TerminalConfiguration _terminalConfiguration;
 
+    [SerializeField] private Material _defaultMat;
+
     private void Awake()
     {
+        if (_defaultMat == null)
+        {
+            Debug.LogError("No default material provided");
+            return;
+        }    
+
         ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<EventBus>(new EventBus());
-        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(playerPrefab, heavyEngine, lightEnemy, normalEnemy, _cellMap, _terminalConfiguration));
+        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(playerPrefab, heavyEngine, lightEnemy, normalEnemy, _cellMap, _terminalConfiguration, _defaultMat));
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());

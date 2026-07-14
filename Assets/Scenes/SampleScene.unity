@@ -13314,7 +13314,7 @@ MonoBehaviour:
   _APWalletConfiguration: {fileID: 11400000, guid: 1607d20703f07974f9114552afa18576, type: 2}
   _habilitiesDurationConfiguration: {fileID: 11400000, guid: 9bd95554dc7745d44afb09cf0ffb9ea5, type: 2}
   _cellMap: {fileID: 11400000, guid: 092fc2a8b9c837d42a8ba904ad473a8d, type: 2}
-  _terminalConfiguration: {fileID: 0}
+  _defaultMat: {fileID: 2100000, guid: 230651a71114c43448e5afb86dbb5ece, type: 2}
 --- !u!4 &1973655150
 Transform:
   m_ObjectHideFlags: 0
