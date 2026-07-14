@@ -17,18 +17,23 @@ public class TurnManager : IService
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
 
-    private AbilitiesDurationConfiguration HabilitiesDurationConfiguration => ServiceProvider.Instance.GetService<AbilitiesDurationConfiguration>();
+    private AbilitiesDurationConfiguration AbilitiesDurationConfiguration => ServiceProvider.Instance.GetService<AbilitiesDurationConfiguration>();
 
     private Dictionary<uint, uint> _stunUnits;
 
     private uint _currenturn = 1;
     private bool _executing;
+    public bool IsExecuting => _executing;
     private Player _player;
+    private List<Unit> _units = new List<Unit>();
 
     public TurnManager()
     {
         _stunUnits = new Dictionary<uint, uint>();
     }
+
+    private bool _isTurnReady;
+    public bool IsTurnReady => _isTurnReady;
 
     public void Init()
     {
@@ -37,95 +42,61 @@ public class TurnManager : IService
         EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
     }
 
+    //Rename cause this is a turn, not a tick
     public void Tick()
     {
         if (!IsEndOfTurn())
             return;
 
-        if(_player == null)
+        if (_player == null)
             _player = EntityRegistry.FilterEntities<Player>().First();
 
-        if (_player.IsTurnReady)
+        if (_units.Count <= 0)
         {
-            ExecuteTurn();
-            //player.HandleMovement();
-            //EnemiesTurn();
-            //MapGrid.Tick(Time.deltaTime);
+            _units.Add(_player);
+            _units.AddRange(EntityRegistry.FilterEntities<Enemy>());
         }
+
+        _isTurnReady = _player.IsTurnReady;
     }
 
 
-    private IEnumerator ExecuteTurn()
+    public IEnumerator ExecuteTurn()
     {
+        CheckStunColdown();
         _executing = true;
 
-        foreach (TurnAction action in _player.PlannedActions)
+        int maxActions = 0;
+        foreach (Unit unit in _units)
+            if (unit.PlannedActions.Count > maxActions)
+                maxActions = unit.PlannedActions.Count;
+
+
+        for (int i = 0; i < maxActions; i++)
         {
-            _player.ConsumeAP(action);
-
-            IEnumerator routine = action.Execute(_player);
-
-            while (routine.MoveNext())
+            MapGrid.Tick(Time.deltaTime);
+            foreach (Unit unit in _units)
             {
-                yield return routine.Current;
+                if (unit.IsStun)
+                    continue;
 
-                //EnemyTick();
-                MapGrid.Tick(Time.deltaTime);
+                if (i >= unit.PlannedActions.Count)
+                    continue;
+
+                IEnumerator routine = unit.PlannedActions[i].Execute(unit);
+
+                while (routine.MoveNext())
+                    yield return routine.Current;
             }
-
-            //yield return action.Execute(player);
-            //
-            //player.ConsumeAP(action);
-            //
-            ////EnemyTick();
-            //
-            //if (APWallet.CurrentAP <= 0)
-            //{
-            //    //Defeat condition
-            //    yield break;
-            //}
         }
 
-        _player.ClearPlan();
-
+        foreach (Unit unit in _units)
+            unit.ClearPlan();
         _executing = false;
+        EventBus.Raise<TurnChangeEvent>(++_currenturn);
     }
 
 
-    public bool IsCellNearUnit(Cell unitCell, Cell cell, int maxDistance)
-    {
-        Vector2Int origin = unitCell.Coordinates;
-        Vector2Int target = cell.Coordinates;
-
-        Vector2Int[] directions = new Vector2Int[]
-        {
-        new Vector2Int( 1,  0),
-        new Vector2Int(-1,  0),
-        new Vector2Int( 0,  1),
-        new Vector2Int( 0, -1),
-        };
-
-        foreach (Vector2Int dir in directions)
-        {
-            for (int i = 1; i <= maxDistance; i++)
-            {
-                Vector2Int current = origin + dir * i;
-
-                if (current.x < 0 || current.y < 0 || current.x >= MapGrid.Width || current.y >= MapGrid.Height)
-                    break;
-
-                Cell currentCell = MapGrid.GetCell(current);
-
-                if (currentCell.ProvidesCover)
-                    break;
-
-                if (current == target)
-                    return true;
-            }
-        }
-
-        return false;
-    }
 
     private bool IsEndOfTurn()
     {
@@ -136,55 +107,27 @@ public class TurnManager : IService
         return true;
     }
 
-    public void EnemiesTurn()
+    private void CheckStunColdown()
     {
-        foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
-            if (!_stunUnits.ContainsKey(enemy.ID))
-                foreach (Player player in EntityRegistry.FilterEntities<Player>())
-                    enemy.TakeTurn(player.CurrentCell);
+        List<uint> removeFromStunList = new List<uint>();
 
-        foreach (HeavyEnemy heavyEnemy in EntityRegistry.FilterEntities<HeavyEnemy>())
-            if (!heavyEnemy.IsStun)
-                if (IsCellNearUnit(heavyEnemy.CurrentCell, EntityRegistry.FilterEntities<Player>().First().CurrentCell, heavyEnemy.AttackRange))
-                    EntityRegistry.FilterEntities<Player>().First().ReduceLife(heavyEnemy.Damage);
+        foreach (KeyValuePair<uint, uint> stunEntity in _stunUnits)
+            if (stunEntity.Value == _currenturn)
+            {
+                EntityRegistry.GetAs<Unit>(stunEntity.Key).GetComponent<Renderer>().material.color = Color.red;
+                EntityRegistry.GetAs<Unit>(stunEntity.Key).Unstun();
+                removeFromStunList.Add(stunEntity.Key);
+            }
 
-        foreach (LightEnemy lightEnemy in EntityRegistry.FilterEntities<LightEnemy>())
-            if (!lightEnemy.IsStun)
-                if (IsCellNearUnit(lightEnemy.CurrentCell, EntityRegistry.FilterEntities<Player>().First().CurrentCell, lightEnemy.AttackRange))
-                {
-                    if (lightEnemy.IsChargedAttack)
-                        EntityRegistry.FilterEntities<Player>().First().ReduceLife(lightEnemy.Damage);
-                    else
-                        lightEnemy.ChargeAttack();
-                }
-                else if (lightEnemy.IsChargedAttack)
-                    lightEnemy.UnchargeAttack();
-
-        CheckStunColdown();
-
-        void CheckStunColdown()
-        {
-            List<uint> removeFromStunList = new List<uint>();
-
-            foreach (KeyValuePair<uint, uint> stunEntity in _stunUnits)
-                if (stunEntity.Value == _currenturn)
-                {
-                    EntityRegistry.GetAs<Unit>(stunEntity.Key).GetComponent<Renderer>().material.color = Color.red;
-                    EntityRegistry.GetAs<Unit>(stunEntity.Key).Unstun();
-                    removeFromStunList.Add(stunEntity.Key);
-                }
-
-            foreach (uint key in removeFromStunList)
-                _stunUnits.Remove(key);
-        }
-
-        EventBus.Raise<TurnChangeEvent>(++_currenturn);
+        foreach (uint key in removeFromStunList)
+            _stunUnits.Remove(key);
     }
 
     public void ApplyStun(Unit unit)
     {
         unit.Stun();
-        _stunUnits[unit.ID] = _currenturn + 1 + HabilitiesDurationConfiguration.stunDuration;
+        _stunUnits[unit.ID] = _currenturn + 1 + AbilitiesDurationConfiguration.stunDuration;
         unit.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+        Debug.Log("EnemyStunned");
     }
 }

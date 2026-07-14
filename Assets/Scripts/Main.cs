@@ -46,6 +46,10 @@ public class Main : MonoBehaviour
     private void Update()
     {
         _turnManager.Tick();
+        if (_turnManager.IsTurnReady && !_turnManager.IsExecuting)
+        {
+            StartCoroutine(_turnManager.ExecuteTurn());
+        }
     }
 
     private void OnApplicationQuit()

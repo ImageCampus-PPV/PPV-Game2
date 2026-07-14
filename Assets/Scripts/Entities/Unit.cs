@@ -16,6 +16,8 @@ public abstract class Unit : BaseEntity
     [Header("Movement")]
     [SerializeField] protected float _timeToMoveCells = 0.2f;
     [SerializeField] protected float _timeToStayInCell = 0.05f;
+    protected List<TurnAction> _plannedActions = new();
+    public List<TurnAction> PlannedActions => _plannedActions;
 
     protected List<Cell> _currentPath;
     protected int _pathIndex;
@@ -350,4 +352,11 @@ public abstract class Unit : BaseEntity
     {
         return basePosition + new Vector3(0, transform.localScale.y * 0.5f, 0);
     }
+
+    public virtual void ClearPlan()
+    {
+        _plannedActions.Clear();
+    }
+
+
 }

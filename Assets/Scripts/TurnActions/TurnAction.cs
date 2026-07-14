@@ -18,5 +18,5 @@ public abstract class TurnAction
         CurrentTick++;
     }
 
-    public abstract IEnumerator Execute(Player player);
+    public abstract IEnumerator Execute(Unit unit);
 }

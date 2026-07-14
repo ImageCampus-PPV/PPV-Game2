@@ -12,10 +12,11 @@ public class MoveAction : TurnAction
     }
 
     public Cell TargetCell => _targetCell;
+    public Cell OriginCell => _originCell;
 
-    public override IEnumerator Execute(Player player)
+    public override IEnumerator Execute(Unit unit)
     {
-        yield return player.MoveTo(_targetCell);
+        yield return unit.MoveTo(_targetCell);
 
         AdvanceTick();
     }

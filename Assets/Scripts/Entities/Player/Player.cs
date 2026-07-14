@@ -2,10 +2,8 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class Player : Unit
 {
@@ -18,9 +16,6 @@ public class Player : Unit
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
 
-
-    private readonly List<TurnAction> _plannedActions = new();
-    public IReadOnlyList<TurnAction> PlannedActions => _plannedActions;
     private int _plannedAPCost;
     public int PlannedAPCost => _plannedAPCost;
 
@@ -74,7 +69,7 @@ public class Player : Unit
 
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
                 if (hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
-                    ReactToInput(clickedCell);
+                    ReactToClick(clickedCell);
         }
 
         if (Input.GetKeyDown(KeyCode.Q))
@@ -96,7 +91,7 @@ public class Player : Unit
     }
 
 
-    private void ReactToInput(Cell clickedCell)
+    private void ReactToClick(Cell clickedCell)
     {
         if (!IsCellAvailable(clickedCell))
             return;
@@ -145,7 +140,9 @@ public class Player : Unit
         if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
             return;
 
-        AbilitySystem.UseAbility(ability, this, clickedCell);
+        //AbilitySystem.UseAbility(ability, this, clickedCell);
+        AbilityAction abilityAction = new AbilityAction(this, ability, clickedCell, 1, ability.APCost);
+        _plannedActions.Add(abilityAction);
     }
 
     private int GetPlannedAPCost()
@@ -167,23 +164,6 @@ public class Player : Unit
 
         return ticks;
     }
-
-    //public void HandleMovement()
-    //{
-    //    _isTurnReady = false;
-    //
-    //    if (_plannedPath.Count <= 0)
-    //        return;
-    //
-    //    if (_isMoving)
-    //        return;
-    //
-    //    Debug.Log("HANDLE MOVEMENT CALLED");
-    //
-    //    StartCoroutine(FollowPath(_plannedPath));
-    //    EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
-    //    EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
-    //}
 
     public Cell GetLastPlannedCell()
     {
@@ -236,7 +216,6 @@ public class Player : Unit
 
     protected override void OnMovementFinished()
     {
-        ResetVariables();
     }
 
     public void ConsumeAP(TurnAction action)
@@ -244,7 +223,7 @@ public class Player : Unit
         EventBus.Raise<APConsumeRequestAceptedEvent>(action.APCost);
     }
 
-    public void ClearPlan()
+    public override void ClearPlan()
     {
         ResetVariables();
     }
