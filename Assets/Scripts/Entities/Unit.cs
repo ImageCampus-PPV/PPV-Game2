@@ -1,3 +1,4 @@
+using Assets.Scripts.Combat;
 using ImageCampus.ToolBox.Services;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ public abstract class Unit : BaseEntity
     [Header("Movement")]
     [SerializeField] protected float _timeToMoveCells = 0.2f;
     [SerializeField] protected float _timeToStayInCell = 0.05f;
+    protected List<TurnAction> _plannedActions = new();
+    public List<TurnAction> PlannedActions => _plannedActions;
 
     protected List<Cell> _currentPath;
     protected int _pathIndex;
@@ -284,6 +287,59 @@ public abstract class Unit : BaseEntity
         OnMovementFinished();
     }
 
+    public IEnumerator MoveTo(Cell targetCell)
+    {
+        if (targetCell.isOccupied)
+        {
+            ClearPlan();
+            yield break;
+        }
+
+        _isMoving = true;
+
+        Vector3 startPos = transform.position;
+        Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
+        Vector3 finalTarget;
+
+        if (targetCell.Height != _currentCell.Height)
+        {
+            finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
+        }
+        else
+        {
+            finalTarget = targetCell.transform.position;
+            finalTarget.y = startPos.y;
+        }
+
+        Cell previousCell = _currentCell;
+        _currentCell = targetCell;
+        previousCell.stander = null;
+        _currentCell.stander = this;
+
+        float elapsed = 0;
+
+        while (elapsed < _timeToMoveCells)
+        {
+            elapsed += Time.deltaTime;
+            transform.position = Vector3.Lerp(startPos, flatTarget, elapsed / _timeToMoveCells);
+            yield return null;
+        }
+
+        elapsed = 0;
+
+        while (elapsed < _timeToMoveCells * .5f)
+        {
+            elapsed += Time.deltaTime;
+            transform.position = Vector3.Lerp(flatTarget, finalTarget, elapsed / (_timeToMoveCells * 0.5f));
+
+            yield return null;
+        }
+
+        transform.position = finalTarget;
+
+        _isMoving = false;
+    }
+
     public void MoveInstant(Cell targetCell)
     {
         if (_currentCell != null)
@@ -307,5 +363,14 @@ public abstract class Unit : BaseEntity
     protected Vector3 GetStandPosition(Vector3 basePosition)
     {
         return basePosition + new Vector3(0, transform.localScale.y * 0.5f, 0);
+    }
+
+    public virtual void ClearPlan()
+    {
+        _plannedActions.Clear();
+    }
+
+    public virtual void ConsumeAP(TurnAction action)
+    {
     }
 }
