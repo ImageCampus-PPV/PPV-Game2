@@ -117,13 +117,16 @@ public abstract class Unit : BaseEntity
 
     protected int GetPathCost(Cell originCell, Cell targetCell)
     {
-        if (!IsCellAvailable(targetCell))
+        if (targetCell == originCell)
+            return -1;
+
+        if (!IsCellAvailable(targetCell) && targetCell.stander is not Player)
         {
             Debug.LogWarning($"Target cell unavailable: {targetCell}");
             return -1;
         }
 
-        if (!IsCellAvailable(originCell))
+        if (!IsCellAvailable(originCell) && originCell.stander is not Player)
         {
             Debug.LogWarning($"Origin cell unavailable: {originCell}");
             return -1;
@@ -139,7 +142,7 @@ public abstract class Unit : BaseEntity
 
     protected List<Cell> GetPathCells(Cell targetCell)
     {
-        if (!IsCellAvailable(targetCell))
+        if (!IsCellAvailable(targetCell) && targetCell.stander is not Player)
         {
             Debug.LogWarning("Target cell unavailable");
             return null;
@@ -150,7 +153,7 @@ public abstract class Unit : BaseEntity
 
     protected List<Cell> GetPathCells(Cell originCell, Cell targetCell)
     {
-        if (!IsCellAvailable(targetCell))
+        if (!IsCellAvailable(targetCell) && targetCell.stander is not Player)
         {
             Debug.LogWarning("Target cell unavailable");
             return null;
