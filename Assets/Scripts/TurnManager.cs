@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public class TurnManager : IService
 {
@@ -99,7 +100,7 @@ public class TurnManager : IService
             if (unit.PlannedActions.Count > maxActions)
                 maxActions = unit.PlannedActions.Count;
 
-        List<IEnumerator> routines = new List<IEnumerator>();
+        List<(Unit unit, IEnumerator routine)> routines = new();
 
         for (int i = 0; i < maxActions; i++) //Ticks
         {
@@ -124,25 +125,32 @@ public class TurnManager : IService
 
             foreach (Unit unit in tickActions)
             {
+                if (unit.IsStun || unit.PlannedActions.Count == 0 || i >= unit.PlannedActions.Count)
+                    continue;
+
                 IEnumerator routine = unit.PlannedActions[i].Execute(unit);
                 unit.ConsumeAP(unit.PlannedActions[i]);
 
-                routines.Add(routine);
+                routines.Add((unit, routine));
             }
+
 
             bool done = true;
             while (done)
             {
                 done = false;
-                foreach (IEnumerator routine in routines)
+                foreach ((Unit, IEnumerator) activeRoutine in routines)
                 {
-                    IEnumerator currentRoutine = routine;
-                    if (routine.Current is IEnumerator subRoutine)
+                    if (activeRoutine.Item1.IsStun || activeRoutine.Item1.PlannedActions.Count == 0)
+                        continue;
+
+                    IEnumerator currentRoutine = activeRoutine.Item2;
+                    if (currentRoutine.Current is IEnumerator subRoutine)
                     {
                         if (subRoutine.MoveNext())
                             done = true;
                     }
-                    else if (routine.MoveNext())
+                    else if (currentRoutine.MoveNext())
                         done = true;
                 }
 
