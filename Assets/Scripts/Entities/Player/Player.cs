@@ -45,6 +45,9 @@ public class Player : Unit
             _life -= life;
 
         EventBus.Raise<PlayerChangeLifeEvent>(_life);
+
+        if (_life <= 0)
+            EventBus.Raise<LevelFailedEvent>();
     }
 
     public void AddLife(uint life)
@@ -57,8 +60,6 @@ public class Player : Unit
     {
         base.Init();
         APWallet.Init();
-        //It's already added on Main. There was a duplicate.
-        //ServiceProvider.Instance.GetService<EntityRegistry>().Add(this);
         AbilitySystem.RegisterAbility(new LagSpikeAbility());
         AbilitySystem.RegisterAbility(new CounterAbility());
     }

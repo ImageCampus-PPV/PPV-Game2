@@ -3,6 +3,7 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,7 @@ public class TurnManager : IService
         EventBus.Subscribe<DevMovePlayerEvent>(OnDevMovePlayer);
     }
 
+   
     private void OnDevMovePlayer(in DevMovePlayerEvent movePlayerEvent)
     {
         if (movePlayerEvent.coordX < 0 || movePlayerEvent.coordX >= MapGrid.Width || 
@@ -83,6 +85,8 @@ public class TurnManager : IService
 
     public IEnumerator ExecuteTurn()
     {
+        bool playerVictory = false;
+
         foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
             enemy.PlanTurn(_player.CurrentCell);
 
@@ -119,6 +123,9 @@ public class TurnManager : IService
             unit.ClearPlan();
         _executing = false;
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
+
+        if (APWallet.CurrentAP <= 0 && !playerVictory)
+            EventBus.Raise<LevelFailedEvent>();
     }
 
     private void TryPlanHack()

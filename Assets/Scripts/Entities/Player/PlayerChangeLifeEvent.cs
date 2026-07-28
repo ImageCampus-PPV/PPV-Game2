@@ -1,4 +1,4 @@
-using ImageCampus.ToolBox.Events;
+﻿using ImageCampus.ToolBox.Events;
 
 internal struct PlayerChangeLifeEvent : IEvent
 {
@@ -12,6 +12,32 @@ internal struct PlayerChangeLifeEvent : IEvent
     public void Reset()
     {
         currentLife = default(uint);
+    }
+}
+
+public struct LevelCompleteEvent : IEvent
+{
+    public void Assign(params object[] parameters)
+    {
+        return;
+    }
+
+    public void Reset()
+    {
+        return;
+    }
+}
+
+public struct LevelFailedEvent : IEvent
+{
+    public void Assign(params object[] parameters)
+    {
+        return;
+    }
+
+    public void Reset()
+    {
+        return;
     }
 }
 
