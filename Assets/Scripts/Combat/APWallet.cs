@@ -43,6 +43,7 @@ namespace Assets.Scripts.Combat
         private void OnAPRefill(in APRefillEvent apConsumeRequestAceptedEvent)
         {
             _currentAP = MAX_AP;
+            EventBus.Raise<APWalletChangeEvent>(_currentAP, MAX_AP);
         }
 
         public void Dispose()
