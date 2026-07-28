@@ -18,9 +18,12 @@ public abstract class Enemy : Unit
     public int PushDistance => _pushDistance;
 
 
-    public void PlanTurn(Cell playerCell)
+    public void PlanTurn(Cell playerCell, int emptyActions)
     {
         _plannedActions.Clear();
+
+        for (int i = 0; i < emptyActions; i++)
+            _plannedActions.Add(new WaitAction());
 
         if (IsInGoodCover(playerCell))
         {
@@ -41,10 +44,10 @@ public abstract class Enemy : Unit
         if (path == null || path.Count <= 1)
             return;
 
-        for (int i = 1; i < path.Count; i++)
-        {
+        int actionLimit = path.Count < _maxTicksPerTurn ? path.Count : _maxTicksPerTurn;
+
+        for (int i = 1; i < actionLimit; i++)
             _plannedActions.Add(new MoveAction(path[i - 1], path[i], 0));
-        }
 
         PlanCombatActions(playerCell);
 

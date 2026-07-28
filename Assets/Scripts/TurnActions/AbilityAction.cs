@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class AbilityAction : TurnAction
+public class AbilityAction : TurnAction, IAttackAction
 {
     private Player _player;
     private IAbility _ability;
@@ -16,6 +16,7 @@ public class AbilityAction : TurnAction
 
     public override IEnumerator Execute(Unit unit)
     {
+        unit.CurrentAction++;
         if (_ability.CanExecute(_player, _targetCell))
             _ability.Execute(_player, _targetCell);
 

@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEngine;
 
 public class MoveAction : TurnAction
 {
@@ -16,6 +17,8 @@ public class MoveAction : TurnAction
 
     public override IEnumerator Execute(Unit unit)
     {
+        Debug.Log($"{unit.gameObject.name} movement started");
+        unit.CurrentAction++;
         yield return unit.MoveTo(_targetCell);
 
         AdvanceTick();

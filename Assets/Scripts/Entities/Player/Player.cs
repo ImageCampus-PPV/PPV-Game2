@@ -7,8 +7,6 @@ using UnityEngine;
 
 public class Player : Unit
 {
-    [SerializeField] private int _maxTicksPerTurn = 7;
-    public int MaxTicksPerTurn => _maxTicksPerTurn;
     public int PlannedTicks => GetPlannedTickCost();
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
@@ -83,7 +81,10 @@ public class Player : Unit
             TryUseAbility(new LagSpikeAbility());
 
         if (Input.GetKeyDown(KeyCode.E))
+        { 
             TryUseAbility(new CounterAbility());
+            Time.timeScale = 0.1f;
+        }
 
         //R removes all actions
         if (Input.GetKeyUp(KeyCode.R))
@@ -126,7 +127,7 @@ public class Player : Unit
         if (futureAP > APWallet.CurrentAP)
             return;
 
-        if (futureTicks > MaxTicksPerTurn)
+        if (futureTicks > _maxTicksPerTurn)
             return;
 
         _plannedActions.AddRange(newActions);

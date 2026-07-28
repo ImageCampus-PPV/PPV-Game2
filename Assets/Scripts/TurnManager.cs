@@ -86,8 +86,9 @@ public class TurnManager : IService
 
     public IEnumerator ExecuteTurn()
     {
+        MapGrid.Tick(Time.deltaTime);
         foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
-            enemy.PlanTurn(_player.CurrentCell);
+            enemy.PlanTurn(_player.CurrentCell, 0);
 
         CheckStunColdown();
         _executing = true;
@@ -103,18 +104,30 @@ public class TurnManager : IService
         for (int i = 0; i < maxActions; i++) //Ticks
         {
             routines.Clear();
-            MapGrid.Tick(Time.deltaTime); //Updates cells
+            if (i >= 1)
+                MapGrid.Tick(Time.deltaTime); //Updates cells
 
+            List<Unit> tickActions = new List<Unit>();
+            List<Unit> attackntActions = new List<Unit>();
             foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
             {
                 if (unit.IsStun || i >= unit.PlannedActions.Count)
                     continue;
 
+                if (unit.PlannedActions[i] is not IAttackAction)
+                    attackntActions.Add(unit);
+                else
+                    tickActions.Add(unit);
+            }
+
+            tickActions.AddRange(attackntActions);
+
+            foreach (Unit unit in tickActions)
+            {
                 IEnumerator routine = unit.PlannedActions[i].Execute(unit);
                 unit.ConsumeAP(unit.PlannedActions[i]);
 
                 routines.Add(routine);
-
             }
 
             bool done = true;
@@ -139,7 +152,10 @@ public class TurnManager : IService
         }
 
         foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
+        {
             unit.ClearPlan();
+            unit.ResetActionsCounter();
+        }
         _executing = false;
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
 
@@ -233,6 +249,7 @@ public class TurnManager : IService
     public void ApplyStun(Unit unit)
     {
         unit.Stun();
+        unit.ClearPlan();
         _stunUnits[unit.ID] = _currenturn + 1 + AbilitiesDurationConfiguration.stunDuration;
         unit.gameObject.GetComponent<Renderer>().material.color = Color.blue;
         Debug.Log("EnemyStunned");

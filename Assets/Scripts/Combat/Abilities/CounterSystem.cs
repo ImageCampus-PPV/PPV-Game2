@@ -8,17 +8,19 @@ public class CounterSystem : IService
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
     private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
 
+
     public void Execute(Player player, Enemy enemy)
     {
         Vector2Int direction = enemy.CurrentCell.Coordinates - player.CurrentCell.Coordinates;
         direction.x = Mathf.Clamp(direction.x, -1, 1);
         direction.y = Mathf.Clamp(direction.y, -1, 1);
 
-        PushEnemy(enemy, direction, enemy.PushDistance);
+        PushEnemy(enemy, direction, enemy.PushDistance, player);
     }
 
-    private void PushEnemy(Enemy enemy, Vector2Int direction, int distance)
+    private void PushEnemy(Enemy enemy, Vector2Int direction, int distance, Player player)
     {
+        enemy.ClearPlan();
         Cell current = enemy.CurrentCell;
 
         for (int i = 0; i < distance; i++)
@@ -28,6 +30,7 @@ public class CounterSystem : IService
             if (!IsInsideMap(next))
             {
                 TurnManager.ApplyStun(enemy);
+                Debug.Log($"Target cell is not inside map. Dir: {direction} Next: {next}");
                 return;
             }
 
@@ -41,7 +44,8 @@ public class CounterSystem : IService
 
             if (nextCell.stander is Enemy otherEnemy)
             {
-                ResolveCollision(enemy, otherEnemy, direction, distance - i);
+                Debug.Log($"Resolving collision with {otherEnemy}");
+                ResolveCollision(enemy, otherEnemy, direction, distance - i, player);
                 return;
             }
 
@@ -51,13 +55,13 @@ public class CounterSystem : IService
 
     }
 
-    private void ResolveCollision(Enemy enemyA, Enemy enemyB, Vector2Int direction, int remainingDistance)
+    private void ResolveCollision(Enemy enemyA, Enemy enemyB, Vector2Int direction, int remainingDistance, Player player)
     {
         if (enemyA.Fortitude > enemyB.Fortitude)
         {
             TurnManager.ApplyStun(enemyB);
 
-            PushEnemy(enemyB, direction, remainingDistance + 1);
+            PushEnemy(enemyB, direction, remainingDistance + 1, player);
             MoveForward(enemyA, direction, remainingDistance);
         }
         else if (enemyA.Fortitude < enemyB.Fortitude)
@@ -66,7 +70,7 @@ public class CounterSystem : IService
         }
         else
         {
-            PushEnemy(enemyB, direction, remainingDistance + 1);
+            PushEnemy(enemyB, direction, remainingDistance + 1, player);
             MoveForward(enemyA, direction, remainingDistance);
         }
     }
