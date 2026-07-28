@@ -85,8 +85,6 @@ public class TurnManager : IService
 
     public IEnumerator ExecuteTurn()
     {
-        bool playerVictory = false;
-
         foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
             enemy.PlanTurn(_player.CurrentCell);
 
@@ -124,7 +122,7 @@ public class TurnManager : IService
         _executing = false;
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
 
-        if (APWallet.CurrentAP <= 0 && !playerVictory)
+        if (APWallet.CurrentAP <= 0)
             EventBus.Raise<LevelFailedEvent>();
     }
 

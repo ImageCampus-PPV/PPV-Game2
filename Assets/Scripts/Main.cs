@@ -2,11 +2,13 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using UnityEngine;
 
 public class Main : MonoBehaviour
 {
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+    private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
     private TurnManager _turnManager;
 
@@ -24,11 +26,13 @@ public class Main : MonoBehaviour
 
     private void Awake()
     {
+        ServiceProvider.Instance.ClearAllNonPersistanceServices();
+
         if (_defaultMat == null)
         {
             Debug.LogError("No default material provided");
             return;
-        }    
+        }
 
         ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
@@ -41,8 +45,9 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
         ServiceProvider.Instance.AddService<HackSystem>(new HackSystem());
 
-      
+
         ServiceProvider.Instance.GetService<APWallet>().Init();
+        EventBus.Raise<APRefillEvent>();
 
         _turnManager = new TurnManager();
         ServiceProvider.Instance.AddService<TurnManager>(_turnManager);
@@ -71,3 +76,4 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.ClearAllServices();
     }
 }
+

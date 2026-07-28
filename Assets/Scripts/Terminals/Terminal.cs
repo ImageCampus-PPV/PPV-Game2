@@ -178,6 +178,9 @@ public class Terminal : BaseEntity
         ApplyBuiltInEffect();
         _onHackCompleted?.Invoke();
 
+        if (_type == TerminalType.FloorObjective)
+            EventBus.Raise<LevelCompleteEvent>();
+
         return true;
     }
 
