@@ -32,6 +32,7 @@ public class Terminal : BaseEntity
 
     private GameObject _marker;
     private Renderer _markerRenderer;
+    private Material _defaultMat;
 
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
 
@@ -66,7 +67,7 @@ public class Terminal : BaseEntity
         _type = type;
     }
 
-    public void Init(Cell cell, TerminalConfiguration configuration)
+    public void Init(Cell cell, TerminalConfiguration configuration, Material defaultMat)
     {
         _cell = cell;
 
@@ -80,6 +81,11 @@ public class Terminal : BaseEntity
 
         _currentTicks = 0;
         _initialized = true;
+
+        if (defaultMat == null)
+            Debug.LogError("No default material provided to Terminal");
+
+        _defaultMat = defaultMat;
 
         CreateMarker();
         SetState(_initialState);
@@ -109,6 +115,8 @@ public class Terminal : BaseEntity
         _marker.transform.localScale = Vector3.one * 0.35f;
 
         _markerRenderer = _marker.GetComponent<Renderer>();
+
+        _markerRenderer.material = _defaultMat;
     }
 
     private void UpdateMarkerVisual()

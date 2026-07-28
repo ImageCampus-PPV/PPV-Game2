@@ -24,6 +24,11 @@ public class DevToolUIManager : MonoBehaviour
     [SerializeField] private TMP_Dropdown _stateDropdown;
     [SerializeField] private TMP_InputField _gridWidth;
     [SerializeField] private TMP_InputField _gridHeight;
+    [SerializeField] private TMP_Dropdown _terminalDropdown;
+    [SerializeField] private Button _addTerminalButton;
+    [SerializeField] private Button _gridActivationButton;
+    [SerializeField] private Button _applyCellStateButton;
+    [SerializeField] private Button _resizeGridButton;
 
     [Header("Entities")]
     [SerializeField] private TMP_InputField _enemyX;
@@ -31,26 +36,23 @@ public class DevToolUIManager : MonoBehaviour
     [SerializeField] private TMP_Dropdown _enemyDropdown;
     [SerializeField] private TMP_InputField _removeX;
     [SerializeField] private TMP_InputField _removeY;
+    [SerializeField] private Button _enemyActivationButton;
+    [SerializeField] private Button _spawnEnemyButton;
+    [SerializeField] private Button _removeEntityButton;
 
     [Header("Player")]
     [SerializeField] private TMP_InputField _playerX;
     [SerializeField] private TMP_InputField _playerY;
+    [SerializeField] private Button _playerActivationButton;
+    [SerializeField] private Button _movePlayerButton;
 
     [Header("AP")]
     [SerializeField] private TMP_InputField _ap;
-
-    [Header("Buttons")]
-    [SerializeField] private Button _gridActivationButton;
-    [SerializeField] private Button _enemyActivationButton;
-    [SerializeField] private Button _playerActivationButton;
     [SerializeField] private Button _APActivationButton;
-    [SerializeField] private Button _activationButton;
-    [SerializeField] private Button _applyCellStateButton;
-    [SerializeField] private Button _resizeGridButton;
-    [SerializeField] private Button _spawnEnemyButton;
-    [SerializeField] private Button _removeEntityButton;
-    [SerializeField] private Button _movePlayerButton;
     [SerializeField] private Button _setAPButton;
+
+    [Header("General")]
+    [SerializeField] private Button _activationButton;
 
     private readonly List<Button> _activationButtons = new();
 
@@ -76,6 +78,15 @@ public class DevToolUIManager : MonoBehaviour
         _removeEntityButton.onClick.AddListener(RemoveEntity);
         _movePlayerButton.onClick.AddListener(MovePlayer);
         _setAPButton.onClick.AddListener(SetAP);
+        _addTerminalButton.onClick.AddListener(AddTerminal);
+    }
+
+    private void AddTerminal()
+    {
+        EventBus.Raise<DevAddTerminalEvent>(IntValue(_cellX), 
+                                            IntValue(_cellY),
+                                            _terminalDropdown.options[_terminalDropdown.value].text
+   );
     }
 
     private void ToggleSection(GameObject section, Button activator)
@@ -111,6 +122,9 @@ public class DevToolUIManager : MonoBehaviour
             "LightEnemy",
             "NormalEnemy"
         });
+
+        _terminalDropdown.ClearOptions();
+        _terminalDropdown.AddOptions(new List<string>(Enum.GetNames(typeof(TerminalType))));
     }
 
     private List<string> GetCellStateNames()

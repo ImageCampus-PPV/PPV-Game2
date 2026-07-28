@@ -54,9 +54,34 @@ public class MapGrid : IService, IDisposable
         EventBus.Subscribe<DevSpawnEnemyEvent>(OnDevSpawnEnemy);
         EventBus.Subscribe<DevRemoveEntityAtCellEvent>(OnDevRemoveEntity);
         EventBus.Subscribe<DevResizeGridEvent>(OnDevResizeGrid);
+        EventBus.Subscribe<DevAddTerminalEvent>(OnDevAddTerminal);
 
         Build();
     }
+
+    private void OnDevAddTerminal(in DevAddTerminalEvent addTerminalEvent)
+    {
+        if (addTerminalEvent.coordX < 0 || addTerminalEvent.coordX >= Width ||
+            addTerminalEvent.coordY < 0 || addTerminalEvent.coordY >= Height) 
+            return;
+
+        Cell cell = GetCell(addTerminalEvent.coordX, addTerminalEvent.coordY);
+
+        if (cell.Terminal != null)
+        {
+            UnityEngine.Object.Destroy(cell.Terminal);
+            cell.Terminal = null;
+        }
+
+        if (Enum.TryParse(addTerminalEvent.terminalTypeName, out TerminalType type))
+        {
+            Terminal terminal = cell.gameObject.AddComponent<Terminal>();
+            terminal.SetType(type);
+            terminal.Init(cell, _terminalConfiguration, _defaultMat);
+            cell.Terminal = terminal;
+        }
+    }
+
 
     private void OnDevResizeGrid(in DevResizeGridEvent resizeGridEvent)
     {
@@ -292,7 +317,7 @@ public class MapGrid : IService, IDisposable
                 {
                     Terminal terminal = goCell.AddComponent<Terminal>();
                     terminal.SetType(terminalType);
-                    terminal.Init(cellObject, _terminalConfiguration);
+                    terminal.Init(cellObject, _terminalConfiguration, _defaultMat);
                     cellObject.Terminal = terminal;
                 }
                 else

@@ -1,4 +1,4 @@
-﻿using ImageCampus.ToolBox.Events;
+using ImageCampus.ToolBox.Events;
 
 internal struct PlayerChangeLifeEvent : IEvent
 {
@@ -12,5 +12,26 @@ internal struct PlayerChangeLifeEvent : IEvent
     public void Reset()
     {
         currentLife = default(uint);
+    }
+}
+
+public struct DevAddTerminalEvent : IEvent
+{
+    public int coordX;
+    public int coordY;
+    public string terminalTypeName;
+
+    public void Assign(params object[] parameters)
+    {
+        coordX = (int)parameters[0];
+        coordY = (int)parameters[1];
+        terminalTypeName = (string)parameters[2];
+    }
+
+    public void Reset()
+    {
+        coordX = default;
+        coordY = default;
+        terminalTypeName = default;
     }
 }
