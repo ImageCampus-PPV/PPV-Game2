@@ -64,7 +64,7 @@ public class Player : Unit
 
     private void Update()
     {
-        if (IsMoving)
+        if (_isTurnPlaying)
             return;
 
         if (Input.GetMouseButtonUp(0))

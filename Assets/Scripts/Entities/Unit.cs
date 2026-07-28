@@ -23,7 +23,9 @@ public abstract class Unit : BaseEntity
 
     protected List<Cell> _currentPath;
     protected int _pathIndex;
-    protected bool _isMoving;
+    protected bool _isTurnPlaying;
+
+    public bool IsTurnPlaying { get => _isTurnPlaying; set => _isTurnPlaying = value; }
 
     protected int _currentAction;
     public int CurrentAction { get => _currentAction; set => _currentAction = value; }
@@ -37,7 +39,6 @@ public abstract class Unit : BaseEntity
     public bool IsStun => _isStun;
 
     public Cell CurrentCell => _currentCell;
-    public bool IsMoving => _isMoving;
     public int MaxTicksPerTurn => _maxTicksPerTurn;
 
     public virtual void Init()
@@ -152,7 +153,7 @@ public abstract class Unit : BaseEntity
             yield break;
         }
 
-        _isMoving = true;
+        _isTurnPlaying = true;
 
         Vector3 startPos = transform.position;
         Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
@@ -194,7 +195,7 @@ public abstract class Unit : BaseEntity
 
         transform.position = finalTarget;
 
-        _isMoving = false;
+        _isTurnPlaying = false;
     }
 
     public void MoveInstant(Cell targetCell)

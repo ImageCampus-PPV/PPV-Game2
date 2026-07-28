@@ -112,6 +112,8 @@ public class TurnManager : IService
             List<Unit> attackntActions = new List<Unit>();
             foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
             {
+                unit.IsTurnPlaying = true;
+
                 if (unit.IsStun || i >= unit.PlannedActions.Count)
                     continue;
 
@@ -161,6 +163,7 @@ public class TurnManager : IService
 
         foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
         {
+            unit.IsTurnPlaying = false;
             unit.ClearPlan();
             unit.ResetActionsCounter();
         }
@@ -232,7 +235,7 @@ public class TurnManager : IService
     private bool IsEndOfTurn()
     {
         foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
-            if (unit.IsMoving)
+            if (unit.IsTurnPlaying)
                 return false;
 
         return true;

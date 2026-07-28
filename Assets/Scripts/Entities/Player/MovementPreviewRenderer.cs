@@ -43,7 +43,7 @@ public class MovementPreviewRenderer : MonoBehaviour
             DrawPlannedPath();
         }
 
-        if (!_player.IsMoving)
+        if (!_player.IsTurnPlaying)
             DrawReachableCells();
     }
 
