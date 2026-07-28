@@ -11955,7 +11955,7 @@ MonoBehaviour:
   _turnText: {fileID: 1215667755}
   _APText: {fileID: 1107607335}
   _playerLife: {fileID: 32998035}
-  _endLevelDelay: 4
+  _endLevelDelay: 2
   _endTextGO: {fileID: 1066927097}
   _endText: {fileID: 1151352278}
 --- !u!114 &1587193799
@@ -14980,7 +14980,7 @@ MonoBehaviour:
   _APWalletConfiguration: {fileID: 11400000, guid: 1607d20703f07974f9114552afa18576, type: 2}
   _habilitiesDurationConfiguration: {fileID: 11400000, guid: 9bd95554dc7745d44afb09cf0ffb9ea5, type: 2}
   _cellMap: {fileID: 11400000, guid: 092fc2a8b9c837d42a8ba904ad473a8d, type: 2}
-  _terminalConfiguration: {fileID: 0}
+  _terminalConfiguration: {fileID: 11400000, guid: e868794dc2b1444ab06653880e3c6238, type: 2}
   _defaultMat: {fileID: 2100000, guid: 230651a71114c43448e5afb86dbb5ece, type: 2}
 --- !u!4 &1973655150
 Transform:

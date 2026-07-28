@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TurnManager : IService
 {
@@ -44,16 +45,16 @@ public class TurnManager : IService
         EventBus.Subscribe<DevMovePlayerEvent>(OnDevMovePlayer);
     }
 
-   
+
     private void OnDevMovePlayer(in DevMovePlayerEvent movePlayerEvent)
     {
-        if (movePlayerEvent.coordX < 0 || movePlayerEvent.coordX >= MapGrid.Width || 
-            movePlayerEvent.coordY < 0 || movePlayerEvent.coordY >= MapGrid.Height) 
+        if (movePlayerEvent.coordX < 0 || movePlayerEvent.coordX >= MapGrid.Width ||
+            movePlayerEvent.coordY < 0 || movePlayerEvent.coordY >= MapGrid.Height)
             return;
 
         Cell target = MapGrid.GetCell(movePlayerEvent.coordX, movePlayerEvent.coordY);
 
-        if (target == null) 
+        if (target == null)
             return;
 
         EntityRegistry.FilterEntities<Player>().First().MoveInstant(target);
@@ -92,28 +93,48 @@ public class TurnManager : IService
         _executing = true;
 
         int maxActions = 0;
-        
+
         foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
             if (unit.PlannedActions.Count > maxActions)
                 maxActions = unit.PlannedActions.Count;
 
+        List<IEnumerator> routines = new List<IEnumerator>();
+
         for (int i = 0; i < maxActions; i++) //Ticks
         {
-            MapGrid.Tick(Time.deltaTime);
+            routines.Clear();
+            MapGrid.Tick(Time.deltaTime); //Updates cells
 
             foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
             {
-                if (unit.IsStun)
-                    continue;
-
-                if (i >= unit.PlannedActions.Count)
+                if (unit.IsStun || i >= unit.PlannedActions.Count)
                     continue;
 
                 IEnumerator routine = unit.PlannedActions[i].Execute(unit);
                 unit.ConsumeAP(unit.PlannedActions[i]);
 
-                while (routine.MoveNext())
-                    yield return routine.Current;
+                routines.Add(routine);
+
+            }
+
+            bool done = true;
+            while (done)
+            {
+                done = false;
+                foreach (IEnumerator routine in routines)
+                {
+                    IEnumerator currentRoutine = routine;
+                    if (routine.Current is IEnumerator subRoutine)
+                    {
+                        if (subRoutine.MoveNext())
+                            done = true;
+                    }
+                    else if (routine.MoveNext())
+                        done = true;
+                }
+
+                if (done)
+                    yield return null;
             }
         }
 
