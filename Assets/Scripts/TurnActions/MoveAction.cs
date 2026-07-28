@@ -5,7 +5,7 @@ public class MoveAction : TurnAction
     private readonly Cell _originCell;
     private readonly Cell _targetCell;
 
-    public MoveAction(Cell originCell, Cell targetCell, int apCost) : base(apCost, 1)
+    public MoveAction(Cell originCell, Cell targetCell, int apCost) : base(1, apCost)
     {
         _originCell = originCell;
         _targetCell = targetCell;

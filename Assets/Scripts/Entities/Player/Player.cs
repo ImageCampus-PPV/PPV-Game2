@@ -57,7 +57,8 @@ public class Player : Unit
     {
         base.Init();
         APWallet.Init();
-        ServiceProvider.Instance.GetService<EntityRegistry>().Add(this);
+        //It's already added on Main. There was a duplicate.
+        //ServiceProvider.Instance.GetService<EntityRegistry>().Add(this);
         AbilitySystem.RegisterAbility(new LagSpikeAbility());
         AbilitySystem.RegisterAbility(new CounterAbility());
     }
@@ -278,6 +279,7 @@ public class Player : Unit
 
     public override void ClearPlan()
     {
+        Debug.Log("Clear plan");
         ResetVariables();
     }
 }

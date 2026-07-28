@@ -78,6 +78,8 @@ public class MapGrid : IService, IDisposable
             return;
         }
 
+        player.ClearPlan();
+
         Vector2Int playerCoord = player.CurrentCell.Coordinates;
 
         List<(Type enemyType, Vector2Int coord)> survivors = new();

@@ -291,6 +291,7 @@ public abstract class Unit : BaseEntity
     {
         if (targetCell.isOccupied)
         {
+            Debug.Log($"Cell {targetCell} is occupied (stander: {targetCell.stander}). Clearing plan.");
             ClearPlan();
             yield break;
         }
