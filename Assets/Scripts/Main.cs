@@ -45,8 +45,6 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
         ServiceProvider.Instance.AddService<HackSystem>(new HackSystem());
 
-
-        ServiceProvider.Instance.GetService<APWallet>().Init();
         EventBus.Raise<APRefillEvent>();
 
         _turnManager = new TurnManager();
@@ -58,7 +56,6 @@ public class Main : MonoBehaviour
 
     private void Start()
     {
-        ServiceProvider.Instance.GetService<APWallet>().Init();
         _turnManager.Init();
     }
 
