@@ -6,6 +6,7 @@ public abstract class TurnAction
     public int APCost { get; }
     public int CurrentTick { get; private set; }
     public bool IsFinished => CurrentTick >= TotalTicks;
+    public bool IsExecuting => CurrentTick > 0 && !IsFinished;
 
     protected TurnAction(int totalTicks, int APCost)
     {

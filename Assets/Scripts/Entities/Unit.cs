@@ -1,12 +1,16 @@
 using Assets.Scripts.Combat;
+using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class Unit : BaseEntity
 {
     protected PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
+    protected EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
@@ -44,6 +48,7 @@ public abstract class Unit : BaseEntity
     public virtual void Init()
     {
         Spawn();
+        EventBus.Subscribe<BreakEvent>(Break);
     }
 
     protected virtual void Spawn()
@@ -227,6 +232,20 @@ public abstract class Unit : BaseEntity
     {
         Debug.Log($"{gameObject.name} plan cleared");
         _plannedActions.Clear();
+    }
+
+    public virtual void Break(in BreakEvent callback)
+    {
+        if (_plannedActions.Count <= 0)
+            return;
+
+        int rangeToRemove = _plannedActions.Count - (_currentAction);
+
+        if (rangeToRemove <= 0)
+            return;
+
+        Debug.Log($"{gameObject.name}| _plannedActions.Count: {_plannedActions.Count}, rangeToRemove: {rangeToRemove}, _currentAction + 1: {_currentAction + 1}");
+        _plannedActions.RemoveRange(_currentAction - 1, rangeToRemove);
     }
 
     public virtual void ResetActionsCounter()

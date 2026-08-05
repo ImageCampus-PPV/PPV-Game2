@@ -2,6 +2,7 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +11,6 @@ public class Player : Unit
     public int PlannedTicks => GetPlannedTickCost();
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
-    private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
 
     public int PlannedAPCost => GetPlannedAPCost();
@@ -30,6 +30,8 @@ public class Player : Unit
     public uint Life => _life;
 
     protected const int MOVEMENT_COST = 1;
+    protected const int BREAK_MIN_COST = 3;
+    private int _breakPenalty;
 
     public void SetLife(uint life)
     {
@@ -59,6 +61,9 @@ public class Player : Unit
     public override void Init()
     {
         base.Init();
+
+        _breakPenalty = 0;
+
         APWallet.Init();
         AbilitySystem.RegisterAbility(new LagSpikeAbility());
         AbilitySystem.RegisterAbility(new CounterAbility());
@@ -67,7 +72,12 @@ public class Player : Unit
     private void Update()
     {
         if (_isTurnPlaying)
+        {
+            if (Input.GetKeyUp(KeyCode.Z))
+                EventBus.Raise<BreakEvent>();
+
             return;
+        }
 
         if (Input.GetMouseButtonUp(0))
         {
@@ -87,7 +97,7 @@ public class Player : Unit
 
         //R removes all actions
         if (Input.GetKeyUp(KeyCode.R))
-            ResetVariables();
+            ClearPlan();
 
         //FinishTurn
         if (Input.GetKeyUp(KeyCode.Space))
@@ -115,7 +125,7 @@ public class Player : Unit
         {
             int apCost = GetPathCost(path[i - 1], path[i]);
 
-            MoveAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST);
+            MoveAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST + _breakPenalty);
 
             futureAP += action.APCost;
             futureTicks += action.TotalTicks;
@@ -193,7 +203,7 @@ public class Player : Unit
             return;
 
         //AbilitySystem.UseAbility(ability, this, clickedCell);
-        AbilityAction abilityAction = new AbilityAction(this, ability, clickedCell, 1, ability.APCost);
+        AbilityAction abilityAction = new AbilityAction(this, ability, clickedCell, 1, ability.APCost + _breakPenalty);
         _plannedActions.Add(abilityAction);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
@@ -235,7 +245,6 @@ public class Player : Unit
         _plannedHackTerminal = null;
         _plannedHackTicks = 0;
         _plannedHackAPCost = 0;
-        _plannedActions.Clear();
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 
@@ -278,9 +287,30 @@ public class Player : Unit
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 
+    public override void Break(in BreakEvent callback)
+    {
+        base.Break(callback);
+        int apToRemove = CalculateBreakCost();
+        _breakPenalty++;
+
+        EventBus.Raise<APConsumeRequestAceptedEvent>(apToRemove);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+    }
+
+    private int CalculateBreakCost()
+    {
+        int plannedApCost = 0;
+
+        foreach (TurnAction action in _plannedActions)
+            plannedApCost += action.APCost;
+
+        return plannedApCost % 4 > BREAK_MIN_COST ? plannedApCost : BREAK_MIN_COST;
+    }
+
     public override void ClearPlan()
     {
         Debug.Log("Clear plan");
+        base.ClearPlan();
         ResetVariables();
     }
 }
