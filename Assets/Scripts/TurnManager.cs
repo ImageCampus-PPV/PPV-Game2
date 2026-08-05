@@ -1,15 +1,11 @@
-using Assets.Scripts;
 using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class TurnManager : IService
 {

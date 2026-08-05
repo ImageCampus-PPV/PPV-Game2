@@ -29,6 +29,8 @@ public class Player : Unit
     private uint _life = 100;
     public uint Life => _life;
 
+    protected const int MOVEMENT_COST = 1;
+
     public void SetLife(uint life)
     {
         _life = life;
@@ -81,10 +83,7 @@ public class Player : Unit
             TryUseAbility(new LagSpikeAbility());
 
         if (Input.GetKeyDown(KeyCode.E))
-        { 
             TryUseAbility(new CounterAbility());
-            Time.timeScale = 0.1f;
-        }
 
         //R removes all actions
         if (Input.GetKeyUp(KeyCode.R))
@@ -116,7 +115,7 @@ public class Player : Unit
         {
             int apCost = GetPathCost(path[i - 1], path[i]);
 
-            MoveAction action = new MoveAction(path[i - 1], path[i], apCost);
+            MoveAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST);
 
             futureAP += action.APCost;
             futureTicks += action.TotalTicks;
