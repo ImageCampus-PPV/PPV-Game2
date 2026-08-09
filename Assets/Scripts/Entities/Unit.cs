@@ -203,6 +203,20 @@ public abstract class Unit : BaseEntity
         _isTurnPlaying = false;
     }
 
+    public IEnumerator Wait()
+    {
+        float elapsed = 0;
+        _isTurnPlaying = true;
+
+        while (elapsed < _timeToMoveCells * 1.5f)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        _isTurnPlaying = false;
+    }
+
     public void MoveInstant(Cell targetCell)
     {
         if (_currentCell != null)

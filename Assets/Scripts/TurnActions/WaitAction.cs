@@ -11,7 +11,7 @@ public class WaitAction : TurnAction
     public override IEnumerator Execute(Unit unit)
     {
         unit.CurrentAction++;
-        yield return null;
+        yield return unit.Wait();
 
         AdvanceTick();
     }

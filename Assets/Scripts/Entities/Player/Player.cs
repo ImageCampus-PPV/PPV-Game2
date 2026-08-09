@@ -95,6 +95,9 @@ public class Player : Unit
         if (Input.GetKeyDown(KeyCode.E))
             TryUseAbility(new CounterAbility());
 
+        if (Input.GetKeyDown(KeyCode.W))
+            _plannedActions.Add(new WaitAction());
+
         //R removes all actions
         if (Input.GetKeyUp(KeyCode.R))
             ClearPlan();
