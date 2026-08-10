@@ -8,6 +8,7 @@ public class Main : MonoBehaviour
 {
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
     private EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
+    private TileHoverHighlighter TileHoverHighlighter => ServiceProvider.Instance.GetService<TileHoverHighlighter>();
     private TurnManager _turnManager;
 
     [SerializeField] private GameObject playerPrefab;
@@ -30,6 +31,7 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());
         ServiceProvider.Instance.AddService<AbilitySystem>(new AbilitySystem());
         ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
+        ServiceProvider.Instance.AddService<TileHoverHighlighter>(new TileHoverHighlighter(Camera.main));
 
         _turnManager = new TurnManager();
         ServiceProvider.Instance.AddService<TurnManager>(_turnManager);
@@ -46,6 +48,7 @@ public class Main : MonoBehaviour
     private void Update()
     {
         _turnManager.Tick();
+        TileHoverHighlighter.Tick();
     }
 
     private void OnApplicationQuit()
