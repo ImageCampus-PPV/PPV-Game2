@@ -1,11 +1,16 @@
+using Assets.Scripts.Combat;
+using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class Unit : BaseEntity
 {
     protected PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
+    protected EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
@@ -14,12 +19,20 @@ public abstract class Unit : BaseEntity
     public void SetSpawnCell(Cell spawnCell) => _spawnCell = spawnCell;
 
     [Header("Movement")]
+    [SerializeField] protected int _maxTicksPerTurn = 7;
     [SerializeField] protected float _timeToMoveCells = 0.2f;
     [SerializeField] protected float _timeToStayInCell = 0.05f;
+    protected List<TurnAction> _plannedActions = new();
+    public List<TurnAction> PlannedActions => _plannedActions;
 
     protected List<Cell> _currentPath;
     protected int _pathIndex;
-    protected bool _isMoving;
+    protected bool _isTurnPlaying;
+
+    public bool IsTurnPlaying { get => _isTurnPlaying; set => _isTurnPlaying = value; }
+
+    protected int _currentAction;
+    public int CurrentAction { get => _currentAction; set => _currentAction = value; }
 
     protected Cell _currentCell;
 
@@ -30,11 +43,12 @@ public abstract class Unit : BaseEntity
     public bool IsStun => _isStun;
 
     public Cell CurrentCell => _currentCell;
-    public bool IsMoving => _isMoving;
+    public int MaxTicksPerTurn => _maxTicksPerTurn;
 
     public virtual void Init()
     {
         Spawn();
+        EventBus.Subscribe<BreakEvent>(Break);
     }
 
     protected virtual void Spawn()
@@ -56,30 +70,6 @@ public abstract class Unit : BaseEntity
     public void Unstun()
     {
         _isStun = false;
-    }
-
-    protected void RequestPath(Cell targetCell)
-    {
-        if (!IsCellAvailable(targetCell))
-        {
-            Debug.LogWarning("Target cell unavailable");
-            return;
-        }
-
-        Debug.Log($"Target: {targetCell}");
-        Debug.Log($"CurrentCell: {_currentCell}");
-        Debug.Log($"PathfindingController: {PathFinding}");
-
-        List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
-
-        if (path != null && path.Count > 1)
-        {
-            _currentPath = path;
-            _pathIndex = 1;
-
-            _isMoving = true;
-            StartCoroutine(FollowPath());
-        }
     }
 
     protected bool IsCellAvailable(Cell targetCell)
@@ -114,9 +104,18 @@ public abstract class Unit : BaseEntity
 
     protected int GetPathCost(Cell originCell, Cell targetCell)
     {
-        if (!IsCellAvailable(targetCell))
+        if (targetCell == originCell)
+            return -1;
+
+        if (!IsCellAvailable(targetCell) && targetCell.stander is not Player)
         {
-            Debug.LogWarning("Target cell unavailable");
+            Debug.LogWarning($"Target cell unavailable: {targetCell}");
+            return -1;
+        }
+
+        if (!IsCellAvailable(originCell) && originCell.stander is not Player)
+        {
+            Debug.LogWarning($"Origin cell unavailable: {originCell}");
             return -1;
         }
 
@@ -130,7 +129,7 @@ public abstract class Unit : BaseEntity
 
     protected List<Cell> GetPathCells(Cell targetCell)
     {
-        if (!IsCellAvailable(targetCell))
+        if (!IsCellAvailable(targetCell) && targetCell.stander is not Player)
         {
             Debug.LogWarning("Target cell unavailable");
             return null;
@@ -141,7 +140,7 @@ public abstract class Unit : BaseEntity
 
     protected List<Cell> GetPathCells(Cell originCell, Cell targetCell)
     {
-        if (!IsCellAvailable(targetCell))
+        if (!IsCellAvailable(targetCell) && targetCell.stander is not Player)
         {
             Debug.LogWarning("Target cell unavailable");
             return null;
@@ -150,132 +149,72 @@ public abstract class Unit : BaseEntity
         return PathFinding.FindPath(originCell.Coordinates, targetCell.Coordinates);
     }
 
-    protected IEnumerator FollowPath()
+    public IEnumerator MoveTo(Cell targetCell)
     {
-        while (_pathIndex < _currentPath.Count)
+        if (targetCell.isOccupied)
         {
-            Cell targetCell = _currentPath[_pathIndex];
-
-            if (targetCell.isOccupied)
-                break;
-
-            Vector3 startPos = transform.position;
-
-            Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
-            Vector3 finalTarget;
-
-            if (targetCell.Height != _currentCell.Height)
-                finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
-            else
-            {
-                finalTarget = targetCell.transform.position;
-                finalTarget.y = transform.position.y;
-            }
-
-            Cell previousCell = _currentCell;
-            _currentCell = targetCell;
-            previousCell.stander = null;
-            _currentCell.stander = this;
-            OnMovementStarted();
-
-            float elapsed = 0f;
-            while (elapsed < _timeToMoveCells)
-            {
-                elapsed += Time.deltaTime;
-                float t = elapsed / _timeToMoveCells;
-
-                transform.position = Vector3.Lerp(startPos, flatTarget, t);
-                yield return null;
-            }
-
-            elapsed = 0f;
-            float heightTime = _timeToMoveCells * 0.5f;
-
-            while (elapsed < heightTime)
-            {
-                elapsed += Time.deltaTime;
-                float t = elapsed / heightTime;
-
-                transform.position = Vector3.Lerp(flatTarget, finalTarget, t);
-                yield return null;
-            }
-
-            transform.position = finalTarget;
-
-            _pathIndex++;
-
-            if (_timeToStayInCell > 0)
-                yield return new WaitForSeconds(_timeToStayInCell);
+            Debug.Log($"Cell {targetCell} is occupied (stander: {targetCell.stander}). Clearing plan.");
+            ClearPlan();
+            yield break;
         }
 
-        _isMoving = false;
-        OnMovementFinished();
+        _isTurnPlaying = true;
+
+        Vector3 startPos = transform.position;
+        Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
+        Vector3 finalTarget;
+
+        if (targetCell.Height != _currentCell.Height)
+        {
+            finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
+        }
+        else
+        {
+            finalTarget = targetCell.transform.position;
+            finalTarget.y = startPos.y;
+        }
+
+        Cell previousCell = _currentCell;
+        _currentCell = targetCell;
+        previousCell.stander = null;
+        _currentCell.stander = this;
+
+        float elapsed = 0;
+
+        while (elapsed < _timeToMoveCells)
+        {
+            elapsed += Time.deltaTime;
+            transform.position = Vector3.Lerp(startPos, flatTarget, elapsed / _timeToMoveCells);
+            yield return null;
+        }
+
+        elapsed = 0;
+
+        while (elapsed < _timeToMoveCells * .5f)
+        {
+            elapsed += Time.deltaTime;
+            transform.position = Vector3.Lerp(flatTarget, finalTarget, elapsed / (_timeToMoveCells * 0.5f));
+
+            yield return null;
+        }
+
+        transform.position = finalTarget;
+
+        _isTurnPlaying = false;
     }
 
-    protected IEnumerator FollowPath(List<Cell> path)
+    public IEnumerator Wait()
     {
-        _currentPath = new List<Cell>(path);
-        _pathIndex = 0;
-        _isMoving = true;
+        float elapsed = 0;
+        _isTurnPlaying = true;
 
-        while (_pathIndex < _currentPath.Count)
+        while (elapsed < _timeToMoveCells * 1.5f)
         {
-            Cell targetCell = _currentPath[_pathIndex];
-
-            if (targetCell.isOccupied)
-                break;
-
-            Vector3 startPos = transform.position;
-
-            Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
-            Vector3 finalTarget;
-
-            if (targetCell.Height != _currentCell.Height)
-                finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
-            else
-            {
-                finalTarget = targetCell.transform.position;
-                finalTarget.y = transform.position.y;
-            }
-
-            Cell previousCell = _currentCell;
-            _currentCell = targetCell;
-            previousCell.stander = null;
-            _currentCell.stander = this;
-            OnMovementStarted();
-
-            float elapsed = 0f;
-            while (elapsed < _timeToMoveCells)
-            {
-                elapsed += Time.deltaTime;
-                float t = elapsed / _timeToMoveCells;
-
-                transform.position = Vector3.Lerp(startPos, flatTarget, t);
-                yield return null;
-            }
-
-            elapsed = 0f;
-            float heightTime = _timeToMoveCells * 0.5f;
-
-            while (elapsed < heightTime)
-            {
-                elapsed += Time.deltaTime;
-                float t = elapsed / heightTime;
-
-                transform.position = Vector3.Lerp(flatTarget, finalTarget, t);
-                yield return null;
-            }
-
-            transform.position = finalTarget;
-
-            _pathIndex++;
-
-            if (_timeToStayInCell > 0)
-                yield return new WaitForSeconds(_timeToStayInCell);
+            elapsed += Time.deltaTime;
+            yield return null;
         }
 
-        _isMoving = false;
-        OnMovementFinished();
+        _isTurnPlaying = false;
     }
 
     public void MoveInstant(Cell targetCell)
@@ -301,5 +240,34 @@ public abstract class Unit : BaseEntity
     protected Vector3 GetStandPosition(Vector3 basePosition)
     {
         return basePosition + new Vector3(0, transform.localScale.y * 0.5f, 0);
+    }
+
+    public virtual void ClearPlan()
+    {
+        Debug.Log($"{gameObject.name} plan cleared");
+        _plannedActions.Clear();
+    }
+
+    public virtual void Break(in BreakEvent callback)
+    {
+        if (_plannedActions.Count <= 0)
+            return;
+
+        int rangeToRemove = _plannedActions.Count - (_currentAction);
+
+        if (rangeToRemove <= 0)
+            return;
+
+        Debug.Log($"{gameObject.name}| _plannedActions.Count: {_plannedActions.Count}, rangeToRemove: {rangeToRemove}, _currentAction + 1: {_currentAction + 1}");
+        _plannedActions.RemoveRange(_currentAction - 1, rangeToRemove);
+    }
+
+    public virtual void ResetActionsCounter()
+    {
+        _currentAction = 0;
+    }
+
+    public virtual void ConsumeAP(TurnAction action)
+    {
     }
 }

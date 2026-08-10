@@ -38,20 +38,18 @@ public class MovementPreviewRenderer : MonoBehaviour
     {
         ClearVisuals();
 
-        if (_player.Waypoints.Count > 0)
+        if (_player.PlannedActions.Count > 0)
         {
             DrawPlannedPath();
-            DrawWaypoints();
-            DrawLastWaypoint();
         }
 
-        if (!_player.IsMoving)
+        if (!_player.IsTurnPlaying)
             DrawReachableCells();
     }
 
     private void DrawReachableCells()
     {
-        Cell origin = _player.CurrentPlanningOrigin;
+        Cell origin = _player.GetLastPlannedCell();
 
         int remainingAP = APWallet.CurrentAP - _player.PlannedAPCost;
         int remainingTicks = _player.MaxTicksPerTurn - _player.PlannedTicks;
@@ -68,8 +66,7 @@ public class MovementPreviewRenderer : MonoBehaviour
                 if (_drawnCells.Contains(cell))
                     continue;
 
-                int apCost =
-                    _player.GetPathCostPreview(origin, cell);
+                int apCost = _player.GetPathCostPreview(origin, cell);
 
                 if (apCost <= 0)
                     continue;
@@ -102,34 +99,6 @@ public class MovementPreviewRenderer : MonoBehaviour
         }
     }
 
-    private void DrawWaypoints()
-    {
-        if (_waypointCellPrefab == null)
-            return;
-
-        for (int i = 0; i < _player.Waypoints.Count - 1; i++)
-        {
-            Cell waypoint = _player.Waypoints[i];
-
-            if (waypoint == null)
-                continue;
-
-            SpawnVisual(_waypointCellPrefab, waypoint.GetWorldTopPosition() + Vector3.up * _yOffset);
-            _drawnCells.Add(waypoint);
-        }
-    }
-
-    private void DrawLastWaypoint()
-    {
-        if (_player.Waypoints.Count == 0)
-            return;
-
-        Cell lastWaypoint =
-            _player.Waypoints[_player.Waypoints.Count - 1];
-
-        SpawnVisual(_targetCellPrefab, lastWaypoint.GetWorldTopPosition() + Vector3.up * _yOffset);
-        _drawnCells.Add(lastWaypoint);
-    }
 
     private void SpawnVisual(GameObject prefab, Vector3 position)
     {

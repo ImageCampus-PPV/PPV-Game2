@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System;
 
 public class CellStateAttribute : Attribute
@@ -15,5 +14,3 @@ public class CellStateAttribute : Attribute
         this.a = a;
     }
 }
-
-#endif

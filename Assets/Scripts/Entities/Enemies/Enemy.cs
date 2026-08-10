@@ -1,5 +1,6 @@
 using ImageCampus.ToolBox.Services;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Enemy : Unit
@@ -16,8 +17,14 @@ public abstract class Enemy : Unit
     public int Fortitude => _fortitude;
     public int PushDistance => _pushDistance;
 
-    public void TakeTurn(Cell playerCell)
+
+    public void PlanTurn(Cell playerCell, int emptyActions)
     {
+        _plannedActions.Clear();
+
+        for (int i = 0; i < emptyActions; i++)
+            _plannedActions.Add(new WaitAction());
+
         if (IsInGoodCover(playerCell))
         {
             Debug.Log($"{name} holding position");
@@ -37,16 +44,23 @@ public abstract class Enemy : Unit
         if (path == null || path.Count <= 1)
             return;
 
+        int actionLimit = path.Count < _maxTicksPerTurn ? path.Count : _maxTicksPerTurn;
+
+        for (int i = 1; i < actionLimit; i++)
+            _plannedActions.Add(new MoveAction(path[i - 1], path[i], 0));
+
+        PlanCombatActions(playerCell);
+
         //Move one tile per turn
-        _currentPath = new List<Cell>()
-        {
-            path[0],
-            path[1]
-        };
-
-        _pathIndex = 1;
-
-        StartCoroutine(FollowPath());
+        //_currentPath = new List<Cell>()
+        //{
+        //    path[0],
+        //    path[1]
+        //};
+        //
+        //_pathIndex = 1;
+        //
+        //StartCoroutine(FollowPath());
     }
 
     private bool IsInRange(Cell playerCell)
@@ -155,8 +169,47 @@ public abstract class Enemy : Unit
         return false;
     }
 
+    protected bool IsCellNearUnit(Cell targetCell, int maxDistance)
+    {
+        Vector2Int origin = CurrentCell.Coordinates;
+        Vector2Int target = targetCell.Coordinates;
+
+        Vector2Int[] directions = new Vector2Int[]
+        {
+        new Vector2Int( 1,  0),
+        new Vector2Int(-1,  0),
+        new Vector2Int( 0,  1),
+        new Vector2Int( 0, -1),
+        };
+
+        foreach (Vector2Int dir in directions)
+        {
+            for (int i = 1; i <= maxDistance; i++)
+            {
+                Vector2Int current = origin + dir * i;
+
+                if (current.x < 0 || current.y < 0 || current.x >= MapGrid.Width || current.y >= MapGrid.Height)
+                    break;
+
+                Cell currentCell = MapGrid.GetCell(current);
+
+                if (currentCell.ProvidesCover)
+                    break;
+
+                if (current == target)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
     private int GetGridDistance(Cell a, Cell b)
     {
         return Mathf.Abs(a.Coordinates.x - b.Coordinates.x) + Mathf.Abs(a.Coordinates.y - b.Coordinates.y);
+    }
+
+    protected virtual void PlanCombatActions(Cell playerCell)
+    {
     }
 }

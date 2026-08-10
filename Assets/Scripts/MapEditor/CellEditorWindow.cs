@@ -1,8 +1,10 @@
 #if UNITY_EDITOR
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,7 +15,7 @@ public class CellEditorWindow : EditorWindow
     private Dictionary<string, Type> _cellStatesPerName;
     private DropdownField cellTypeDropdown;
     private DropdownField unitSpawnType;
-    private Toggle playerCanSpawnThereField;
+    private DropdownField terminalTypeDropdown;
     private Label cellInfoLabel;
 
     public static void ShowWindow(CellData inCell, Action<CellData> onChanged = null)
@@ -36,6 +38,7 @@ public class CellEditorWindow : EditorWindow
 
         unitSpawnType.SetValueWithoutNotify(cell._spawnUnit);
         cellTypeDropdown.SetValueWithoutNotify(cell._initialState);
+        terminalTypeDropdown?.SetValueWithoutNotify(string.IsNullOrEmpty(cell._terminalType) ? "None" : cell._terminalType);
         cellInfoLabel.text = $"Editing Cell ({cell._coordinates.x}, {cell._coordinates.y})";
     }
 
@@ -67,7 +70,34 @@ public class CellEditorWindow : EditorWindow
             unitTypeNames.Add(type.Name);
         }
 
+        List<string> terminalTypeNames = new List<string>();
+        terminalTypeNames.Add("None");
+        terminalTypeNames.AddRange(Enum.GetNames(typeof(TerminalType)));
+
         VisualElement root = rootVisualElement;
+
+        ObjectField spawnDecorationField = new ObjectField("Decoration")
+        {
+            objectType = typeof(GameObject),
+            allowSceneObjects = false
+        };
+
+        spawnDecorationField.RegisterValueChangedCallback(evt =>
+        {
+            GameObject gameObject = evt.newValue as GameObject;
+            bool isPrefabAsset = gameObject != null
+                && PrefabUtility.GetPrefabAssetType(gameObject) != PrefabAssetType.NotAPrefab;
+
+            if (!isPrefabAsset)
+            {
+                Debug.LogWarning("Drop a Prefab asset from the Project window, not a scene object or non-prefab asset.");
+                spawnDecorationField.SetValueWithoutNotify(null);
+                gameObject = null;
+            }
+
+            cell._assetToSpawn = gameObject;
+            onStateChanged?.Invoke(cell);
+        });
 
         cellInfoLabel = new Label();
         root.Add(cellInfoLabel);
@@ -84,7 +114,11 @@ public class CellEditorWindow : EditorWindow
             defaultIndex: 0
         );
 
-        playerCanSpawnThereField = new Toggle("Player Spawn Point");
+        terminalTypeDropdown = new DropdownField(
+            label: "Terminal (MEC-02)",
+            choices: terminalTypeNames,
+            defaultIndex: 0
+        );
 
         unitSpawnType.RegisterValueChangedCallback(evt =>
         {
@@ -98,8 +132,16 @@ public class CellEditorWindow : EditorWindow
             onStateChanged?.Invoke(cell);
         });
 
+        terminalTypeDropdown.RegisterValueChangedCallback(evt =>
+        {
+            cell._terminalType = evt.newValue;
+            onStateChanged?.Invoke(cell);
+        });
+
         root.Add(unitSpawnType);
         root.Add(cellTypeDropdown);
+        root.Add(terminalTypeDropdown);
+        root.Add(spawnDecorationField);
 
         RefreshGUI();
     }

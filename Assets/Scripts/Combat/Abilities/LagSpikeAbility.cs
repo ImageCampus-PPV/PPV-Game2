@@ -23,8 +23,8 @@ public class LagSpikeAbility : IAbility
         if (APWallet.CurrentAP < APCost)
             return false;
 
-        if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
-            return false;
+        //if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
+        //    return false;
 
         return true;
     }
@@ -33,7 +33,7 @@ public class LagSpikeAbility : IAbility
     {
         Enemy enemy = targetCell.stander as Enemy;
 
-        EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
+        //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
 
         TurnManager.ApplyStun(enemy);
 

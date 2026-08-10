@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -141,6 +142,7 @@ public class FloorEditor : EditorWindow
             {
                 _cells[i, j]._spawnUnit = "None";
                 _cells[i, j]._initialState = nameof(DefaultCell);
+                _cells[i, j]._terminalType = "None";
 
                 ApplyCellVisual(_cellButtons[_cells[i, j]._coordinates], _cells[i, j]);
             }
@@ -390,6 +392,12 @@ public class FloorEditor : EditorWindow
             Debug.LogWarning($"Unknown cell state '{cell._initialState}' at ({cell._coordinates.x}, {cell._coordinates.y}); falling back to magenta.");
             bg = Color.magenta;
         }
+
+        Texture2D preview = cell._assetToSpawn != null ? AssetPreview.GetAssetPreview(cell._assetToSpawn) : null;
+
+        Background icon = btn.iconImage;
+        icon.texture = preview != null ? preview : null;
+        btn.iconImage = icon;
 
         btn.style.backgroundColor = bg;
         btn.style.color = cell._initialState == nameof(DefaultCell) ||

@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e6bcfda0eb25764a9e048f0d09e8c03, type: 3}
+  m_Script: {fileID: 11500000, guid: d008b632c84411b47ad6cdda7d3a237e, type: 3}
   m_Name: HabilitiesDurationConfiguration
   m_EditorClassIdentifier: Assembly-CSharp::HabilitiesDurationConfiguration
   stunDuration: 2

@@ -17,75 +17,125 @@ MonoBehaviour:
   - _initialState: Healing
     _coordinates: {x: 0, y: 0}
     _spawnUnit: Player
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: Healing
     _coordinates: {x: 0, y: 1}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: Infected
     _coordinates: {x: 0, y: 2}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: Healing
     _coordinates: {x: 0, y: 3}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 0, y: 4}
     _spawnUnit: LightEnemy
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 1, y: 0}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 1, y: 1}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 1, y: 2}
     _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 1, y: 3}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: Healing
     _coordinates: {x: 1, y: 4}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 2, y: 0}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 2, y: 1}
     _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 2, y: 2}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 2, y: 3}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 2, y: 4}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 3, y: 0}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: Unstable
     _coordinates: {x: 3, y: 1}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 3, y: 2}
     _spawnUnit: NormalEnemy
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 3, y: 3}
     _spawnUnit: LightEnemy
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: Healing
     _coordinates: {x: 3, y: 4}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 4, y: 0}
     _spawnUnit: Player
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 4, y: 1}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 4, y: 2}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 4, y: 3}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 
   - _initialState: Broken
     _coordinates: {x: 4, y: 4}
     _spawnUnit: 
+    _assetToSpawn: {fileID: 0}
+    _terminalType: 

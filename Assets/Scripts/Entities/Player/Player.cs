@@ -2,47 +2,42 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : Unit
 {
-    [SerializeField] private int _maxTicksPerTurn = 7;
-    private int _plannedTicks;
-    public int MaxTicksPerTurn => _maxTicksPerTurn;
-    public int PlannedTicks => _plannedTicks;
-    APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
-    EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
+    public int PlannedTicks => GetPlannedTickCost();
 
-    private List<Cell> _waypoints = new List<Cell>();
-    private List<Cell> _plannedPath = new List<Cell>();
-    private int _plannedAPCost;
-    public int PlannedAPCost => _plannedAPCost;
+    private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
+    private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
+
+    public int PlannedAPCost => GetPlannedAPCost();
+
+    private Terminal _plannedHackTerminal;
+    private int _plannedHackTicks;
+    private int _plannedHackAPCost;
+    public Terminal PlannedHackTerminal => _plannedHackTerminal;
+    HackSystem HackSystem => ServiceProvider.Instance.GetService<HackSystem>();
 
     private bool _isTurnReady = false;
     public bool IsTurnReady => _isTurnReady;
 
-    public List<Cell> PlannedPath => _plannedPath;
-    public List<Cell> Waypoints => _waypoints;
+    public List<Cell> PlannedPath => GetPlannedPath();
 
     private uint _life = 100;
     public uint Life => _life;
 
-    public Cell CurrentPlanningOrigin
-    {
-        get
-        {
-            if (_waypoints.Count == 0)
-                return CurrentCell;
+    protected const int MOVEMENT_COST = 1;
+    protected const int BREAK_MIN_COST = 3;
+    private int _breakPenalty;
 
-            return _waypoints[_waypoints.Count - 1];
-        }
-    }
+    public int BreakPenalty => _breakPenalty;
 
     public void SetLife(uint life)
     {
         _life = life;
-
         EventBus.Raise<PlayerChangeLifeEvent>(_life);
     }
 
@@ -54,26 +49,37 @@ public class Player : Unit
             _life -= life;
 
         EventBus.Raise<PlayerChangeLifeEvent>(_life);
+
+        if (_life <= 0)
+            EventBus.Raise<LevelFailedEvent>();
     }
 
     public void AddLife(uint life)
     {
         _life += life;
-
         EventBus.Raise<PlayerChangeLifeEvent>(_life);
-
     }
 
     public override void Init()
     {
         base.Init();
-        ServiceProvider.Instance.GetService<EntityRegistry>().Add(this);
+
+        _breakPenalty = 0;
+
+        APWallet.Init();
+        AbilitySystem.RegisterAbility(new LagSpikeAbility());
+        AbilitySystem.RegisterAbility(new CounterAbility());
     }
 
     private void Update()
     {
-        if (IsMoving)
+        if (_isTurnPlaying)
+        {
+            if (Input.GetKeyUp(KeyCode.Z))
+                EventBus.Raise<BreakEvent>();
+
             return;
+        }
 
         if (Input.GetMouseButtonUp(0))
         {
@@ -82,167 +88,168 @@ public class Player : Unit
 
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
                 if (hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
-                    ReactToInput(clickedCell);
+                    ReactToClick(clickedCell);
         }
 
-        //Right click removes last waypoint
-        if (Input.GetMouseButtonUp(1))
-        {
-            Debug.Log("RIGHHT INPUT DETECTED");
+        if (Input.GetKeyDown(KeyCode.Q))
+            TryUseAbility(new LagSpikeAbility());
 
-            Cell previousWaypoint;
-            Cell waypointToRemove;
-            if (_waypoints.Count == 1)
-            {
-                previousWaypoint = _currentCell;
-                waypointToRemove = _waypoints[_waypoints.Count - 1];
-                RemoveWaypoint(previousWaypoint, waypointToRemove);
-            }
-            else if (_waypoints.Count > 1)
-            {
-                previousWaypoint = _waypoints[_waypoints.Count - 2];
-                waypointToRemove = _waypoints[_waypoints.Count - 1];
+        if (Input.GetKeyDown(KeyCode.E))
+            TryUseAbility(new CounterAbility());
 
-                RemoveWaypoint(previousWaypoint, waypointToRemove);
-            }
+        if (Input.GetKeyDown(KeyCode.W))
+            _plannedActions.Add(new WaitAction());
 
-            EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
-        }
-
-        //R removes all waypoints
+        //R removes all actions
         if (Input.GetKeyUp(KeyCode.R))
-            ResetVariables();
+            ClearPlan();
 
-        if (Input.GetKeyUp(KeyCode.Space)) //FinishTurn
+        //FinishTurn
+        if (Input.GetKeyUp(KeyCode.Space))
             _isTurnReady = true;
-
-
-        Debug.Log("Planned ticks: " + _plannedTicks);
-        
-        for (int i = 0; i < _waypoints.Count - 1; i++)
-            Debug.Log("Waypoint " + i + ": " + _waypoints[i].Coordinates);
-        
-        for (int i = 0; i < _plannedPath.Count - 1; i++)
-            Debug.Log("Path cell " + i + ": " + _plannedPath[i].Coordinates);
-
-        //List<Cell> test = GetPathCells(_currentCell, _waypoints[0]);
-        //
-        //foreach (Cell c in test)
-        //    Debug.Log(c.Coordinates);
-
     }
 
 
-    private void ReactToInput(Cell clickedCell)
+    private void ReactToClick(Cell clickedCell)
     {
-        //if (_selectedTargetCell == clickedCell && clickedCell != _currentCell)
-        //{
-        //    _isTurnReady = true;
-        //    return;
-        //}
-
-        if (IsCellAvailable(clickedCell))
-        {
-            Cell originCell = (_waypoints.Count == 0) ? _currentCell : _waypoints[_waypoints.Count - 1];
-            List<Cell> cellsToAdd = GetPathCells(originCell, clickedCell);
-            int newTicksCount = cellsToAdd.Count - 1;
-
-            int totalTicksUsed = newTicksCount + _plannedTicks;
-
-            int segmentCost = GetPathCost(originCell, clickedCell);
-            int totalAPCost = _plannedAPCost + segmentCost;
-
-            if (totalAPCost <= APWallet.CurrentAP && totalTicksUsed <= _maxTicksPerTurn)
-            {
-                _plannedAPCost += segmentCost;
-                //EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
-                EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
-                //_plannedPath = GetPathCells(clickedCell);
-
-                _waypoints.Add(clickedCell);
-                RebuildPath();
-                _plannedTicks += newTicksCount;
-            }
-
-        }
-
-        //if (IsCellAvailable(clickedCell))
-        //{
-        //    if (GetPathCost(clickedCell) <= APWallet.CurrentAP)
-        //    {
-        //        _plannedAPCost = GetPathCost(clickedCell);
-        //        EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
-        //        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
-        //        _plannedPath = GetPathCells(clickedCell);
-        //        _selectedTargetCell = clickedCell;
-        //    }
-        //}
-        //else if(clickedCell == _currentCell)
-        //{
-        //    _plannedAPCost = 0;
-        //    EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
-        //    EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - _plannedAPCost, APWallet.MaxAP);
-        //    _plannedPath.Clear();
-        //    _selectedTargetCell = clickedCell;
-        //}
-        //else
-        //    _selectedTargetCell = null;
-
-
-
-    }
-
-    private void RebuildPath()
-    {
-        _plannedPath.Clear();
-
-        Cell current = _currentCell;
-
-        foreach (Cell waypoint in _waypoints)
-        {
-            List<Cell> segment = GetPathCells(current, waypoint);
-
-            if (segment.Count > 0)
-                segment.RemoveAt(0);
-
-            _plannedPath.AddRange(segment);
-
-            current = waypoint;
-        }
-    }
-
-    public void HandleMovement()
-    {
-        _isTurnReady = false;
-
-        if (_plannedPath.Count <= 0)
+        if (!IsCellAvailable(clickedCell))
             return;
 
-        if (_isMoving)
+        Cell origin = GetLastPlannedCell();
+        List<Cell> path = GetPathCells(origin, clickedCell);
+
+        if (path == null || path.Count <= 1)
             return;
 
-        Debug.Log("HANDLE MOVEMENT CALLED");
-        //RequestPath(_selectedTargetCell);
-        StartCoroutine(FollowPath(_plannedPath));
-        EventBus.Raise<APConsumeRequestAceptedEvent>(_plannedAPCost);
-        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+        int futureAP = GetPlannedAPCost();
+        int futureTicks = GetPlannedTickCost();
+
+        List<MoveAction> newActions = new();
+
+        for (int i = 1; i < path.Count; i++)
+        {
+            int apCost = GetPathCost(path[i - 1], path[i]);
+
+            MoveAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST + _breakPenalty);
+
+            futureAP += action.APCost;
+            futureTicks += action.TotalTicks;
+
+            newActions.Add(action);
+        }
+
+        if (futureAP > APWallet.CurrentAP)
+            return;
+
+        if (futureTicks > _maxTicksPerTurn)
+            return;
+
+        _plannedActions.AddRange(newActions);
+
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - futureAP, APWallet.MaxAP);
     }
 
-    private void RemoveWaypoint(Cell previousWaypoint, Cell waypointToRemove)
+    // --- Terminales / Hackeo ---------------------------------------------
+
+    public bool TryPlanHack(Terminal terminal)
     {
-        _plannedAPCost -= GetPathCost(previousWaypoint, waypointToRemove);
-        _plannedTicks -= GetPathTicksPreview(previousWaypoint, waypointToRemove);
-        _waypoints.RemoveAt(_waypoints.Count - 1);
-        RebuildPath();
+        if (terminal == null)
+            return false;
+
+        if (_plannedHackTerminal != null)
+        {
+            Debug.Log("[Player] Ya hay un hackeo planificado este turno. Confirma el turno (Space) o cancela el plan (R) antes de planificar otro.");
+            return false;
+        }
+
+        bool isFreshStart = terminal.CurrentTicks == 0;
+        int hackAPCost = isFreshStart ? terminal.APCost : 0;
+
+        int remainingTickBudget = _maxTicksPerTurn - GetPlannedTickCost();
+        int ticksNeeded = Mathf.Min(remainingTickBudget, terminal.RequiredTicks - terminal.CurrentTicks);
+
+        if (ticksNeeded <= 0)
+        {
+            Debug.Log($"[Player] No queda presupuesto de ticks este turno para hackear ({GetPlannedTickCost()}/{_maxTicksPerTurn} ya planificados). Confirma el turno o saca movimiento planificado.");
+            return false;
+        }
+
+        int totalPlannedAPCost = GetPlannedAPCost() + hackAPCost;
+
+        Cell originCell = GetLastPlannedCell();
+
+        if (!HackSystem.CanStartHack(originCell, terminal, totalPlannedAPCost))
+            return false;
+
+        _plannedHackTerminal = terminal;
+        _plannedHackTicks = ticksNeeded;
+        _plannedHackAPCost = hackAPCost;
+
+        HackAction hackAction = new HackAction(this, terminal, ticksNeeded, hackAPCost);
+        _plannedActions.Add(hackAction);
+
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
+
+        Debug.Log($"[Player] Hackeo planificado: {terminal.Type} en {terminal.Cell.Coordinates} ({hackAPCost} AP, {ticksNeeded} ticks). Confirma con Space para ejecutarlo.");
+
+        return true;
+    }
+
+    // -----------------------------------------------------------------------
+
+    private void TryUseAbility(IAbility ability)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (!Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
+            return;
+
+        if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
+            return;
+
+        //AbilitySystem.UseAbility(ability, this, clickedCell);
+        AbilityAction abilityAction = new AbilityAction(this, ability, clickedCell, 1, ability.APCost + _breakPenalty);
+        _plannedActions.Add(abilityAction);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
+    }
+
+    private int GetPlannedAPCost()
+    {
+        int cost = 0;
+
+        foreach (TurnAction action in _plannedActions)
+            cost += action.APCost;
+
+        return cost;
+    }
+
+    private int GetPlannedTickCost()
+    {
+        int ticks = 0;
+
+        foreach (TurnAction action in _plannedActions)
+            ticks += action.TotalTicks;
+
+        return ticks;
+    }
+
+    public Cell GetLastPlannedCell()
+    {
+        Cell current = CurrentCell;
+
+        foreach (TurnAction action in _plannedActions)
+            if (action is MoveAction move)
+                current = move.TargetCell;
+
+        return current;
     }
 
     private void ResetVariables()
     {
         _isTurnReady = false;
-        _plannedPath.Clear();
-        _plannedTicks = 0;
-        _plannedAPCost = 0;
-        _waypoints.Clear();
+        _plannedHackTerminal = null;
+        _plannedHackTicks = 0;
+        _plannedHackAPCost = 0;
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 
@@ -261,12 +268,54 @@ public class Player : Unit
         return path.Count - 1;
     }
 
+    private List<Cell> GetPlannedPath()
+    {
+        List<Cell> plannedPath = new List<Cell>();
+        foreach (TurnAction action in _plannedActions)
+            if (action is MoveAction move)
+                plannedPath.Add(move.TargetCell);
+
+        return plannedPath;
+    }
+
     protected override void OnMovementStarted()
     {
     }
 
     protected override void OnMovementFinished()
     {
+    }
+
+    public override void ConsumeAP(TurnAction action)
+    {
+        EventBus.Raise<APConsumeRequestAceptedEvent>(action.APCost);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+    }
+
+    public override void Break(in BreakEvent callback)
+    {
+        base.Break(callback);
+        int apToRemove = CalculateBreakCost();
+        _breakPenalty++;
+
+        EventBus.Raise<APConsumeRequestAceptedEvent>(apToRemove);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+    }
+
+    private int CalculateBreakCost()
+    {
+        int plannedApCost = 0;
+
+        foreach (TurnAction action in _plannedActions)
+            plannedApCost += action.APCost;
+
+        return plannedApCost % 4 > BREAK_MIN_COST ? plannedApCost : BREAK_MIN_COST;
+    }
+
+    public override void ClearPlan()
+    {
+        Debug.Log("Clear plan");
+        base.ClearPlan();
         ResetVariables();
     }
 }

@@ -10,7 +10,6 @@ public class CounterAbility : IAbility
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
-    private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
     private CounterSystem CounterSystem => ServiceProvider.Instance.GetService<CounterSystem>();
 
     public bool CanExecute(Player player, Cell targetCell)
@@ -24,8 +23,8 @@ public class CounterAbility : IAbility
         if (APWallet.CurrentAP < APCost)
             return false;
 
-        if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
-            return false;
+        //if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
+        //    return false;
 
         return true;
     }
@@ -34,7 +33,7 @@ public class CounterAbility : IAbility
     {
         Enemy enemy = targetCell.stander as Enemy;
 
-        EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
+        //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
         CounterSystem.Execute(player, enemy);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }

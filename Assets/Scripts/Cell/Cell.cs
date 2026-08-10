@@ -22,9 +22,14 @@ public class Cell : BaseEntity
     [HideInInspector] public bool isOccupied => stander != null;
     public Unit stander = null;
 
+    public Terminal Terminal { get; set; }
+
     private Bounds _bounds;
 
     private FSM _fsm;
+
+    private Renderer _renderer;
+    public Renderer Renderer => _renderer != null ? _renderer : (_renderer = GetComponent<Renderer>());
 
     public bool IsWalkable => _isWalkable && _fsm.GetState() != typeof(Broken);
     public bool IsHeightConnector => _isHeightConnector;
@@ -48,12 +53,12 @@ public class Cell : BaseEntity
 
         Renderer renderer = GetComponent<Renderer>();
 
-        _fsm.AddState<DefaultCell>();
-        _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { renderer, 1 });
-        _fsm.AddState<Broken>(onEnterParameters: () => new object[] { renderer });
-        _fsm.AddState<Healing>(onEnterParameters: () => new object[] { renderer }, onTickParameters: () => new object[] { stander });
-        _fsm.AddState<Contagious>(onEnterParameters: () => new object[] { 10u, _coordinates, renderer }, onTickParameters: () => new object[] { stander });
-        _fsm.AddState<Infected>(onEnterParameters: () => new object[] { 10u, renderer }, onTickParameters: () => new object[] { stander });
+        _fsm.AddState<DefaultCell>(onEnterParameters: () => new object[] { this }, onExitParameters: () => new object[] { this });
+        _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { this, renderer, 1 }, onExitParameters: () => new object[] { this });
+        _fsm.AddState<Broken>(onEnterParameters: () => new object[] { this, renderer }, onExitParameters: () => new object[] { this });
+        _fsm.AddState<Healing>(onEnterParameters: () => new object[] { this, renderer }, onTickParameters: () => new object[] { stander }, onExitParameters: () => new object[] { this });
+        _fsm.AddState<Contagious>(onEnterParameters: () => new object[] { this, 10u, _coordinates, renderer }, onTickParameters: () => new object[] { stander }, onExitParameters: () => new object[] { this });
+        _fsm.AddState<Infected>(onEnterParameters: () => new object[] { this, 10u, renderer }, onTickParameters: () => new object[] { stander }, onExitParameters: () => new object[] { this });
 
         _fsm.Transition(initialState);
     }
