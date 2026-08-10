@@ -59,7 +59,6 @@ public class TurnManager : IService
 
     public void Tick()
     {
-        //FinishTurn
         if (!IsEndOfTurn())
             return;
 
