@@ -30,7 +30,7 @@ public class MapGrid : IService, IDisposable
     private GameObject _normalEnemy;
     private Cell[,] _gridArray;
     private TerminalConfiguration _terminalConfiguration;
- 
+
     private Dictionary<string, Type> _cellStatesPerName = new Dictionary<string, Type>();
 
     private Dictionary<Type, List<Vector2Int>> _cellTypePerCoords;
@@ -70,7 +70,7 @@ public class MapGrid : IService, IDisposable
     private void OnDevAddTerminal(in DevAddTerminalEvent addTerminalEvent)
     {
         if (addTerminalEvent.coordX < 0 || addTerminalEvent.coordX >= Width ||
-            addTerminalEvent.coordY < 0 || addTerminalEvent.coordY >= Height) 
+            addTerminalEvent.coordY < 0 || addTerminalEvent.coordY >= Height)
             return;
 
         Cell cell = GetCell(addTerminalEvent.coordX, addTerminalEvent.coordY);
@@ -291,7 +291,7 @@ public class MapGrid : IService, IDisposable
         Type cellState = typeof(CellType);
 
         if (!_cellTypePerCoords.ContainsKey(cellState))
-            throw new KeyNotFoundException($"key {cellState.Name} was not found.");
+            return null;
 
         List<Vector2Int> cellsOCoords = _cellTypePerCoords[cellState];
 
@@ -462,6 +462,8 @@ public class MapGrid : IService, IDisposable
 
     public void Tick(float deltaTime)
     {
+        EventBus.Raise<InfectTilesEvent>();
+
         foreach (Cell cell in _gridArray)
             cell.Tick(deltaTime);
     }
@@ -521,7 +523,6 @@ public class MapGrid : IService, IDisposable
 
         if (neighbor != null && neighbor.IsWalkable && neighbor.GetState() != typeof(Infected) && neighbor.GetState() != typeof(Contagious))
             neighbor.Transition(typeof(Contagious));
-
     }
 
     private void OnTileTurnHeal(in TurnTileHealing turnTileHealing)
