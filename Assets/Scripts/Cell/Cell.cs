@@ -26,6 +26,9 @@ public class Cell : BaseEntity
 
     private FSM _fsm;
 
+    private Renderer _renderer;
+    public Renderer Renderer => _renderer != null ? _renderer : (_renderer = GetComponent<Renderer>());
+
     public bool IsWalkable => _isWalkable && _fsm.GetState() != typeof(Broken);
     public bool IsHeightConnector => _isHeightConnector;
     public bool ProvidesCover => _providesCover;
@@ -48,7 +51,7 @@ public class Cell : BaseEntity
 
         Renderer renderer = GetComponent<Renderer>();
 
-        _fsm.AddState<DefaultCell>();
+        _fsm.AddState<DefaultCell>(onEnterParameters: () => new object[] { this }, onExitParameters: () => new object[] { this });
         _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { this, renderer, 1 }, onExitParameters: () => new object[] { this });
         _fsm.AddState<Broken>(onEnterParameters: () => new object[] { this, renderer }, onExitParameters: () => new object[] { this });
         _fsm.AddState<Healing>(onEnterParameters: () => new object[] { this, renderer }, onTickParameters: () => new object[] { stander }, onExitParameters: () => new object[] { this });
