@@ -67,7 +67,7 @@ public class TurnManager : IService
 
 
         if (Input.GetKeyDown(KeyCode.F))
-            TryPlanHack();
+                TryPlanHack();
 
         Player player = EntityRegistry.FilterEntities<Player>().First();
 
@@ -166,7 +166,7 @@ public class TurnManager : IService
         _executing = false;
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
 
-        if (APWallet.CurrentAP <= 0)
+        if (APWallet.CurrentAP <= _player.BreakPenalty)
             EventBus.Raise<LevelFailedEvent>();
     }
 

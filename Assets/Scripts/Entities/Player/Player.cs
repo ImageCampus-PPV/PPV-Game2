@@ -33,6 +33,8 @@ public class Player : Unit
     protected const int BREAK_MIN_COST = 3;
     private int _breakPenalty;
 
+    public int BreakPenalty => _breakPenalty;
+
     public void SetLife(uint life)
     {
         _life = life;
