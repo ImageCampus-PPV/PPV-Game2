@@ -59,7 +59,7 @@ public class MapGrid : IService, IDisposable
 
         do
         {
-            cellState = cellState == null ? cell.GetState().GetType() : cellState.BaseType;
+            cellState = cellState == null ? cell.GetState() : cellState.BaseType;
 
             if (!_cellTypePerCoords.ContainsKey(cellState))
                 _cellTypePerCoords.Add(cellState, new List<Vector2Int>());
@@ -135,7 +135,7 @@ public class MapGrid : IService, IDisposable
 
         do
         {
-            cellState = cellState == null ? cell.GetState().GetType() : cellState.BaseType;
+            cellState = cellState == null ? cell.GetState() : cellState.BaseType;
 
             if (_cellTypePerCoords.ContainsKey(cellState))
                 _cellTypePerCoords[cellState].Remove(cell.Coordinates);
