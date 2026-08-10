@@ -2,24 +2,34 @@
 using ImageCampus.ToolBox.Services;
 using UnityEngine;
 
+public abstract class CellState : State
+{
+    protected MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+}
+
 [CellState(0.50f, 0.50f, 0.50f, 1)]
-public sealed class DefaultCell : State
+public sealed class DefaultCell : CellState
 {
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
     {
-        if (parameters == null || parameters.Length == 0 || parameters[0] is not Renderer renderer)
-            return default(BehaviourActions);
+        Cell cell = (Cell)parameters[0];
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
-        behaviourActions.AddUpdateBehaviour(() => { renderer.material.color = new Color(0.5f, 0.5f, 0.5f, 1f); });
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.AddCell(cell); });
 
         return behaviourActions;
     }
 
     public override BehaviourActions GetOnExitBehaviour(params object[] parameters)
     {
-        return default(BehaviourActions);
+        Cell cell = (Cell)parameters[0];
+
+        BehaviourActions behaviourActions = new BehaviourActions();
+
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.RemoveCell(cell); });
+
+        return behaviourActions;
     }
 
     public override BehaviourActions GetOnTickBehaviour(params object[] parameters)
@@ -29,22 +39,29 @@ public sealed class DefaultCell : State
 }
 
 [CellState(0, 0, 0, 1)]
-public sealed class Broken : State
+public sealed class Broken : CellState
 {
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
     {
-        Renderer renderer = (Renderer)parameters[0];
+        Cell cell = (Cell)parameters[0];
+        Renderer renderer = (Renderer)parameters[1];
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
-        behaviourActions.AddUpdateBehaviour(() => { renderer.material.color = Color.black; });
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.AddCell(cell); renderer.material.color = Color.black; });
 
         return behaviourActions;
     }
 
     public override BehaviourActions GetOnExitBehaviour(params object[] parameters)
     {
-        return default(BehaviourActions);
+        Cell cell = (Cell)parameters[0];
+
+        BehaviourActions behaviourActions = new BehaviourActions();
+
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.RemoveCell(cell);});
+
+        return behaviourActions;
     }
 
     public override BehaviourActions GetOnTickBehaviour(params object[] parameters)
@@ -54,22 +71,29 @@ public sealed class Broken : State
 }
 
 [CellState(1, 1, 1, 1f)]
-public sealed class Empty : State
+public sealed class Empty : CellState
 {
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
     {
-        Renderer renderer = (Renderer)parameters[0];
+        Cell cell = (Cell)parameters[0];
+        Renderer renderer = (Renderer)parameters[1];
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
-        behaviourActions.AddUpdateBehaviour(() => { renderer.material.color = Color.black; });
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.AddCell(cell); renderer.material.color = Color.black; });
 
         return behaviourActions;
     }
 
     public override BehaviourActions GetOnExitBehaviour(params object[] parameters)
     {
-        return default(BehaviourActions);
+        Cell cell = (Cell)parameters[0];
+
+        BehaviourActions behaviourActions = new BehaviourActions();
+
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.RemoveCell(cell); });
+
+        return behaviourActions;
     }
 
     public override BehaviourActions GetOnTickBehaviour(params object[] parameters)
@@ -79,20 +103,21 @@ public sealed class Empty : State
 }
 
 [CellState(1, 0.6f, 0f, 1)]
-public sealed class Unstable : State
+public sealed class Unstable : CellState
 {
     private int _maxTurnsAlive = 0;
     private int _turnsSinceCreated = 0;
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
     {
-        Renderer renderer = (Renderer)parameters[0];
-        int turnToBeDestroy = (int)parameters[1];
+        Cell cell = (Cell)parameters[0];
+        Renderer renderer = (Renderer)parameters[1];
+        int turnToBeDestroy = (int)parameters[2];
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
         behaviourActions.AddUpdateBehaviour
         (
-          () => { this._maxTurnsAlive = turnToBeDestroy; renderer.material.color = Color.gray; }
+          () => { MapGrid.AddCell(cell); this._maxTurnsAlive = turnToBeDestroy; renderer.material.color = Color.gray; }
         );
 
         return behaviourActions;
@@ -100,7 +125,13 @@ public sealed class Unstable : State
 
     public override BehaviourActions GetOnExitBehaviour(params object[] parameters)
     {
-        return default(BehaviourActions);
+        Cell cell = (Cell)parameters[0];
+
+        BehaviourActions behaviourActions = new BehaviourActions();
+
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.RemoveCell(cell); });
+
+        return behaviourActions;
     }
 
     public override BehaviourActions GetOnTickBehaviour(params object[] parameters)
@@ -121,13 +152,14 @@ public sealed class Unstable : State
 }
 
 [CellState(0, 1f, 0f, 1.0f)]
-public sealed class Healing : State
+public sealed class Healing : CellState
 {
     private uint _healing = 20;
 
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
     {
-        Renderer renderer = (Renderer)parameters[0];
+        Cell cell = (Cell)parameters[0];
+        Renderer renderer = (Renderer)parameters[1];
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
@@ -135,6 +167,7 @@ public sealed class Healing : State
         (
             () =>
             {
+                MapGrid.AddCell(cell);
                 renderer.material.color = Color.yellow;
             }
         );
@@ -144,7 +177,13 @@ public sealed class Healing : State
 
     public override BehaviourActions GetOnExitBehaviour(params object[] parameters)
     {
-        return default(BehaviourActions);
+        Cell cell = (Cell)parameters[0];
+
+        BehaviourActions behaviourActions = new BehaviourActions();
+
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.RemoveCell(cell); });
+
+        return behaviourActions;
     }
 
     public override BehaviourActions GetOnTickBehaviour(params object[] parameters)
@@ -167,14 +206,15 @@ public sealed class Healing : State
 }
 
 [CellState(0.62f, 0.125f, 0.94f, 1.0f)]
-public class Infected : State
+public class Infected : CellState
 {
     protected uint _damage = 0;
 
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
     {
-        uint damage = (uint)parameters[0];
-        Renderer renderer = (Renderer)parameters[1];
+        Cell cell = (Cell)parameters[0];
+        uint damage = (uint)parameters[1];
+        Renderer renderer = (Renderer)parameters[2];
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
@@ -185,7 +225,13 @@ public class Infected : State
 
     public override BehaviourActions GetOnExitBehaviour(params object[] parameters)
     {
-        return default(BehaviourActions);
+        Cell cell = (Cell)parameters[0];
+
+        BehaviourActions behaviourActions = new BehaviourActions();
+
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.RemoveCell(cell); });
+
+        return behaviourActions;
     }
 
     public override BehaviourActions GetOnTickBehaviour(params object[] parameters)
@@ -215,9 +261,10 @@ public class Contagious : Infected
 
     public override BehaviourActions GetOnEnterBehaviour(params object[] parameters)
     {
-        uint damage = (uint)parameters[0];
-        Vector2Int position = (Vector2Int)parameters[1];
-        Renderer renderer = (Renderer)parameters[2];
+        Cell cell = (Cell)parameters[0];
+        uint damage = (uint)parameters[1];
+        Vector2Int position = (Vector2Int)parameters[2];
+        Renderer renderer = (Renderer)parameters[3];
 
         BehaviourActions behaviourActions = new BehaviourActions();
 
@@ -225,6 +272,7 @@ public class Contagious : Infected
         (
             () =>
             {
+                MapGrid.AddCell(cell);
                 renderer.material.color = Color.deepPink;
                 _damage = damage;
                 _position = position;
@@ -236,7 +284,13 @@ public class Contagious : Infected
 
     public override BehaviourActions GetOnExitBehaviour(params object[] parameters)
     {
-        return default(BehaviourActions);
+        Cell cell = (Cell)parameters[0];
+
+        BehaviourActions behaviourActions = new BehaviourActions();
+
+        behaviourActions.AddUpdateBehaviour(() => { MapGrid.RemoveCell(cell); });
+
+        return behaviourActions;
     }
 
     public override BehaviourActions GetOnTickBehaviour(params object[] parameters)
@@ -249,8 +303,6 @@ public class Contagious : Infected
          (
             () =>
             {
-                EventBus.Raise<InfectTilesEvent>(_position);
-
                 if (unitOnTop is Player player)
                     player.ReduceLife(_damage);
 

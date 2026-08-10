@@ -10,6 +10,7 @@ public class Main : MonoBehaviour
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
+    private TileHoverHighlighter TileHoverHighlighter => ServiceProvider.Instance.GetService<TileHoverHighlighter>();
     private TurnManager _turnManager;
 
     [SerializeField] private GameObject playerPrefab;
@@ -44,6 +45,7 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<AbilitySystem>(new AbilitySystem());
         ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
         ServiceProvider.Instance.AddService<HackSystem>(new HackSystem());
+        ServiceProvider.Instance.AddService<TileHoverHighlighter>(new TileHoverHighlighter(Camera.main));
 
         EventBus.Raise<APRefillEvent>();
 
@@ -61,11 +63,12 @@ public class Main : MonoBehaviour
 
     private void Update()
     {
+        TileHoverHighlighter.Tick();
+
         _turnManager.Tick();
+
         if (_turnManager.IsTurnReady && !_turnManager.IsExecuting)
-        {
             StartCoroutine(_turnManager.ExecuteTurn());
-        }
     }
 
     private void OnApplicationQuit()
@@ -73,4 +76,3 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.ClearAllServices();
     }
 }
-

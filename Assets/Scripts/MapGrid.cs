@@ -25,22 +25,30 @@ public class MapGrid : IService, IDisposable
     //This should be optimize.
     private Floor _cellMap;
     private GameObject _playerPrefab;
-    private GameObject _heavyEngine;
+    private GameObject _heavyEnemy;
     private GameObject _lightEnemy;
     private GameObject _normalEnemy;
     private Cell[,] _gridArray;
     private TerminalConfiguration _terminalConfiguration;
  
     private Dictionary<string, Type> _cellStatesPerName = new Dictionary<string, Type>();
-    public MapGrid(GameObject playerPrefab, GameObject heavyEngine, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps, TerminalConfiguration terminalConfiguration, Material defaultMat)
+
+    private Dictionary<Type, List<Vector2Int>> _cellTypePerCoords;
+
+    [SerializeField] private GameObject _cellPrefab;
+
+    public MapGrid(GameObject playerPrefab, GameObject heavyEnemy, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps, TerminalConfiguration terminalConfiguration, Material defaultMat)
     {
         _playerPrefab = playerPrefab;
-        _heavyEngine = heavyEngine;
+        _heavyEnemy = heavyEnemy;
         _lightEnemy = lightEnemy;
         _normalEnemy = normalEnemy;
         _cellMap = cellsMaps;
+
         _terminalConfiguration = terminalConfiguration;
         _defaultMat = defaultMat;
+
+        _cellTypePerCoords = new Dictionary<Type, List<Vector2Int>>();
     }
 
     public void Init()
@@ -160,7 +168,7 @@ public class MapGrid : IService, IDisposable
 
         foreach ((Type enemyType, Vector2Int coord) in survivors)
         {
-            GameObject prefab = enemyType == typeof(HeavyEnemy) ? _heavyEngine
+            GameObject prefab = enemyType == typeof(HeavyEnemy) ? _heavyEnemy
                 : enemyType == typeof(LightEnemy) ? _lightEnemy
                 : enemyType == typeof(NormalEnemy) ? _normalEnemy
                 : null;
@@ -197,7 +205,7 @@ public class MapGrid : IService, IDisposable
 
         GameObject prefab = spawnEnemyEvent.enemyTypeName switch
         {
-            nameof(HeavyEnemy) => _heavyEngine,
+            nameof(HeavyEnemy) => _heavyEnemy,
             nameof(LightEnemy) => _lightEnemy,
             nameof(NormalEnemy) => _normalEnemy,
             _ => null
@@ -240,6 +248,96 @@ public class MapGrid : IService, IDisposable
         cell.stander = null;
         registry.Remove(unit);
         UnityEngine.Object.Destroy(unit.gameObject);
+    }
+
+    public void AddCell(Cell cell)
+    {
+        Type cellState = null;
+
+        do
+        {
+            cellState = cellState == null ? cell.GetState() : cellState.BaseType;
+
+            if (!_cellTypePerCoords.ContainsKey(cellState))
+                _cellTypePerCoords.Add(cellState, new List<Vector2Int>());
+
+            _cellTypePerCoords[cellState].Add(cell.Coordinates);
+
+        } while (cellState != typeof(CellState));
+    }
+
+    public List<Cell> GetListOfState<CellType>() where CellType : CellState
+    {
+        Type cellState = typeof(CellType);
+
+        if (!_cellTypePerCoords.ContainsKey(cellState))
+            throw new KeyNotFoundException($"key {cellState.Name} was not found.");
+
+        List<Cell> cells = new List<Cell>();
+
+        foreach (Vector2Int coord in _cellTypePerCoords[cellState])
+            cells.Add(_gridArray[coord.x, coord.y]);
+
+        return cells;
+    }
+
+    public Cell GetRandom()
+    {
+        return GetRandomOfState<CellState>();
+    }
+
+    public Cell GetRandomOfState<CellType>() where CellType : CellState
+    {
+        Type cellState = typeof(CellType);
+
+        if (!_cellTypePerCoords.ContainsKey(cellState))
+            throw new KeyNotFoundException($"key {cellState.Name} was not found.");
+
+        List<Vector2Int> cellsOCoords = _cellTypePerCoords[cellState];
+
+        int randomIndex = UnityEngine.Random.Range(0, cellsOCoords.Count);
+
+        Vector2Int coordinate = cellsOCoords[randomIndex];
+
+        return _gridArray[coordinate.x, coordinate.y];
+    }
+
+    public Cell GetRandomOfState<CellType>(Cell exeption) where CellType : CellState
+    {
+        Cell randomCell = null;
+
+        do
+        {
+            randomCell = GetRandomOfState<CellType>();
+
+        } while (exeption != null && exeption != randomCell);
+
+        return randomCell;
+    }
+
+    public IEnumerator<Cell> GetAllOfState<CellType>() where CellType : CellState
+    {
+        Type cellState = typeof(CellType);
+
+        if (!_cellTypePerCoords.ContainsKey(cellState))
+            throw new KeyNotFoundException($"key {cellState.Name} was not found.");
+
+        foreach (Vector2Int coord in _cellTypePerCoords[cellState])
+            yield return _gridArray[coord.x, coord.y];
+    }
+
+    public void RemoveCell(Cell cell)
+    {
+        Type cellState = null;
+
+        do
+        {
+            cellState = cellState == null ? cell.GetState() : cellState.BaseType;
+
+            if (_cellTypePerCoords.ContainsKey(cellState))
+                _cellTypePerCoords[cellState].Remove(cell.Coordinates);
+
+        } while (cellState != typeof(CellState));
     }
 
     private void Build()
@@ -293,7 +391,7 @@ public class MapGrid : IService, IDisposable
                     break;
 
                 case nameof(HeavyEnemy):
-                    goEnemy = UnityEngine.Object.Instantiate(_heavyEngine);
+                    goEnemy = UnityEngine.Object.Instantiate(_heavyEnemy);
                     goEnemyScript = goEnemy.AddComponent<HeavyEnemy>();
                     break;
 
@@ -387,7 +485,7 @@ public class MapGrid : IService, IDisposable
         //    ((Mathf.Abs(z) % 2) == 1 ? new Vector3(1, 0, 0) * _cellsSize * .5f : Vector3.zero);
     }
 
-    private void OnTileContagiousSpread(in InfectTilesEvent infectTilesEvent)
+    private void OnTileContagiousSpread(in InfectTilesEvent _)
     {
         Vector2Int[] directions =
        {
@@ -397,21 +495,33 @@ public class MapGrid : IService, IDisposable
         Vector2Int.right
     };
 
+        int random = UnityEngine.Random.Range(0, directions.Length);
 
-        Vector2Int posToCheck;
+        Vector2Int direction = directions[random];
 
-        foreach (Vector2Int dir in directions)
+        List<Cell> cells = new List<Cell>();
+
+        Cell selectedCell = null;
+        Cell neighbor = null;
+
+        do
         {
-            posToCheck = infectTilesEvent.position + dir;
+            selectedCell = GetRandomOfState<Contagious>(selectedCell);
 
-            Cell neighbor = posToCheck.x >=
+            Vector2Int posToCheck = selectedCell.Coordinates + direction;
+
+            neighbor = posToCheck.x >=
                 Width || posToCheck.x < 0 || posToCheck.y >= Height || posToCheck.y < 0 ?
                 null :
-                GetCell(infectTilesEvent.position + dir);
+                GetCell(selectedCell.Coordinates + direction);
 
-            if (neighbor != null && neighbor.IsWalkable && neighbor.GetState() != typeof(Infected) && neighbor.GetState() != typeof(Contagious))
-                neighbor.Transition(typeof(Contagious));
-        }
+        } while (neighbor != null);
+
+        selectedCell.Transition(typeof(Infected));
+
+        if (neighbor != null && neighbor.IsWalkable && neighbor.GetState() != typeof(Infected) && neighbor.GetState() != typeof(Contagious))
+            neighbor.Transition(typeof(Contagious));
+
     }
 
     private void OnTileTurnHeal(in TurnTileHealing turnTileHealing)
