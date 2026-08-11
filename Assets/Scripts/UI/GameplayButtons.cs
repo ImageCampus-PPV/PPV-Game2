@@ -30,6 +30,8 @@ public class GameplayButtons : MonoBehaviour
     public void Init()
     {
         AssignButtonEvents();
+        _actionTypeText.text = "Action selected: ";
+        SetCurrentActionText(ClickActionType.Move);
     }
 
     private void AssignButtonEvents()
@@ -43,6 +45,37 @@ public class GameplayButtons : MonoBehaviour
         _undoButton.onClick.AddListener(() => EventBus.Raise<UndoButtonEvent>());
         _breakButton.onClick.AddListener(() => EventBus.Raise<BreakEvent>());
         _confirmActionsButton.onClick.AddListener(() => EventBus.Raise<ConfirmActionsButtonEvent>());
+
+        _moveButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Move));
+        _hackButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Hack));
+        _counterButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Counter));
+        _lagSpikeButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.LagSpike));
+    }
+
+    private void SetCurrentActionText(ClickActionType actionType)
+    {
+        _actionTypeText.text = "Action selected: ";
+        switch (actionType)
+        {
+            case ClickActionType.Move:
+                _actionTypeText.text += "Move";
+                break;
+
+            case ClickActionType.Hack:
+                _actionTypeText.text += "Hack";
+                break;
+
+            case ClickActionType.Counter:
+                _actionTypeText.text += "Counter";
+                break;
+
+            case ClickActionType.LagSpike:
+                _actionTypeText.text += "Lag Spike";
+                break;
+
+            default:
+                break;
+        }
     }
 }
 public struct MoveButtonEvent : IEvent
