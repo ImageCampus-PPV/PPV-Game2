@@ -489,40 +489,82 @@ public class MapGrid : IService, IDisposable
 
     private void OnTileContagiousSpread(in InfectTilesEvent _)
     {
+        if (IsBoardInfected())
+            return;
+
+        Cell selectedCell = GetRandomOfState<Contagious>(null);
+
+        if (selectedCell == null)
+            return;
+
         Vector2Int[] directions =
-       {
+        {
         Vector2Int.up,
         Vector2Int.down,
         Vector2Int.left,
         Vector2Int.right
-    };
+        };
 
-        int random = UnityEngine.Random.Range(0, directions.Length);
+        ShuffleDirections(directions);
 
-        Vector2Int direction = directions[random];
-
-        List<Cell> cells = new List<Cell>();
-
-        Cell selectedCell = null;
         Cell neighbor = null;
 
-        do
+        foreach (Vector2Int direction in directions)
         {
-            selectedCell = GetRandomOfState<Contagious>(selectedCell);
-
             Vector2Int posToCheck = selectedCell.Coordinates + direction;
 
-            neighbor = posToCheck.x >=
-                Width || posToCheck.x < 0 || posToCheck.y >= Height || posToCheck.y < 0 ?
-                null :
-                GetCell(selectedCell.Coordinates + direction);
+            bool outOfBounds = posToCheck.x >= Width || posToCheck.x < 0 ||
+                                posToCheck.y >= Height || posToCheck.y < 0;
 
-        } while (neighbor != null);
+            if (outOfBounds)
+                continue;
+
+            Cell candidate = GetCell(posToCheck);
+            if (candidate != null)
+            {
+                neighbor = candidate;
+                break;
+            }
+        }
 
         selectedCell.Transition(typeof(Infected));
 
-        if (neighbor != null && neighbor.IsWalkable && neighbor.GetState() != typeof(Infected) && neighbor.GetState() != typeof(Contagious))
+        if (neighbor != null &&
+            neighbor.IsWalkable &&
+            neighbor.GetState() != typeof(Infected) &&
+            neighbor.GetState() != typeof(Contagious))
+        {
             neighbor.Transition(typeof(Contagious));
+        }
+
+        bool IsBoardInfected()
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    Cell cell = GetCell(new Vector2Int(x, y));
+
+                    if (cell == null || !cell.IsWalkable)
+                        continue;
+
+                    Type state = cell.GetState();
+                    if (state != typeof(Infected) && state != typeof(Contagious))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        void ShuffleDirections(Vector2Int[] directions)
+        {
+            for (int i = directions.Length - 1; i > 0; i--)
+            {
+                int j = UnityEngine.Random.Range(0, i + 1);
+                (directions[i], directions[j]) = (directions[j], directions[i]);
+            }
+        }
     }
 
     private void OnTileTurnHeal(in TurnTileHealing turnTileHealing)
