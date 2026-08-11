@@ -83,7 +83,7 @@ public class TurnManager : IService
 
     public IEnumerator ExecuteTurn()
     {
-        MapGrid.Tick(Time.deltaTime);
+        //MapGrid.Tick(Time.deltaTime);
         foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
             enemy.PlanTurn(_player.CurrentCell, 0);
 
@@ -101,8 +101,8 @@ public class TurnManager : IService
         for (int i = 0; i < maxActions; i++) //Ticks
         {
             routines.Clear();
-            if (i >= 1)
-                MapGrid.Tick(Time.deltaTime); //Updates cells
+            //if (i >= 1)
+            //    MapGrid.Tick(Time.deltaTime); //Updates cells
 
             List<Unit> tickActions = new List<Unit>();
             List<Unit> attackntActions = new List<Unit>();

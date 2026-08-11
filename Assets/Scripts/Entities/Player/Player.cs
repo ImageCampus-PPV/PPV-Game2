@@ -1,5 +1,4 @@
 using Assets.Scripts.Combat;
-using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using System;
@@ -14,6 +13,7 @@ public class Player : Unit
     private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
 
     public int PlannedAPCost => GetPlannedAPCost();
+    private ClickActionType _currentActionTypeSelected;
 
     private Terminal _plannedHackTerminal;
     private int _plannedHackTicks;
@@ -65,10 +65,24 @@ public class Player : Unit
         base.Init();
 
         _breakPenalty = 0;
-
+        _currentActionTypeSelected = ClickActionType.Move;
         APWallet.Init();
         AbilitySystem.RegisterAbility(new LagSpikeAbility());
         AbilitySystem.RegisterAbility(new CounterAbility());
+
+        EventBus.Subscribe<MoveButtonEvent>((in MoveButtonEvent callback) => SetClickActionType(ClickActionType.Move));
+        EventBus.Subscribe<HackButtonEvent>((in HackButtonEvent callback) => SetClickActionType(ClickActionType.Hack));
+        EventBus.Subscribe<CounterButtonEvent>((in CounterButtonEvent callback) => SetClickActionType(ClickActionType.Counter));
+        EventBus.Subscribe<LagSpikeButtonEvent>((in LagSpikeButtonEvent callback) => SetClickActionType(ClickActionType.LagSpike));
+        EventBus.Subscribe<WaitButtonEvent>((in WaitButtonEvent callback) => AddWaitAction());
+        EventBus.Subscribe<UndoButtonEvent>(OnUndoButton);
+        EventBus.Subscribe<RestartButtonEvent>((in RestartButtonEvent callback) => ClearPlan());
+        EventBus.Subscribe<ConfirmActionsButtonEvent>((in ConfirmActionsButtonEvent callback) => _isTurnReady = true);
+    }
+
+    private void SetClickActionType(ClickActionType actionType)
+    {
+       _currentActionTypeSelected = actionType;
     }
 
     private void Update()
@@ -98,7 +112,10 @@ public class Player : Unit
             TryUseAbility(new CounterAbility());
 
         if (Input.GetKeyDown(KeyCode.W))
-            _plannedActions.Add(new WaitAction());
+            AddWaitAction();
+
+        //if (Input.GetKeyDown(KeyCode.F))
+        //    TryPlanHack();
 
         //R removes all actions
         if (Input.GetKeyUp(KeyCode.R))
@@ -109,8 +126,70 @@ public class Player : Unit
             _isTurnReady = true;
     }
 
+    private void AddWaitAction()
+    {
+        WaitAction action = new WaitAction();
+
+        if (!CanAddAction(action))
+            return;
+
+        _plannedActions.Add(action);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
+    }
+
+    private bool CanAddAction(TurnAction action)
+    {
+        int futureAP = GetPlannedAPCost() + action.APCost;
+        int futureTicks = GetPlannedTickCost() + action.TotalTicks;
+
+        if (futureAP > APWallet.CurrentAP)
+            return false;
+
+        if (futureTicks > _maxTicksPerTurn)
+            return false;
+
+        return true;
+    }
 
     private void ReactToClick(Cell clickedCell)
+    {
+        switch (_currentActionTypeSelected)
+        {
+            case ClickActionType.Move:
+                {
+                    TryMove(clickedCell);
+                    break;
+                }
+
+            case ClickActionType.Hack:
+                {
+                    TryPlanHack(clickedCell.Terminal);
+                    break;
+                }
+
+            case ClickActionType.Counter:
+                {
+                    TryUseAbility(new CounterAbility(), clickedCell);
+                    break;
+                }
+
+            case ClickActionType.LagSpike:
+                {
+                    TryUseAbility(new LagSpikeAbility(), clickedCell);
+                    break;
+                }
+
+            default:
+                {
+                    Debug.LogWarning("Click action type switche entered default");
+                    break;
+                }
+        }
+
+
+    }
+
+    private void TryMove(Cell clickedCell)
     {
         if (!IsCellAvailable(clickedCell))
             return;
@@ -147,6 +226,7 @@ public class Player : Unit
         _plannedActions.AddRange(newActions);
 
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - futureAP, APWallet.MaxAP);
+        return;
     }
 
     // --- Terminales / Hackeo ---------------------------------------------
@@ -209,6 +289,21 @@ public class Player : Unit
 
         //AbilitySystem.UseAbility(ability, this, clickedCell);
         AbilityAction abilityAction = new AbilityAction(this, ability, clickedCell, 1, ability.APCost + _breakPenalty);
+
+        if (!CanAddAction(abilityAction))
+            return;
+
+        _plannedActions.Add(abilityAction);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
+    }
+
+    private void TryUseAbility(IAbility ability, Cell targetCell)
+    {
+        AbilityAction abilityAction = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
+
+        if (!CanAddAction(abilityAction))
+            return;
+
         _plannedActions.Add(abilityAction);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
@@ -276,6 +371,15 @@ public class Player : Unit
                 plannedPath.Add(move.TargetCell);
 
         return plannedPath;
+    }
+
+    private void OnUndoButton(in UndoButtonEvent callback)
+    {
+        if (_plannedActions.Count == 0)
+            return;
+
+        _plannedActions.RemoveAt(_plannedActions.Count - 1);
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
     protected override void OnMovementStarted()

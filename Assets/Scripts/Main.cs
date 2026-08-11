@@ -24,6 +24,7 @@ public class Main : MonoBehaviour
     [SerializeField] private TerminalConfiguration _terminalConfiguration;
 
     [SerializeField] private Material _defaultMat;
+    [SerializeField] private GameplayButtons _UiButtonsScript;
 
     private void Awake()
     {
@@ -53,6 +54,7 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<TurnManager>(_turnManager);
 
         MapGrid.Init();
+        _UiButtonsScript.Init();
         EntityRegistry.Init();
     }
 
