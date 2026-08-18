@@ -42,7 +42,6 @@ public class TurnManager : IService
         EventBus.Subscribe<DevMovePlayerEvent>(OnDevMovePlayer);
     }
 
-
     private void OnDevMovePlayer(in DevMovePlayerEvent movePlayerEvent)
     {
         if (movePlayerEvent.coordX < 0 || movePlayerEvent.coordX >= MapGrid.Width ||
@@ -59,23 +58,14 @@ public class TurnManager : IService
 
     public void Tick()
     {
-        if (!IsEndOfTurn())
+        if (_executing)
             return;
 
         if (_player == null)
             _player = EntityRegistry.FilterEntities<Player>().First();
 
-
         if (Input.GetKeyDown(KeyCode.F))
                 TryPlanHack();
-
-        Player player = EntityRegistry.FilterEntities<Player>().First();
-
-        //if (player.IsTurnReady)
-        //{
-        //    _units.Add(_player);
-        //    _units.AddRange(EntityRegistry.FilterEntities<Enemy>());
-        //}
 
         _isTurnReady = _player.IsTurnReady;
     }
@@ -83,91 +73,70 @@ public class TurnManager : IService
 
     public IEnumerator ExecuteTurn()
     {
-        //MapGrid.Tick(Time.deltaTime);
-        foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
-            enemy.PlanTurn(_player.CurrentCell, 0);
-
-        CheckStunColdown();
         _executing = true;
+        CheckStunColdown();
 
-        int maxActions = 0;
+        _player.IsTurnPlaying = true;
 
-        foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
-            if (unit.PlannedActions.Count > maxActions)
-                maxActions = unit.PlannedActions.Count;
-
-        List<(Unit unit, IEnumerator routine)> routines = new();
-
-        for (int i = 0; i < maxActions; i++) //Ticks
+        foreach (TurnAction action in _player.PlannedActions)
         {
-            routines.Clear();
-            //if (i >= 1)
-            //    MapGrid.Tick(Time.deltaTime); //Updates cells
+            if (_player.IsStun)
+                break;
 
-            List<Unit> tickActions = new List<Unit>();
-            List<Unit> attackntActions = new List<Unit>();
-            foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
+            _player.ConsumeAP(action);
+
+            IEnumerator routine = action.Execute(_player);
+
+            while (routine.MoveNext())
+                yield return routine.Current;
+
+            MapGrid.Tick(Time.deltaTime);
+
+            if (APWallet.CurrentAP <= _player.BreakPenalty)
             {
-                unit.IsTurnPlaying = true;
-
-                if (unit.IsStun || i >= unit.PlannedActions.Count)
-                    continue;
-
-                if (unit.PlannedActions[i] is not IAttackAction)
-                    attackntActions.Add(unit);
-                else
-                    tickActions.Add(unit);
-            }
-
-            tickActions.AddRange(attackntActions);
-
-            foreach (Unit unit in tickActions)
-            {
-                if (unit.IsStun || unit.PlannedActions.Count == 0 || i >= unit.PlannedActions.Count)
-                    continue;
-
-                IEnumerator routine = unit.PlannedActions[i].Execute(unit);
-                unit.ConsumeAP(unit.PlannedActions[i]);
-
-                routines.Add((unit, routine));
-            }
-
-
-            bool done = true;
-            while (done)
-            {
-                done = false;
-                foreach ((Unit, IEnumerator) activeRoutine in routines)
-                {
-                    if (activeRoutine.Item1.IsStun || activeRoutine.Item1.PlannedActions.Count == 0)
-                        continue;
-
-                    IEnumerator currentRoutine = activeRoutine.Item2;
-                    if (currentRoutine.Current is IEnumerator subRoutine)
-                    {
-                        if (subRoutine.MoveNext())
-                            done = true;
-                    }
-                    else if (currentRoutine.MoveNext())
-                        done = true;
-                }
-
-                if (done)
-                    yield return null;
+                EventBus.Raise<LevelFailedEvent>();
+                _player.IsTurnPlaying = false;
+                _executing = false;
+                yield break;
             }
         }
 
-        foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
+        _player.IsTurnPlaying = false;
+
+
+        foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
         {
-            unit.IsTurnPlaying = false;
-            unit.ClearPlan();
-            unit.ResetActionsCounter();
+            if (enemy.IsStun)
+                continue;
+
+            enemy.PlanTurn(_player.CurrentCell, 0);
+            enemy.IsTurnPlaying = true;
+
+            foreach (TurnAction action in enemy.PlannedActions)
+            {
+                if (enemy.IsStun)
+                    break;
+
+                IEnumerator routine = action.Execute(enemy);
+
+                while (routine.MoveNext())
+                    yield return routine.Current;
+
+                MapGrid.Tick(Time.deltaTime);
+            }
+
+            enemy.IsTurnPlaying = false;
+            enemy.ClearPlan();
+            enemy.ResetActionsCounter();
         }
+
+
+        _player.ClearPlan();
+        _player.ResetActionsCounter();
+
         _executing = false;
-        EventBus.Raise<TurnChangeEvent>(++_currenturn);
 
-        if (APWallet.CurrentAP <= _player.BreakPenalty)
-            EventBus.Raise<LevelFailedEvent>();
+        EventBus.Raise<TurnChangeEvent>(++_currenturn);
     }
 
     private void TryPlanHack()
@@ -226,15 +195,6 @@ public class TurnManager : IService
         }
 
         return false;
-    }
-
-    private bool IsEndOfTurn()
-    {
-        foreach (Unit unit in EntityRegistry.FilterEntities<Unit>())
-            if (unit.IsTurnPlaying)
-                return false;
-
-        return true;
     }
 
     private void CheckStunColdown()
