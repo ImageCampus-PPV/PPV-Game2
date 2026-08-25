@@ -24,6 +24,7 @@ public class TurnManager : IService
     private uint _currenturn = 1;
     private bool _executing;
     private bool _executePlayerActionRequested;
+    private bool _mapTicked;
 
     public bool ShouldExecutePlayerAction => _executePlayerActionRequested;
     public bool IsExecuting => _executing;
@@ -45,6 +46,8 @@ public class TurnManager : IService
         EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
         EventBus.Subscribe<DevMovePlayerEvent>(OnDevMovePlayer);
         EventBus.Subscribe<PlayerExecuteActionEvent>(OnPlayerExecuteAction);
+
+        _mapTicked = false;
     }
 
     private void OnDevMovePlayer(in DevMovePlayerEvent movePlayerEvent)
@@ -81,6 +84,13 @@ public class TurnManager : IService
         _executePlayerActionRequested = false;
         _isTurnReady = false;
 
+
+        if (!_mapTicked)
+        {
+            _mapTicked = true;
+            MapGrid.Tick(Time.deltaTime);
+        }
+
         if (_player.PlannedActions.Count == 0)
         {
             _executing = false;
@@ -98,7 +108,6 @@ public class TurnManager : IService
             while (routine.MoveNext())
                 yield return routine.Current;
 
-            MapGrid.Tick(Time.deltaTime);
             _player.PlannedActions.RemoveAt(0);
         }
 
@@ -110,6 +119,12 @@ public class TurnManager : IService
     {
         _executing = true;
         CheckStunColdown();
+
+        if (!_mapTicked)
+        {
+            _mapTicked = true;
+            MapGrid.Tick(Time.deltaTime);
+        }
 
         foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
         {
@@ -128,8 +143,6 @@ public class TurnManager : IService
 
                 while (routine.MoveNext())
                     yield return routine.Current;
-
-                MapGrid.Tick(Time.deltaTime);
             }
 
             enemy.IsTurnPlaying = false;
@@ -141,6 +154,8 @@ public class TurnManager : IService
         _player.IsTurnPlaying = false;
 
         _executing = false;
+        _mapTicked = false;
+
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
     }
 
