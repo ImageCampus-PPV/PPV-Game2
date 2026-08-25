@@ -4,6 +4,7 @@ using ImageCampus.ToolBox.Services;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class MovementPreviewRenderer : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class MovementPreviewRenderer : MonoBehaviour
     EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
 
     [Header("References")]
-    private Player _player => EntityRegistry.FilterEntities<Player>().First();
+    private Player _player ;
 
     [Header("Visual Prefabs")]
     [SerializeField] private GameObject _reachableCellPrefab;
@@ -25,6 +26,11 @@ public class MovementPreviewRenderer : MonoBehaviour
 
     private readonly List<GameObject> _spawnedVisuals = new();
     private readonly HashSet<Cell> _drawnCells = new();
+
+    private void Start()
+    {
+        _player = EntityRegistry.FilterEntities<Player>().First();
+    }
 
     private void Update()
     {
@@ -52,7 +58,7 @@ public class MovementPreviewRenderer : MonoBehaviour
         Cell origin = _player.GetLastPlannedCell();
 
         int remainingAP = APWallet.CurrentAP - _player.PlannedAPCost;
-        int remainingTicks = _player.MaxTicksPerTurn - _player.PlannedTicks;
+        int remainingTicks = _player.MaxTicksPerTurn - _player.PlannedTicks - _player.UsedTicksThisTurn;
 
         for (int x = 0; x < MapGrid.Width; x++)
         {

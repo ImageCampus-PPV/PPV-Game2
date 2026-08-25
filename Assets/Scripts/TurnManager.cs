@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class TurnManager : IService
 {
@@ -22,6 +23,9 @@ public class TurnManager : IService
 
     private uint _currenturn = 1;
     private bool _executing;
+    private bool _executePlayerActionRequested;
+
+    public bool ShouldExecutePlayerAction => _executePlayerActionRequested;
     public bool IsExecuting => _executing;
     private Player _player;
 
@@ -40,6 +44,7 @@ public class TurnManager : IService
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
         EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
         EventBus.Subscribe<DevMovePlayerEvent>(OnDevMovePlayer);
+        EventBus.Subscribe<PlayerExecuteActionEvent>(OnPlayerExecuteAction);
     }
 
     private void OnDevMovePlayer(in DevMovePlayerEvent movePlayerEvent)
@@ -65,44 +70,46 @@ public class TurnManager : IService
             _player = EntityRegistry.FilterEntities<Player>().First();
 
         if (Input.GetKeyDown(KeyCode.F))
-                TryPlanHack();
+            TryPlanHack();
 
         _isTurnReady = _player.IsTurnReady;
     }
 
-
-    public IEnumerator ExecuteTurn()
+    public IEnumerator ExecutePlayerActions()
     {
         _executing = true;
-        CheckStunColdown();
+        _executePlayerActionRequested = false;
+        _isTurnReady = false;
+
+        if (_player.PlannedActions.Count == 0)
+        {
+            _executing = false;
+            yield break;
+        }
 
         _player.IsTurnPlaying = true;
 
-        foreach (TurnAction action in _player.PlannedActions)
+        while (_player.PlannedActions.Count > 0)
         {
-            if (_player.IsStun)
-                break;
-
+            TurnAction action = _player.PlannedActions[0];
             _player.ConsumeAP(action);
-
             IEnumerator routine = action.Execute(_player);
 
             while (routine.MoveNext())
                 yield return routine.Current;
 
             MapGrid.Tick(Time.deltaTime);
-
-            if (APWallet.CurrentAP <= _player.BreakPenalty)
-            {
-                EventBus.Raise<LevelFailedEvent>();
-                _player.IsTurnPlaying = false;
-                _executing = false;
-                yield break;
-            }
+            _player.PlannedActions.RemoveAt(0);
         }
 
         _player.IsTurnPlaying = false;
+        _executing = false;
+    }
 
+    public IEnumerator ExecuteEnemiesTurn()
+    {
+        _executing = true;
+        CheckStunColdown();
 
         foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
         {
@@ -130,14 +137,80 @@ public class TurnManager : IService
             enemy.ResetActionsCounter();
         }
 
-
         _player.ClearPlan();
-        _player.ResetActionsCounter();
+        _player.IsTurnPlaying = false;
 
         _executing = false;
-
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
     }
+
+    //public IEnumerator ExecuteTurn()
+    //{
+    //    _executing = true;
+    //    CheckStunColdown();
+    //
+    //    _player.IsTurnPlaying = true;
+    //
+    //    foreach (TurnAction action in _player.PlannedActions)
+    //    {
+    //        if (_player.IsStun)
+    //            break;
+    //
+    //        _player.ConsumeAP(action);
+    //
+    //        IEnumerator routine = action.Execute(_player);
+    //
+    //        while (routine.MoveNext())
+    //            yield return routine.Current;
+    //
+    //        MapGrid.Tick(Time.deltaTime);
+    //
+    //        if (APWallet.CurrentAP <= _player.BreakPenalty)
+    //        {
+    //            EventBus.Raise<LevelFailedEvent>();
+    //            _player.IsTurnPlaying = false;
+    //            _executing = false;
+    //            yield break;
+    //        }
+    //    }
+    //
+    //    _player.IsTurnPlaying = false;
+    //
+    //
+    //    foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
+    //    {
+    //        if (enemy.IsStun)
+    //            continue;
+    //
+    //        enemy.PlanTurn(_player.CurrentCell, 0);
+    //        enemy.IsTurnPlaying = true;
+    //
+    //        foreach (TurnAction action in enemy.PlannedActions)
+    //        {
+    //            if (enemy.IsStun)
+    //                break;
+    //
+    //            IEnumerator routine = action.Execute(enemy);
+    //
+    //            while (routine.MoveNext())
+    //                yield return routine.Current;
+    //
+    //            MapGrid.Tick(Time.deltaTime);
+    //        }
+    //
+    //        enemy.IsTurnPlaying = false;
+    //        enemy.ClearPlan();
+    //        enemy.ResetActionsCounter();
+    //    }
+    //
+    //
+    //    _player.ClearPlan();
+    //    _player.ResetActionsCounter();
+    //
+    //    _executing = false;
+    //
+    //    EventBus.Raise<TurnChangeEvent>(++_currenturn);
+    //}
 
     private void TryPlanHack()
     {
@@ -220,5 +293,13 @@ public class TurnManager : IService
         _stunUnits[unit.ID] = _currenturn + 1 + AbilitiesDurationConfiguration.stunDuration;
         unit.gameObject.GetComponent<Renderer>().material.color = Color.blue;
         Debug.Log("EnemyStunned");
+    }
+
+    private void OnPlayerExecuteAction(in PlayerExecuteActionEvent callback)
+    {
+        if (_executing)
+            return;
+
+        _executePlayerActionRequested = true;
     }
 }

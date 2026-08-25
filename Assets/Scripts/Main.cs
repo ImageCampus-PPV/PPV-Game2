@@ -69,8 +69,11 @@ public class Main : MonoBehaviour
 
         _turnManager.Tick();
 
+        if (_turnManager.ShouldExecutePlayerAction && !_turnManager.IsExecuting)
+            StartCoroutine(_turnManager.ExecutePlayerActions());
+
         if (_turnManager.IsTurnReady && !_turnManager.IsExecuting)
-            StartCoroutine(_turnManager.ExecuteTurn());
+            StartCoroutine(_turnManager.ExecuteEnemiesTurn());
     }
 
     private void OnApplicationQuit()

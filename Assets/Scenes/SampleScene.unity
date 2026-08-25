@@ -434,7 +434,7 @@ MonoBehaviour:
   _waitButton: {fileID: 2135043385}
   _restartButton: {fileID: 231974547}
   _undoButton: {fileID: 1138319092}
-  _breakButton: {fileID: 1688350582}
+  _endTurnButton: {fileID: 1688350582}
   _confirmActionsButton: {fileID: 1708479386}
   _actionTypeText: {fileID: 1985848401}
 --- !u!4 &83016666
@@ -11971,11 +11971,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5202686001929931259, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_Name
-      value: BreakButton
+      value: EndTurnButton
       objectReference: {fileID: 0}
     - target: {fileID: 8521863301976487894, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_text
-      value: BREAK
+      value: END TURN
       objectReference: {fileID: 0}
     - target: {fileID: 8521863301976487894, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_fontSize

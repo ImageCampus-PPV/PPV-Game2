@@ -15,6 +15,10 @@ public class Player : Unit
     public int PlannedAPCost => GetPlannedAPCost();
     private ClickActionType _currentActionTypeSelected;
 
+    private int _usedTicksThisTurn;
+    public int UsedTicksThisTurn => _usedTicksThisTurn;
+    public int RemainingTicksThisTurn => Mathf.Max(0, _maxTicksPerTurn - _usedTicksThisTurn - GetPlannedTickCost());
+
     private Terminal _plannedHackTerminal;
     private int _plannedHackTicks;
     private int _plannedHackAPCost;
@@ -77,12 +81,13 @@ public class Player : Unit
         EventBus.Subscribe<WaitButtonEvent>((in WaitButtonEvent callback) => AddWaitAction());
         EventBus.Subscribe<UndoButtonEvent>(OnUndoButton);
         EventBus.Subscribe<RestartButtonEvent>((in RestartButtonEvent callback) => ClearPlan());
-        EventBus.Subscribe<ConfirmActionsButtonEvent>((in ConfirmActionsButtonEvent callback) => _isTurnReady = true);
+        EventBus.Subscribe<ConfirmActionsButtonEvent>(OnConfirmAction);
+        EventBus.Subscribe<EndTurnButtonEvent>(OnEndTurnButton);
     }
 
     private void SetClickActionType(ClickActionType actionType)
     {
-       _currentActionTypeSelected = actionType;
+        _currentActionTypeSelected = actionType;
     }
 
     private void Update()
@@ -140,7 +145,7 @@ public class Player : Unit
     private bool CanAddAction(TurnAction action)
     {
         int futureAP = GetPlannedAPCost() + action.APCost;
-        int futureTicks = GetPlannedTickCost() + action.TotalTicks;
+        int futureTicks = _usedTicksThisTurn + GetPlannedTickCost() + action.TotalTicks;
 
         if (futureAP > APWallet.CurrentAP)
             return false;
@@ -149,6 +154,20 @@ public class Player : Unit
             return false;
 
         return true;
+    }
+
+    private bool CanAddActions(List<TurnAction> actions)
+    {
+        int futureAP = GetPlannedAPCost();
+        int futureTicks = _usedTicksThisTurn + GetPlannedTickCost();
+
+        foreach (TurnAction action in actions)
+        {
+            futureAP += action.APCost;
+            futureTicks += action.TotalTicks;
+        }
+
+        return futureAP <= APWallet.CurrentAP && futureTicks <= _maxTicksPerTurn;
     }
 
     private void ReactToClick(Cell clickedCell)
@@ -200,33 +219,19 @@ public class Player : Unit
         if (path == null || path.Count <= 1)
             return;
 
-        int futureAP = GetPlannedAPCost();
-        int futureTicks = GetPlannedTickCost();
-
-        List<MoveAction> newActions = new();
+        List<TurnAction> newActions = new();
 
         for (int i = 1; i < path.Count; i++)
         {
-            int apCost = GetPathCost(path[i - 1], path[i]);
-
-            MoveAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST + _breakPenalty);
-
-            futureAP += action.APCost;
-            futureTicks += action.TotalTicks;
-
+            TurnAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST + _breakPenalty);
             newActions.Add(action);
         }
 
-        if (futureAP > APWallet.CurrentAP)
-            return;
-
-        if (futureTicks > _maxTicksPerTurn)
+        if (!CanAddActions(newActions))
             return;
 
         _plannedActions.AddRange(newActions);
-
-        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - futureAP, APWallet.MaxAP);
-        return;
+        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
     // --- Terminales / Hackeo ---------------------------------------------
@@ -245,7 +250,7 @@ public class Player : Unit
         bool isFreshStart = terminal.CurrentTicks == 0;
         int hackAPCost = isFreshStart ? terminal.APCost : 0;
 
-        int remainingTickBudget = _maxTicksPerTurn - GetPlannedTickCost();
+        int remainingTickBudget = _maxTicksPerTurn - _usedTicksThisTurn - GetPlannedTickCost();
         int ticksNeeded = Mathf.Min(remainingTickBudget, terminal.RequiredTicks - terminal.CurrentTicks);
 
         if (ticksNeeded <= 0)
@@ -373,6 +378,11 @@ public class Player : Unit
         return plannedPath;
     }
 
+    public void UseTicks(int ticks)
+    {
+        _usedTicksThisTurn += ticks;
+    }
+
     private void OnUndoButton(in UndoButtonEvent callback)
     {
         if (_plannedActions.Count == 0)
@@ -380,6 +390,20 @@ public class Player : Unit
 
         _plannedActions.RemoveAt(_plannedActions.Count - 1);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
+    }
+
+    private void OnConfirmAction(in ConfirmActionsButtonEvent callback)
+    {
+        if (_plannedActions.Count == 0)
+            return;
+
+        EventBus.Raise<PlayerExecuteActionEvent>();
+    }
+
+    private void OnEndTurnButton(in EndTurnButtonEvent callback)
+    {
+        _isTurnReady = true;
+        _usedTicksThisTurn = 0;
     }
 
     protected override void OnMovementStarted()
@@ -392,6 +416,7 @@ public class Player : Unit
 
     public override void ConsumeAP(TurnAction action)
     {
+        _usedTicksThisTurn += action.APCost;
         EventBus.Raise<APConsumeRequestAceptedEvent>(action.APCost);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }

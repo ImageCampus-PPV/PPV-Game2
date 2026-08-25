@@ -23,7 +23,7 @@ public class GameplayButtons : MonoBehaviour
     [SerializeField] private Button _waitButton;
     [SerializeField] private Button _restartButton;
     [SerializeField] private Button _undoButton;
-    [SerializeField] private Button _breakButton;
+    [SerializeField] private Button _endTurnButton;
     [SerializeField] private Button _confirmActionsButton;
     [SerializeField] private TMP_Text _actionTypeText;
 
@@ -43,7 +43,7 @@ public class GameplayButtons : MonoBehaviour
         _waitButton.onClick.AddListener(() => EventBus.Raise<WaitButtonEvent>());
         _restartButton.onClick.AddListener(() => EventBus.Raise<RestartButtonEvent>());
         _undoButton.onClick.AddListener(() => EventBus.Raise<UndoButtonEvent>());
-        _breakButton.onClick.AddListener(() => EventBus.Raise<BreakEvent>());
+        _endTurnButton.onClick.AddListener(() => EventBus.Raise<EndTurnButtonEvent>());
         _confirmActionsButton.onClick.AddListener(() => EventBus.Raise<ConfirmActionsButtonEvent>());
 
         _moveButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Move));
@@ -156,6 +156,28 @@ public struct UndoButtonEvent : IEvent
 }
 
 public struct ConfirmActionsButtonEvent : IEvent
+{
+    public void Assign(params object[] parameters)
+    {
+    }
+
+    public void Reset()
+    {
+    }
+}
+
+public struct EndTurnButtonEvent : IEvent
+{
+    public void Assign(params object[] parameters)
+    {
+    }
+
+    public void Reset()
+    {
+    }
+}
+
+public struct PlayerExecuteActionEvent : IEvent
 {
     public void Assign(params object[] parameters)
     {
