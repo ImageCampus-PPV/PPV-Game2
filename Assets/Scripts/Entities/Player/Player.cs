@@ -15,9 +15,7 @@ public class Player : Unit
     public int PlannedAPCost => GetPlannedAPCost();
     private ClickActionType _currentActionTypeSelected;
 
-    private int _usedTicksThisTurn;
-    public int UsedTicksThisTurn => _usedTicksThisTurn;
-    public int RemainingTicksThisTurn => Mathf.Max(0, _maxTicksPerTurn - _usedTicksThisTurn - GetPlannedTickCost());
+    
 
     private Terminal _plannedHackTerminal;
     private int _plannedHackTicks;
@@ -142,7 +140,7 @@ public class Player : Unit
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
-    private bool CanAddAction(TurnAction action)
+    protected override bool CanAddAction(TurnAction action)
     {
         int futureAP = GetPlannedAPCost() + action.APCost;
         int futureTicks = _usedTicksThisTurn + GetPlannedTickCost() + action.TotalTicks;
@@ -323,15 +321,6 @@ public class Player : Unit
         return cost;
     }
 
-    private int GetPlannedTickCost()
-    {
-        int ticks = 0;
-
-        foreach (TurnAction action in _plannedActions)
-            ticks += action.TotalTicks;
-
-        return ticks;
-    }
 
     public Cell GetLastPlannedCell()
     {

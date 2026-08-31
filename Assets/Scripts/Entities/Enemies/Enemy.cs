@@ -1,55 +1,40 @@
 using ImageCampus.ToolBox.Services;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Enemy : Unit
 {
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
 
-    protected uint _damage = 10;
+    //Normal enemy values
+    protected uint _damage = 25;
     protected int _movementRange = 1;
     protected int _fortitude = 2;
     protected int _pushDistance = 2;
+    protected int _attackTickCost = 1;
 
     public uint Damage => _damage;
     public int MovementRange => _movementRange;
     public int Fortitude => _fortitude;
     public int PushDistance => _pushDistance;
+    public int AttackTickCost => _attackTickCost;
 
 
     public void PlanTurn(Cell playerCell, int emptyActions)
     {
         _plannedActions.Clear();
+        _usedTicksThisTurn = 0;
 
         for (int i = 0; i < emptyActions; i++)
             _plannedActions.Add(new WaitAction());
 
-        if (IsInGoodCover(playerCell))
-        {
-            Debug.Log($"{name} holding position");
-            return;
-        }
+        Cell newCurrentCell = _currentCell;
+        if (!IsInAttackRange(_currentCell, playerCell))
+            newCurrentCell = PlanMovementActions(playerCell);
 
-        Cell targetCell = FindBestCell(playerCell);
+        if (IsInAttackRange(newCurrentCell, playerCell))
+            PlanCombatActions(playerCell);
 
-        if (targetCell == null)
-        {
-            Debug.Log($"{name} found no valid move");
-            return;
-        }
-
-        List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
-
-        if (path == null || path.Count <= 1)
-            return;
-
-        int actionLimit = path.Count < _maxTicksPerTurn ? path.Count : _maxTicksPerTurn;
-
-        for (int i = 1; i < actionLimit; i++)
-            _plannedActions.Add(new MoveAction(path[i - 1], path[i], 0));
-
-        PlanCombatActions(playerCell);
 
         //Move one tile per turn
         //_currentPath = new List<Cell>()
@@ -61,6 +46,39 @@ public abstract class Enemy : Unit
         //_pathIndex = 1;
         //
         //StartCoroutine(FollowPath());
+    }
+
+    private Cell PlanMovementActions(Cell playerCell)
+    {
+        Cell newCurrentCell = CurrentCell;
+        //if (IsInGoodCover(playerCell))
+        //{
+        //    Debug.Log($"{name} holding position");
+        //    return;
+        //}
+
+        Cell targetCell = FindBestCell(playerCell);
+
+        if (targetCell == null)
+        {
+            Debug.Log($"{name} found no valid move");
+            return newCurrentCell;
+        }
+
+        List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
+
+        if (path == null || path.Count <= 1)
+            return newCurrentCell;
+
+        int actionLimit = path.Count < _maxTicksPerTurn ? path.Count : _maxTicksPerTurn;
+
+        for (int i = 1; i < actionLimit; i++)
+        {
+            _plannedActions.Add(new MoveAction(path[i - 1], path[i], 0));
+            newCurrentCell = path[i];
+        }
+
+        return newCurrentCell;
     }
 
     private bool IsInRange(Cell playerCell)
@@ -169,9 +187,9 @@ public abstract class Enemy : Unit
         return false;
     }
 
-    protected bool IsCellNearUnit(Cell targetCell, int maxDistance)
+    protected bool IsInAttackRange(Cell originCell, Cell targetCell)
     {
-        Vector2Int origin = CurrentCell.Coordinates;
+        Vector2Int origin = originCell.Coordinates;
         Vector2Int target = targetCell.Coordinates;
 
         Vector2Int[] directions = new Vector2Int[]
@@ -184,7 +202,7 @@ public abstract class Enemy : Unit
 
         foreach (Vector2Int dir in directions)
         {
-            for (int i = 1; i <= maxDistance; i++)
+            for (int i = 1; i <= AttackRange; i++)
             {
                 Vector2Int current = origin + dir * i;
 

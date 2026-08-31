@@ -29,6 +29,10 @@ public abstract class Unit : BaseEntity
     protected int _pathIndex;
     protected bool _isTurnPlaying;
 
+    protected int _usedTicksThisTurn;
+    public int UsedTicksThisTurn => _usedTicksThisTurn;
+    public int RemainingTicksThisTurn => Mathf.Max(0, _maxTicksPerTurn - _usedTicksThisTurn - GetPlannedTickCost());
+
     public bool IsTurnPlaying { get => _isTurnPlaying; set => _isTurnPlaying = value; }
 
     protected int _currentAction;
@@ -36,7 +40,7 @@ public abstract class Unit : BaseEntity
 
     protected Cell _currentCell;
 
-    private int _attackRange = 4;
+    protected int _attackRange = 4;
     public int AttackRange => _attackRange;
 
     private bool _isStun = false;
@@ -226,6 +230,23 @@ public abstract class Unit : BaseEntity
         _currentCell.stander = this;
 
         transform.position = GetStandPosition(targetCell.GetWorldTopPosition());
+    }
+
+    protected int GetPlannedTickCost()
+    {
+        int ticks = 0;
+
+        foreach (TurnAction action in _plannedActions)
+            ticks += action.TotalTicks;
+
+        return ticks;
+    }
+
+    protected virtual bool CanAddAction(TurnAction action)
+    {
+        int futureTicks = GetPlannedTickCost() + action.TotalTicks;
+
+        return futureTicks <= _maxTicksPerTurn;
     }
 
     protected virtual void OnMovementStarted() { }
