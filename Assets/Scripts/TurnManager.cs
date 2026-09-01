@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class TurnManager : IService
 {
@@ -84,7 +83,6 @@ public class TurnManager : IService
         _executePlayerActionRequested = false;
         _isTurnReady = false;
 
-
         if (!_mapTicked)
         {
             _mapTicked = true;
@@ -159,6 +157,8 @@ public class TurnManager : IService
         _executing = false;
         _mapTicked = false;
 
+        EventBus.Raise<EntityTurnStartEvent>(_player);
+        EventBus.Raise<OnTurnEndEvent>();
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
     }
 

@@ -1,6 +1,6 @@
 using ImageCampus.ToolBox.Events;
 
-public struct OnTurnStartEvent : IEvent
+public struct OnTurnEndEvent : IEvent
 {
     public void Assign(params object[] parameters)
     {

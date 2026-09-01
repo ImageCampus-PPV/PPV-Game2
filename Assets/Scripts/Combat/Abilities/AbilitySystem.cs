@@ -13,7 +13,7 @@ public class AbilitySystem : IService
     public void Init()
     {
         EventBus eventBus = ServiceProvider.Instance.GetService<EventBus>();
-        eventBus.Subscribe<OnTurnStartEvent>(OnTurnStart);
+        eventBus.Subscribe<OnTurnEndEvent>(OnTurnStart);
 
         RegisterAbility(new PunchAbility());
         RegisterAbility(new KickAbility());
@@ -67,7 +67,7 @@ public class AbilitySystem : IService
             ability.TickCooldown();
     }
 
-    private void OnTurnStart(in OnTurnStartEvent callback)
+    private void OnTurnStart(in OnTurnEndEvent callback)
     {
         TickCooldowns();
     }

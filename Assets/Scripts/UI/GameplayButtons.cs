@@ -18,8 +18,6 @@ public class GameplayButtons : MonoBehaviour
 
     [SerializeField] private Button _moveButton;
     [SerializeField] private Button _hackButton;
-    [SerializeField] private Button _KickButton;
-    [SerializeField] private Button _PunchButton;
     [SerializeField] private Button _waitButton;
     [SerializeField] private Button _restartButton;
     [SerializeField] private Button _undoButton;
@@ -28,6 +26,14 @@ public class GameplayButtons : MonoBehaviour
     [SerializeField] private TMP_Text _actionTypeText;
     [SerializeField] private TMP_Text _entityTurnText;
 
+    //Abilities
+    [SerializeField] private Button _kickButton;
+    [SerializeField] private TMP_Text _kickText;
+
+    [SerializeField] private Button _punchButton;
+    [SerializeField] private TMP_Text _punchText;
+
+
     public void Init()
     {
         AssignButtonEvents();
@@ -35,6 +41,7 @@ public class GameplayButtons : MonoBehaviour
         SetCurrentActionText(ClickActionType.Move);
 
         EventBus.Subscribe<EntityTurnStartEvent>(OnEntityTurnStart);
+        EventBus.Subscribe<AbilityCooldownChangedEvent>(OnAbilityCooldownChanged);
         _entityTurnText.text = "Turn: Player";
     }
 
@@ -42,9 +49,7 @@ public class GameplayButtons : MonoBehaviour
     {
         _moveButton.onClick.AddListener(() => EventBus.Raise<MoveButtonEvent>());
         _hackButton.onClick.AddListener(() => EventBus.Raise<HackButtonEvent>());
-        _KickButton.onClick.AddListener(() => EventBus.Raise<KickButtonEvent>());
-        _PunchButton.onClick.AddListener(() => EventBus.Raise<PunchButtonEvent>());
-        _waitButton.onClick.AddListener(() => EventBus.Raise<WaitButtonEvent>());
+        //_waitButton.onClick.AddListener(() => EventBus.Raise<WaitButtonEvent>());
         _restartButton.onClick.AddListener(() => EventBus.Raise<RestartButtonEvent>());
         _undoButton.onClick.AddListener(() => EventBus.Raise<UndoButtonEvent>());
         _endTurnButton.onClick.AddListener(() => EventBus.Raise<EndTurnButtonEvent>());
@@ -52,8 +57,14 @@ public class GameplayButtons : MonoBehaviour
 
         _moveButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Move));
         _hackButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Hack));
-        _KickButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Kick));
-        _PunchButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Punch));
+
+
+        //Abilities
+        _kickButton.onClick.AddListener(() => EventBus.Raise<KickButtonEvent>());
+        _kickButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Kick));
+
+        _punchButton.onClick.AddListener(() => EventBus.Raise<PunchButtonEvent>());
+        _punchButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Punch));
     }
 
     private void SetCurrentActionText(ClickActionType actionType)
@@ -92,6 +103,23 @@ public class GameplayButtons : MonoBehaviour
         else
             _entityTurnText.text = $"Turn: {callback.Entity.name}";
     }
+
+    private void UpdateAbilityText(IAbility ability, TMP_Text text)
+    {
+        if (ability.RemainingCooldown > 0)
+            text.text = $"{ability.Name} | Cooldown ({ability.RemainingCooldown})";
+        else
+            text.text = $"{ability.Name}";
+    }
+
+    private void OnAbilityCooldownChanged(in AbilityCooldownChangedEvent callback)
+    {
+        if (callback.Ability is KickAbility)
+            UpdateAbilityText(callback.Ability, _kickText);
+        else if (callback.Ability is PunchAbility)
+            UpdateAbilityText(callback.Ability, _punchText);
+    }
+
 }
 public struct MoveButtonEvent : IEvent
 {
@@ -215,5 +243,23 @@ public struct EntityTurnStartEvent : IEvent
     public void Reset()
     {
         Entity = null;
+    }
+}
+
+public struct AbilityCooldownChangedEvent : IEvent
+{
+    public IAbility Ability;
+    public int RemainingCooldown;
+
+    public void Assign(params object[] parameters)
+    {
+        Ability = parameters[0] as IAbility;
+        RemainingCooldown = (int)parameters[1];
+    }
+
+    public void Reset()
+    {
+        Ability = null;
+        RemainingCooldown = 0;
     }
 }

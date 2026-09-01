@@ -27,6 +27,9 @@ public class PunchAbility : IAbility
         if (APWallet.CurrentAP < APCost)
             return false;
 
+        if (_remainingCooldown > 0)
+            return false;
+
         //if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
         //    return false;
 
@@ -47,11 +50,14 @@ public class PunchAbility : IAbility
     public void StartCooldown()
     {
         _remainingCooldown = Cooldown;
+        EventBus.Raise<AbilityCooldownChangedEvent>(this, _remainingCooldown);
     }
 
     public void TickCooldown()
     {
         if (_remainingCooldown > 0)
             _remainingCooldown--;
+
+        EventBus.Raise<AbilityCooldownChangedEvent>(this, _remainingCooldown);
     }
 }

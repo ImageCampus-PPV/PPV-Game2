@@ -7,8 +7,7 @@ public class KickAbility : IAbility
     public string Name => "Kick";
     public int APCost => 1;
     public int Range => 1;
-
-    public int Cooldown => 2;
+    public int Cooldown => 1;
 
     private int _remainingCooldown;
     public int RemainingCooldown => _remainingCooldown;
@@ -26,6 +25,9 @@ public class KickAbility : IAbility
             return false;
 
         if (APWallet.CurrentAP < APCost)
+            return false;
+
+        if (_remainingCooldown > 0)
             return false;
 
         //if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
@@ -47,11 +49,14 @@ public class KickAbility : IAbility
     public void StartCooldown()
     {
         _remainingCooldown = Cooldown;
+        EventBus.Raise<AbilityCooldownChangedEvent>(this, _remainingCooldown);
     }
 
     public void TickCooldown()
     {
         if (_remainingCooldown > 0)
             _remainingCooldown--;
+
+        EventBus.Raise<AbilityCooldownChangedEvent>(this, _remainingCooldown);
     }
 }
