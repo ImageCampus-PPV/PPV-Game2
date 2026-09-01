@@ -330,7 +330,11 @@ public class Player : Unit
             return;
 
         AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
+        
         if (!CanAddAction(action))
+            return;
+
+        if (!ability.CanExecute(this, targetCell))
             return;
 
         _plannedActions.Add(action);
@@ -344,7 +348,11 @@ public class Player : Unit
             return;
 
         AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
+       
         if (!CanAddAction(action))
+            return;
+
+        if (!ability.CanExecute(this, targetCell))
             return;
 
         _plannedActions.Add(action);

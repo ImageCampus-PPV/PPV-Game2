@@ -19,7 +19,7 @@ public class Cell : BaseEntity
     [HideInInspector] public int hCost;
     [HideInInspector] public int fCost;
     [HideInInspector] public Cell cameFromCell;
-    [HideInInspector] public bool isOccupied => stander != null;
+    [HideInInspector] public bool isOccupied => stander != null || Terminal != null;
     public Unit stander = null;
 
     public Terminal Terminal { get; set; }
