@@ -107,7 +107,7 @@ MonoBehaviour:
   - _initialState: DefaultCell
     _coordinates: {x: 1, y: 8}
     _spawnUnit: None
-    _assetToSpawn: {fileID: 7279457351147869013, guid: c2f9c8fa2bc88394789c1b12bffc239b, type: 3}
+    _assetToSpawn: {fileID: 0}
     _terminalType: None
   - _initialState: DefaultCell
     _coordinates: {x: 1, y: 9}

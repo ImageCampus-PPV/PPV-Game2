@@ -17,6 +17,7 @@ public class CellEditorWindow : EditorWindow
     private DropdownField unitSpawnType;
     private DropdownField terminalTypeDropdown;
     private Label cellInfoLabel;
+    private ObjectField spawnDecorationField;
 
     public static void ShowWindow(CellData inCell, Action<CellData> onChanged = null)
     {
@@ -39,6 +40,7 @@ public class CellEditorWindow : EditorWindow
         unitSpawnType.SetValueWithoutNotify(cell._spawnUnit);
         cellTypeDropdown.SetValueWithoutNotify(cell._initialState);
         terminalTypeDropdown?.SetValueWithoutNotify(string.IsNullOrEmpty(cell._terminalType) ? "None" : cell._terminalType);
+        spawnDecorationField?.SetValueWithoutNotify(cell._assetToSpawn);
         cellInfoLabel.text = $"Editing Cell ({cell._coordinates.x}, {cell._coordinates.y})";
     }
 
@@ -76,11 +78,12 @@ public class CellEditorWindow : EditorWindow
 
         VisualElement root = rootVisualElement;
 
-        ObjectField spawnDecorationField = new ObjectField("Decoration")
+        spawnDecorationField = new ObjectField("Decoration")
         {
             objectType = typeof(GameObject),
             allowSceneObjects = false
         };
+
 
         spawnDecorationField.RegisterValueChangedCallback(evt =>
         {
