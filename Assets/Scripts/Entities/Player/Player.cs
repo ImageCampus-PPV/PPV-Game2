@@ -2,6 +2,7 @@ using Assets.Scripts.Combat;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,6 +46,7 @@ public class Player : Unit
 
     public void ReduceLife(uint life)
     {
+        Vibrate();
         if ((int)_life - life <= 0)
             _life = 0;
         else
@@ -55,6 +57,41 @@ public class Player : Unit
         if (_life <= 0)
             EventBus.Raise<LevelFailedEvent>();
     }
+
+    /////////////////DEBUG///////////////////////
+    private Coroutine _shakeCoroutine;
+
+    private void Vibrate()
+    {
+        if (_shakeCoroutine != null)
+            StopCoroutine(_shakeCoroutine);
+
+        _shakeCoroutine = StartCoroutine(VibrateCoroutine());
+    }
+
+    private IEnumerator VibrateCoroutine()
+    {
+        Vector3 originalPosition = transform.localPosition;
+
+        const float duration = 0.12f;
+        const float strength = 0.1f;
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+
+            transform.localPosition =
+                originalPosition + (Vector3)UnityEngine.Random.insideUnitCircle * strength;
+
+            yield return null;
+        }
+
+        transform.localPosition = originalPosition;
+        _shakeCoroutine = null;
+    }
+    /////////////////DEBUG///////////////////////
 
     public void AddLife(uint life)
     {
