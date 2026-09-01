@@ -1,16 +1,15 @@
-using Assets.Scripts.Combat;
+
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public abstract class Unit : BaseEntity
 {
     protected PathFinding PathFinding => ServiceProvider.Instance.GetService<PathFinding>();
     protected EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
+    protected MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
@@ -74,6 +73,41 @@ public abstract class Unit : BaseEntity
     public void Unstun()
     {
         _isStun = false;
+    }
+
+    public bool IsInAttackRange(Cell originCell, Cell targetCell, int attackRange)
+    {
+        Vector2Int origin = originCell.Coordinates;
+        Vector2Int target = targetCell.Coordinates;
+
+        Vector2Int[] directions = new Vector2Int[]
+        {
+        new Vector2Int( 1,  0),
+        new Vector2Int(-1,  0),
+        new Vector2Int( 0,  1),
+        new Vector2Int( 0, -1),
+        };
+
+        foreach (Vector2Int dir in directions)
+        {
+            for (int i = 1; i <= attackRange; i++)
+            {
+                Vector2Int current = origin + dir * i;
+
+                if (current.x < 0 || current.y < 0 || current.x >= MapGrid.Width || current.y >= MapGrid.Height)
+                    break;
+
+                Cell currentCell = MapGrid.GetCell(current);
+
+                if (currentCell.ProvidesCover)
+                    break;
+
+                if (current == target)
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     protected bool IsCellAvailable(Cell targetCell)

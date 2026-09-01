@@ -11,7 +11,7 @@ public class Player : Unit
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
-
+    private FloatingTextInstancer FloatingTextInstancer => ServiceProvider.Instance.GetService<FloatingTextInstancer>();
     public int PlannedAPCost => GetPlannedAPCost();
     private ClickActionType _currentActionTypeSelected;
 
@@ -35,6 +35,8 @@ public class Player : Unit
     protected const int MOVEMENT_COST = 1;
     protected const int BREAK_MIN_COST = 3;
     private int _breakPenalty;
+
+    private Vector3 headPos => transform.position + Vector3.up;
 
     public int BreakPenalty => _breakPenalty;
 
@@ -83,6 +85,8 @@ public class Player : Unit
     {
         Vector3 originalPosition = transform.localPosition;
 
+        FloatingTextInstancer.InstantiateText($"Ouch!", headPos, Color.red);
+
         const float duration = 0.12f;
         const float strength = 0.1f;
 
@@ -118,7 +122,7 @@ public class Player : Unit
         EventBus.Subscribe<PunchButtonEvent>((in PunchButtonEvent callback) => SetClickActionType(ClickActionType.Punch));
         EventBus.Subscribe<WaitButtonEvent>((in WaitButtonEvent callback) => AddWaitAction());
         EventBus.Subscribe<UndoButtonEvent>(OnUndoButton);
-        EventBus.Subscribe<RestartButtonEvent>((in RestartButtonEvent callback) => ClearPlan());
+        EventBus.Subscribe<RestartButtonEvent>((in RestartButtonEvent callback) => RestartPlan());
         EventBus.Subscribe<ConfirmActionsButtonEvent>(OnConfirmAction);
         EventBus.Subscribe<EndTurnButtonEvent>(OnEndTurnButton);
     }
@@ -162,12 +166,15 @@ public class Player : Unit
 
         //R removes all actions
         if (Input.GetKeyUp(KeyCode.R))
-            ClearPlan();
+        {
+            RestartPlan();
+        }
 
         //FinishTurn
         if (Input.GetKeyUp(KeyCode.Space))
             _isTurnReady = true;
     }
+
 
     private void AddWaitAction()
     {
@@ -185,11 +192,19 @@ public class Player : Unit
         int futureAP = GetPlannedAPCost() + action.APCost;
         int futureTicks = _usedTicksThisTurn + GetPlannedTickCost() + action.TotalTicks;
 
+   
+
         if (futureAP > APWallet.CurrentAP)
+        {
+            FloatingTextInstancer.InstantiateText("Not enough AP", headPos, Color.red);
             return false;
+        }
 
         if (futureTicks > _maxTicksPerTurn)
+        {
+            FloatingTextInstancer.InstantiateText("Max ticks per turn reached", headPos, Color.red);
             return false;
+        }
 
         return true;
     }
@@ -205,7 +220,19 @@ public class Player : Unit
             futureTicks += action.TotalTicks;
         }
 
-        return futureAP <= APWallet.CurrentAP && futureTicks <= _maxTicksPerTurn;
+        if (futureAP > APWallet.CurrentAP)
+        {
+            FloatingTextInstancer.InstantiateText("Not enough AP", headPos, Color.red);
+            return false;
+        }
+
+        if (futureTicks > _maxTicksPerTurn)
+        {
+            FloatingTextInstancer.InstantiateText("Max ticks per turn reached", headPos, Color.red);
+            return false;
+        }
+
+        return true;
     }
 
     private void ReactToClick(Cell clickedCell)
@@ -249,7 +276,10 @@ public class Player : Unit
     private void TryMove(Cell clickedCell)
     {
         if (!IsCellAvailable(clickedCell))
+        {
+            FloatingTextInstancer.InstantiateText("Cell is not available", clickedCell.GetWorldTopPosition(), Color.red);
             return;
+        }
 
         Cell origin = GetLastPlannedCell();
         List<Cell> path = GetPathCells(origin, clickedCell);
@@ -281,6 +311,7 @@ public class Player : Unit
 
         if (_plannedHackTerminal != null)
         {
+            FloatingTextInstancer.InstantiateText("Hack already planned this turn", terminal.Cell.GetWorldTopPosition(), Color.red);
             Debug.Log("[Player] Ya hay un hackeo planificado este turno. Confirma el turno (Space) o cancela el plan (R) antes de planificar otro.");
             return false;
         }
@@ -293,6 +324,7 @@ public class Player : Unit
 
         if (ticksNeeded <= 0)
         {
+            FloatingTextInstancer.InstantiateText($"Not enough ticks for hacking ({GetPlannedTickCost()}/{_maxTicksPerTurn})", terminal.Cell.GetWorldTopPosition(), Color.red);
             Debug.Log($"[Player] No queda presupuesto de ticks este turno para hackear ({GetPlannedTickCost()}/{_maxTicksPerTurn} ya planificados). Confirma el turno o saca movimiento planificado.");
             return false;
         }
@@ -313,6 +345,7 @@ public class Player : Unit
 
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
 
+        FloatingTextInstancer.InstantiateText("Hack planned!", terminal.Cell.GetWorldTopPosition(), Color.green);
         Debug.Log($"[Player] Hackeo planificado: {terminal.Type} en {terminal.Cell.Coordinates} ({hackAPCost} AP, {ticksNeeded} ticks). Confirma con Space para ejecutarlo.");
 
         return true;
@@ -342,6 +375,7 @@ public class Player : Unit
             return;
 
         _plannedActions.Add(action);
+        FloatingTextInstancer.InstantiateText($"Planned!", targetCell.GetWorldTopPosition(), Color.blue);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
@@ -360,6 +394,7 @@ public class Player : Unit
             return;
 
         _plannedActions.Add(action);
+        FloatingTextInstancer.InstantiateText($"Planned!", targetCell.GetWorldTopPosition(), Color.blue);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
@@ -419,12 +454,19 @@ public class Player : Unit
         return plannedPath;
     }
 
+    private void RestartPlan()
+    {
+        FloatingTextInstancer.InstantiateText("Reset!", headPos, Color.blue);
+        ClearPlan();
+    }
+
     private void OnUndoButton(in UndoButtonEvent callback)
     {
         if (_plannedActions.Count == 0)
             return;
 
         _plannedActions.RemoveAt(_plannedActions.Count - 1);
+        FloatingTextInstancer.InstantiateText("Undo!", headPos, Color.blue);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 

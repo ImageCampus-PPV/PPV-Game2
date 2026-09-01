@@ -824,6 +824,30 @@ PrefabInstance:
       propertyPath: m_text
       value: LEVEL INFO
       objectReference: {fileID: 0}
+    - target: {fileID: 8925797403522090965, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
+      propertyPath: m_margin.w
+      value: 33.0527
+      objectReference: {fileID: 0}
+    - target: {fileID: 8925797403522090965, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
+      propertyPath: m_margin.x
+      value: -4.531639
+      objectReference: {fileID: 0}
+    - target: {fileID: 8925797403522090965, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
+      propertyPath: m_margin.y
+      value: -5.854574
+      objectReference: {fileID: 0}
+    - target: {fileID: 8925797403522090965, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
+      propertyPath: m_margin.z
+      value: 29.253677
+      objectReference: {fileID: 0}
+    - target: {fileID: 8925797403522090965, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 8925797403522090965, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -17074,6 +17098,8 @@ MonoBehaviour:
   _terminalConfiguration: {fileID: 11400000, guid: e868794dc2b1444ab06653880e3c6238, type: 2}
   _defaultMat: {fileID: 2100000, guid: 230651a71114c43448e5afb86dbb5ece, type: 2}
   _UiButtonsScript: {fileID: 83016665}
+  _floatingTextGO: {fileID: 5434869071130886376, guid: 18a493cfbca72b2429ba2bc1d16d921e, type: 3}
+  _canvasGO: {fileID: 1587193797}
 --- !u!4 &1973655150
 Transform:
   m_ObjectHideFlags: 0
@@ -18472,8 +18498,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 18
+  m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

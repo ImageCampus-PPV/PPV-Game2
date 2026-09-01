@@ -30,6 +30,9 @@ public class PunchAbility : IAbility
         if (_remainingCooldown > 0)
             return false;
 
+        if (!player.IsInAttackRange(player.CurrentCell, targetCell, Range))
+            return false;
+
         //if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
         //    return false;
 

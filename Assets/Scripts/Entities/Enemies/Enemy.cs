@@ -4,8 +4,6 @@ using UnityEngine;
 
 public abstract class Enemy : Unit
 {
-    private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
-
     //Normal enemy values
     protected uint _damage = 25;
     protected int _movementRange = 1;
@@ -29,10 +27,10 @@ public abstract class Enemy : Unit
             _plannedActions.Add(new WaitAction());
 
         Cell newCurrentCell = _currentCell;
-        if (!IsInAttackRange(_currentCell, playerCell))
+        if (!IsInAttackRange(_currentCell, playerCell, _attackRange))
             newCurrentCell = PlanMovementActions(playerCell);
 
-        if (IsInAttackRange(newCurrentCell, playerCell))
+        if (IsInAttackRange(newCurrentCell, playerCell, _attackRange))
             PlanCombatActions(playerCell);
 
 
@@ -182,41 +180,6 @@ public abstract class Enemy : Unit
 
             if (hitCell != null && hitCell != playerCell && hitCell != cell && !hitCell.IsWalkable)
                 return true;
-        }
-
-        return false;
-    }
-
-    protected bool IsInAttackRange(Cell originCell, Cell targetCell)
-    {
-        Vector2Int origin = originCell.Coordinates;
-        Vector2Int target = targetCell.Coordinates;
-
-        Vector2Int[] directions = new Vector2Int[]
-        {
-        new Vector2Int( 1,  0),
-        new Vector2Int(-1,  0),
-        new Vector2Int( 0,  1),
-        new Vector2Int( 0, -1),
-        };
-
-        foreach (Vector2Int dir in directions)
-        {
-            for (int i = 1; i <= AttackRange; i++)
-            {
-                Vector2Int current = origin + dir * i;
-
-                if (current.x < 0 || current.y < 0 || current.x >= MapGrid.Width || current.y >= MapGrid.Height)
-                    break;
-
-                Cell currentCell = MapGrid.GetCell(current);
-
-                if (currentCell.ProvidesCover)
-                    break;
-
-                if (current == target)
-                    return true;
-            }
         }
 
         return false;

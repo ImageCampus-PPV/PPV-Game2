@@ -15,7 +15,7 @@ public class TurnManager : IService
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
-
+    private FloatingTextInstancer FloatingTextInstancer => ServiceProvider.Instance.GetService<FloatingTextInstancer>();
     private AbilitiesDurationConfiguration AbilitiesDurationConfiguration => ServiceProvider.Instance.GetService<AbilitiesDurationConfiguration>();
 
     private Dictionary<uint, uint> _stunUnits;
@@ -166,17 +166,24 @@ public class TurnManager : IService
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
+        string noCellMessage = "No cell under cursor";
+
         if (!Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
         {
+            FloatingTextInstancer.InstantiateText(noCellMessage, hit.point, Color.red);
             Debug.Log("[TurnManager] F: no hay ninguna celda bajo el cursor.");
             return;
         }
 
         if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
+        {
+            FloatingTextInstancer.InstantiateText(noCellMessage, hit.point, Color.red);
             return;
+        }
 
         if (clickedCell.Terminal == null)
         {
+            FloatingTextInstancer.InstantiateText("Cell is not a terminal", hit.point, Color.red);
             Debug.Log($"[TurnManager] F: la celda {clickedCell.Coordinates} bajo el cursor no tiene ninguna Terminal.");
             return;
         }
