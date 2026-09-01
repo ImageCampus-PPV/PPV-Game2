@@ -416,7 +416,7 @@ MonoBehaviour:
     _terminalType: None
   - _initialState: DefaultCell
     _coordinates: {x: 8, y: 0}
-    _spawnUnit: None
+    _spawnUnit: HeavyEnemy
     _assetToSpawn: {fileID: 0}
     _terminalType: None
   - _initialState: DefaultCell

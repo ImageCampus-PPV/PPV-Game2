@@ -7,7 +7,7 @@
         _movementRange = 1;
         _fortitude = 2;
         _pushDistance = 3;
-        _maxTicksPerTurn = base.MaxTicksPerTurn;
+        _maxTicksPerTurn = base.MaxTicksPerTurn - 1;
         _attackTickCost = 1;
     }
 
