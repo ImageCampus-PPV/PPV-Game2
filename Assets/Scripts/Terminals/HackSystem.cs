@@ -52,7 +52,7 @@ public class HackSystem : IService
         if (terminal == null || ticksToResolve <= 0)
             return;
 
-        if (player.IsStun || player.Life == 0)
+        if (player.IsStun || player.CurrentHp == 0)
         {
             terminal.Interrupt();
             return;

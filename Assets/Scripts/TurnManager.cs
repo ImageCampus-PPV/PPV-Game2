@@ -42,7 +42,7 @@ public class TurnManager : IService
     {
         EventBus.Raise<TurnChangeEvent>(_currenturn);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
-        EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().Life);
+        EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().CurrentHp);
         EventBus.Subscribe<DevMovePlayerEvent>(OnDevMovePlayer);
         EventBus.Subscribe<PlayerExecuteActionEvent>(OnPlayerExecuteAction);
 

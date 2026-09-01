@@ -16,7 +16,7 @@ public class AttackAction : TurnAction, IAttackAction
         if (_target != null)
         {
             if (_target is Player player)
-                player.ReduceLife(_damage);
+                player.ReduceHp(_damage);
         }
 
         AdvanceTick();

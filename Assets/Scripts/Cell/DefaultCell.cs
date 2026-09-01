@@ -197,7 +197,7 @@ public sealed class Healing : CellState
             () =>
             {
                 if (unitOnTop is Player player)
-                    player.AddLife(_healing);
+                    player.AddHp(_healing);
             }
         );
 
@@ -245,7 +245,7 @@ public class Infected : CellState
             () =>
             {
                 if (unitOnTop is Player player)
-                    player.ReduceLife(_damage);
+                    player.ReduceHp(_damage);
             }
         );
 
@@ -304,7 +304,7 @@ public class Contagious : Infected
             () =>
             {
                 if (unitOnTop is Player player)
-                    player.ReduceLife(_damage);
+                    player.ReduceHp(_damage);
 
                 changeState.Invoke(typeof(Infected));
             }

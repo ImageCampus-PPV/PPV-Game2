@@ -29,8 +29,9 @@ public class Player : Unit
 
     public List<Cell> PlannedPath => GetPlannedPath();
 
-    private uint _life = 100;
-    public uint Life => _life;
+    private uint _maxHp = 100;
+    private uint _currentHp = 100;
+    public uint CurrentHp => _currentHp;
 
     protected const int MOVEMENT_COST = 1;
     protected const int BREAK_MIN_COST = 3;
@@ -38,24 +39,34 @@ public class Player : Unit
 
     public int BreakPenalty => _breakPenalty;
 
-    public void SetLife(uint life)
+    public void SetHp(uint hp)
     {
-        _life = life;
-        EventBus.Raise<PlayerChangeLifeEvent>(_life);
+        _currentHp = hp;
+        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
     }
 
-    public void ReduceLife(uint life)
+    public void ReduceHp(uint hpToReduce)
     {
         Vibrate();
-        if ((int)_life - life <= 0)
-            _life = 0;
+        if ((int)_currentHp - hpToReduce <= 0)
+            _currentHp = 0;
         else
-            _life -= life;
+            _currentHp -= hpToReduce;
 
-        EventBus.Raise<PlayerChangeLifeEvent>(_life);
+        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
 
-        if (_life <= 0)
+        if (_currentHp <= 0)
             EventBus.Raise<LevelFailedEvent>();
+    }
+
+    public void AddHp(uint hpToAdd)
+    {
+        _currentHp += hpToAdd;
+
+        if (_currentHp > _maxHp)
+            _currentHp = _maxHp;
+
+        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
     }
 
     /////////////////DEBUG///////////////////////
@@ -91,13 +102,7 @@ public class Player : Unit
         transform.localPosition = originalPosition;
         _shakeCoroutine = null;
     }
-    /////////////////DEBUG///////////////////////
-
-    public void AddLife(uint life)
-    {
-        _life += life;
-        EventBus.Raise<PlayerChangeLifeEvent>(_life);
-    }
+    /////////////////END-DEBUG///////////////////////
 
     public override void Init()
     {
@@ -330,7 +335,7 @@ public class Player : Unit
             return;
 
         AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
-        
+
         if (!CanAddAction(action))
             return;
 
@@ -348,7 +353,7 @@ public class Player : Unit
             return;
 
         AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
-       
+
         if (!CanAddAction(action))
             return;
 
