@@ -1,7 +1,6 @@
 using Assets.Scripts.Combat;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

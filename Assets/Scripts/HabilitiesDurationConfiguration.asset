@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d008b632c84411b47ad6cdda7d3a237e, type: 3}
   m_Name: HabilitiesDurationConfiguration
   m_EditorClassIdentifier: Assembly-CSharp::HabilitiesDurationConfiguration
-  stunDuration: 2
+  stunDuration: 1
   pushDistance: 2

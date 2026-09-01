@@ -1,6 +1,4 @@
-﻿using UnityEditor.Timeline.Actions;
-
-public class HeavyEnemy : Enemy
+﻿public class HeavyEnemy : Enemy
 {
     HeavyEnemy()
     {
