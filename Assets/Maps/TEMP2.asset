@@ -54,10 +54,10 @@ MonoBehaviour:
     _spawnUnit: None
     _assetToSpawn: {fileID: 0}
     _terminalType: None
-  - _initialState: DefaultCell
+  - _initialState: Broken
     _coordinates: {x: 0, y: 8}
     _spawnUnit: None
-    _assetToSpawn: {fileID: 0}
+    _assetToSpawn: {fileID: 9215778569877319087, guid: f40d3a8593b90764ea18738c2cd8cb32, type: 3}
     _terminalType: None
   - _initialState: DefaultCell
     _coordinates: {x: 0, y: 9}
@@ -216,28 +216,28 @@ MonoBehaviour:
     _terminalType: None
   - _initialState: DefaultCell
     _coordinates: {x: 4, y: 0}
-    _spawnUnit: Player
+    _spawnUnit: None
     _assetToSpawn: {fileID: 0}
     _terminalType: 
-  - _initialState: DefaultCell
+  - _initialState: Broken
     _coordinates: {x: 4, y: 1}
-    _spawnUnit: 
-    _assetToSpawn: {fileID: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
     _terminalType: 
-  - _initialState: DefaultCell
+  - _initialState: Broken
     _coordinates: {x: 4, y: 2}
-    _spawnUnit: 
-    _assetToSpawn: {fileID: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
     _terminalType: 
-  - _initialState: DefaultCell
+  - _initialState: Broken
     _coordinates: {x: 4, y: 3}
-    _spawnUnit: 
-    _assetToSpawn: {fileID: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
     _terminalType: 
   - _initialState: Broken
     _coordinates: {x: 4, y: 4}
     _spawnUnit: 
-    _assetToSpawn: {fileID: 0}
+    _assetToSpawn: {fileID: 205849611690011842, guid: a102493a399e69b4590f43cfa537c2ae, type: 3}
     _terminalType: 
   - _initialState: DefaultCell
     _coordinates: {x: 4, y: 5}
@@ -512,5 +512,5 @@ MonoBehaviour:
   - _initialState: DefaultCell
     _coordinates: {x: 9, y: 9}
     _spawnUnit: None
-    _assetToSpawn: {fileID: 0}
-    _terminalType: None
+    _assetToSpawn: {fileID: 1517379098189983311, guid: 28fd8324cedcd574f8af561901aa549e, type: 3}
+    _terminalType: FloorObjective
