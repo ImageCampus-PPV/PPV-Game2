@@ -26,12 +26,16 @@ public class GameplayButtons : MonoBehaviour
     [SerializeField] private Button _endTurnButton;
     [SerializeField] private Button _confirmActionsButton;
     [SerializeField] private TMP_Text _actionTypeText;
+    [SerializeField] private TMP_Text _entityTurnText;
 
     public void Init()
     {
         AssignButtonEvents();
         _actionTypeText.text = "Action selected: ";
         SetCurrentActionText(ClickActionType.Move);
+
+        EventBus.Subscribe<EntityTurnStartEvent>(OnEntityTurnStart);
+        _entityTurnText.text = "Turn: Player";
     }
 
     private void AssignButtonEvents()
@@ -76,6 +80,17 @@ public class GameplayButtons : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    private void OnEntityTurnStart(in EntityTurnStartEvent callback)
+    {
+        if (callback.Entity == null)
+            return;
+
+        if (callback.Entity is Player)
+            _entityTurnText.text = "Turn: Player";
+        else
+            _entityTurnText.text = $"Turn: {callback.Entity.name}";
     }
 }
 public struct MoveButtonEvent : IEvent
@@ -185,5 +200,20 @@ public struct PlayerExecuteActionEvent : IEvent
 
     public void Reset()
     {
+    }
+}
+
+public struct EntityTurnStartEvent : IEvent
+{
+    public Unit Entity;
+
+    public void Assign(params object[] parameters)
+    {
+        Entity = (Unit)parameters[0];
+    }
+
+    public void Reset()
+    {
+        Entity = null;
     }
 }

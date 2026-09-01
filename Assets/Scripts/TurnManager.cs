@@ -98,6 +98,7 @@ public class TurnManager : IService
         }
 
         _player.IsTurnPlaying = true;
+        EventBus.Raise<EntityTurnStartEvent>(_player);
 
         while (_player.PlannedActions.Count > 0)
         {
@@ -133,6 +134,7 @@ public class TurnManager : IService
 
             enemy.PlanTurn(_player.CurrentCell, 0);
             enemy.IsTurnPlaying = true;
+            EventBus.Raise<EntityTurnStartEvent>(enemy);
 
             foreach (TurnAction action in enemy.PlannedActions)
             {
@@ -158,74 +160,6 @@ public class TurnManager : IService
 
         EventBus.Raise<TurnChangeEvent>(++_currenturn);
     }
-
-    //public IEnumerator ExecuteTurn()
-    //{
-    //    _executing = true;
-    //    CheckStunColdown();
-    //
-    //    _player.IsTurnPlaying = true;
-    //
-    //    foreach (TurnAction action in _player.PlannedActions)
-    //    {
-    //        if (_player.IsStun)
-    //            break;
-    //
-    //        _player.ConsumeAP(action);
-    //
-    //        IEnumerator routine = action.Execute(_player);
-    //
-    //        while (routine.MoveNext())
-    //            yield return routine.Current;
-    //
-    //        MapGrid.Tick(Time.deltaTime);
-    //
-    //        if (APWallet.CurrentAP <= _player.BreakPenalty)
-    //        {
-    //            EventBus.Raise<LevelFailedEvent>();
-    //            _player.IsTurnPlaying = false;
-    //            _executing = false;
-    //            yield break;
-    //        }
-    //    }
-    //
-    //    _player.IsTurnPlaying = false;
-    //
-    //
-    //    foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
-    //    {
-    //        if (enemy.IsStun)
-    //            continue;
-    //
-    //        enemy.PlanTurn(_player.CurrentCell, 0);
-    //        enemy.IsTurnPlaying = true;
-    //
-    //        foreach (TurnAction action in enemy.PlannedActions)
-    //        {
-    //            if (enemy.IsStun)
-    //                break;
-    //
-    //            IEnumerator routine = action.Execute(enemy);
-    //
-    //            while (routine.MoveNext())
-    //                yield return routine.Current;
-    //
-    //            MapGrid.Tick(Time.deltaTime);
-    //        }
-    //
-    //        enemy.IsTurnPlaying = false;
-    //        enemy.ClearPlan();
-    //        enemy.ResetActionsCounter();
-    //    }
-    //
-    //
-    //    _player.ClearPlan();
-    //    _player.ResetActionsCounter();
-    //
-    //    _executing = false;
-    //
-    //    EventBus.Raise<TurnChangeEvent>(++_currenturn);
-    //}
 
     private void TryPlanHack()
     {

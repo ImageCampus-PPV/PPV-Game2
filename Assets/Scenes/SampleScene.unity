@@ -437,6 +437,7 @@ MonoBehaviour:
   _endTurnButton: {fileID: 1688350582}
   _confirmActionsButton: {fileID: 1708479386}
   _actionTypeText: {fileID: 1985848401}
+  _entityTurnText: {fileID: 2129750826}
 --- !u!4 &83016666
 Transform:
   m_ObjectHideFlags: 0
@@ -721,7 +722,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7635257328009783481, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
       propertyPath: m_Name
-      value: window
+      value: LevelInfo
       objectReference: {fileID: 0}
     - target: {fileID: 8729378526221557560, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
       propertyPath: m_Pivot.x
@@ -797,11 +798,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8729378526221557560, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 560.7
+      value: 304
       objectReference: {fileID: 0}
     - target: {fileID: 8729378526221557560, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 315.8
+      value: 166
       objectReference: {fileID: 0}
     - target: {fileID: 8729378526221557560, guid: 86ff9e2123be6f146a7dd7bdbba962e7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -5357,7 +5358,7 @@ GameObject:
   - component: {fileID: 611737443}
   - component: {fileID: 611737442}
   m_Layer: 5
-  m_Name: Button
+  m_Name: QuitButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5380,7 +5381,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -90, y: -40}
+  m_AnchoredPosition: {x: -398, y: -40}
   m_SizeDelta: {x: 180, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &611737442
@@ -18441,15 +18442,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 3
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -18480,7 +18481,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -153.35855, w: 0}
+  m_margin: {x: -18.833015, y: -14.936159, z: 39.56131, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
