@@ -40,7 +40,7 @@ public class PunchAbility : IAbility
         //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
 
         TurnManager.ApplyStun(enemy);
-
+        StartCooldown();
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 

@@ -40,6 +40,7 @@ public class KickAbility : IAbility
 
         //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
         KickSystem.Execute(player, enemy);
+        StartCooldown();
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 
