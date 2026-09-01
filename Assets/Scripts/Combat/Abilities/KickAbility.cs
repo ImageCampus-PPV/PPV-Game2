@@ -2,15 +2,20 @@ using Assets.Scripts.Combat;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 
-public class LagSpikeAbility : IAbility
+public class KickAbility : IAbility
 {
-    public string Name => "LagSpike";
+    public string Name => "Kick";
     public int APCost => 1;
-    public int Range => 2;
+    public int Range => 1;
+
+    public int Cooldown => 2;
+
+    private int _remainingCooldown;
+    public int RemainingCooldown => _remainingCooldown;
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
-    private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
+    private KickSystem KickSystem => ServiceProvider.Instance.GetService<KickSystem>();
 
     public bool CanExecute(Player player, Cell targetCell)
     {
@@ -34,9 +39,18 @@ public class LagSpikeAbility : IAbility
         Enemy enemy = targetCell.stander as Enemy;
 
         //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
-
-        TurnManager.ApplyStun(enemy);
-
+        KickSystem.Execute(player, enemy);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+    }
+
+    public void StartCooldown()
+    {
+        _remainingCooldown = Cooldown;
+    }
+
+    public void TickCooldown()
+    {
+        if (_remainingCooldown > 0)
+            _remainingCooldown--;
     }
 }

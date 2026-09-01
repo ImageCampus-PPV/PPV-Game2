@@ -162,6 +162,13 @@ public abstract class Unit : BaseEntity
             yield break;
         }
 
+        if(!targetCell.IsWalkable)
+        {
+            Debug.Log($"Cell {targetCell} is not walkable. Clearing plan.");
+            ClearPlan();
+            yield break;
+        }
+
         _isTurnPlaying = true;
 
         Vector3 startPos = transform.position;
@@ -283,7 +290,7 @@ public abstract class Unit : BaseEntity
         _plannedActions.RemoveRange(_currentAction - 1, rangeToRemove);
     }
 
-    public virtual void ResetActionsCounter()
+    public virtual void ResetActionsKick()
     {
         _currentAction = 0;
     }

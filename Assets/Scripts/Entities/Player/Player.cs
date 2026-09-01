@@ -15,7 +15,7 @@ public class Player : Unit
     public int PlannedAPCost => GetPlannedAPCost();
     private ClickActionType _currentActionTypeSelected;
 
-    
+
 
     private Terminal _plannedHackTerminal;
     private int _plannedHackTicks;
@@ -69,13 +69,12 @@ public class Player : Unit
         _breakPenalty = 0;
         _currentActionTypeSelected = ClickActionType.Move;
         APWallet.Init();
-        AbilitySystem.RegisterAbility(new LagSpikeAbility());
-        AbilitySystem.RegisterAbility(new CounterAbility());
+        AbilitySystem.Init();
 
         EventBus.Subscribe<MoveButtonEvent>((in MoveButtonEvent callback) => SetClickActionType(ClickActionType.Move));
         EventBus.Subscribe<HackButtonEvent>((in HackButtonEvent callback) => SetClickActionType(ClickActionType.Hack));
-        EventBus.Subscribe<CounterButtonEvent>((in CounterButtonEvent callback) => SetClickActionType(ClickActionType.Counter));
-        EventBus.Subscribe<LagSpikeButtonEvent>((in LagSpikeButtonEvent callback) => SetClickActionType(ClickActionType.LagSpike));
+        EventBus.Subscribe<KickButtonEvent>((in KickButtonEvent callback) => SetClickActionType(ClickActionType.Kick));
+        EventBus.Subscribe<PunchButtonEvent>((in PunchButtonEvent callback) => SetClickActionType(ClickActionType.Punch));
         EventBus.Subscribe<WaitButtonEvent>((in WaitButtonEvent callback) => AddWaitAction());
         EventBus.Subscribe<UndoButtonEvent>(OnUndoButton);
         EventBus.Subscribe<RestartButtonEvent>((in RestartButtonEvent callback) => ClearPlan());
@@ -109,10 +108,10 @@ public class Player : Unit
         }
 
         if (Input.GetKeyDown(KeyCode.Q))
-            TryUseAbility(new LagSpikeAbility());
+            TryUseAbility<PunchAbility>();
 
         if (Input.GetKeyDown(KeyCode.E))
-            TryUseAbility(new CounterAbility());
+            TryUseAbility<KickAbility>();
 
         if (Input.GetKeyDown(KeyCode.W))
             AddWaitAction();
@@ -184,15 +183,15 @@ public class Player : Unit
                     break;
                 }
 
-            case ClickActionType.Counter:
+            case ClickActionType.Kick:
                 {
-                    TryUseAbility(new CounterAbility(), clickedCell);
+                    TryUseAbility<KickAbility>(clickedCell);
                     break;
                 }
 
-            case ClickActionType.LagSpike:
+            case ClickActionType.Punch:
                 {
-                    TryUseAbility(new LagSpikeAbility(), clickedCell);
+                    TryUseAbility<PunchAbility>(clickedCell);
                     break;
                 }
 
@@ -280,34 +279,38 @@ public class Player : Unit
 
     // -----------------------------------------------------------------------
 
-    private void TryUseAbility(IAbility ability)
+    private void TryUseAbility<T>() where T : class, IAbility
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        IAbility ability = AbilitySystem.GetAbility<T>();
+        if (ability == null)
+            return;
 
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
             return;
 
-        if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
+        if (!hit.collider.TryGetComponent<Cell>(out Cell targetCell))
             return;
 
-        //AbilitySystem.UseAbility(ability, this, clickedCell);
-        AbilityAction abilityAction = new AbilityAction(this, ability, clickedCell, 1, ability.APCost + _breakPenalty);
-
-        if (!CanAddAction(abilityAction))
+        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
+        if (!CanAddAction(action))
             return;
 
-        _plannedActions.Add(abilityAction);
+        _plannedActions.Add(action);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
-    private void TryUseAbility(IAbility ability, Cell targetCell)
+    private void TryUseAbility<T>(Cell targetCell) where T : class, IAbility
     {
-        AbilityAction abilityAction = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
-
-        if (!CanAddAction(abilityAction))
+        IAbility ability = AbilitySystem.GetAbility<T>();
+        if (ability == null)
             return;
 
-        _plannedActions.Add(abilityAction);
+        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
+        if (!CanAddAction(action))
+            return;
+
+        _plannedActions.Add(action);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
@@ -367,11 +370,6 @@ public class Player : Unit
         return plannedPath;
     }
 
-    public void UseTicks(int ticks)
-    {
-        _usedTicksThisTurn += ticks;
-    }
-
     private void OnUndoButton(in UndoButtonEvent callback)
     {
         if (_plannedActions.Count == 0)
@@ -405,7 +403,7 @@ public class Player : Unit
 
     public override void ConsumeAP(TurnAction action)
     {
-        _usedTicksThisTurn += action.APCost;
+        _usedTicksThisTurn += action.TotalTicks;
         EventBus.Raise<APConsumeRequestAceptedEvent>(action.APCost);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }

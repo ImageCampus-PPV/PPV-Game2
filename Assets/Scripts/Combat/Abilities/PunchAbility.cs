@@ -2,15 +2,19 @@ using Assets.Scripts.Combat;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 
-public class CounterAbility : IAbility
+public class PunchAbility : IAbility
 {
-    public string Name => "Counter";
+    public string Name => "Punch";
     public int APCost => 1;
-    public int Range => 1;
+    public int Range => 2;
+    public int Cooldown => 2;
+
+    private int _remainingCooldown;
+    public int RemainingCooldown => _remainingCooldown;
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
-    private CounterSystem CounterSystem => ServiceProvider.Instance.GetService<CounterSystem>();
+    private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
 
     public bool CanExecute(Player player, Cell targetCell)
     {
@@ -34,7 +38,20 @@ public class CounterAbility : IAbility
         Enemy enemy = targetCell.stander as Enemy;
 
         //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
-        CounterSystem.Execute(player, enemy);
+
+        TurnManager.ApplyStun(enemy);
+
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+    }
+
+    public void StartCooldown()
+    {
+        _remainingCooldown = Cooldown;
+    }
+
+    public void TickCooldown()
+    {
+        if (_remainingCooldown > 0)
+            _remainingCooldown--;
     }
 }

@@ -109,7 +109,8 @@ public class TurnManager : IService
             while (routine.MoveNext())
                 yield return routine.Current;
 
-            _player.PlannedActions.RemoveAt(0);
+            if (_player.PlannedActions.Count > 0)
+                _player.PlannedActions.RemoveAt(0);
         }
 
         _player.IsTurnPlaying = false;
@@ -149,7 +150,7 @@ public class TurnManager : IService
 
             enemy.IsTurnPlaying = false;
             enemy.ClearPlan();
-            enemy.ResetActionsCounter();
+            enemy.ResetActionsKick();
         }
 
         _player.ClearPlan();

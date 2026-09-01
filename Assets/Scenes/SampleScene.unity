@@ -429,8 +429,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameplayButtons
   _moveButton: {fileID: 1261057882}
   _hackButton: {fileID: 1656354816}
-  _counterButton: {fileID: 1777158141}
-  _lagSpikeButton: {fileID: 1302294124}
+  _KickButton: {fileID: 1777158141}
+  _PunchButton: {fileID: 1302294124}
   _waitButton: {fileID: 2135043385}
   _restartButton: {fileID: 231974547}
   _undoButton: {fileID: 1138319092}
@@ -543,11 +543,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5202686001929931259, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_Name
-      value: CounterButton
+      value: KickButton
       objectReference: {fileID: 0}
     - target: {fileID: 8521863301976487894, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_text
-      value: Counter (8)
+      value: 'Kick
+
+'
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4916,11 +4918,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5202686001929931259, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_Name
-      value: LagSpikeButton
+      value: PunchButton
       objectReference: {fileID: 0}
     - target: {fileID: 8521863301976487894, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_text
-      value: Lag Spike (12)
+      value: Punch
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

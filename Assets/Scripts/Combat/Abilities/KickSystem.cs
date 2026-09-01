@@ -1,8 +1,7 @@
-using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Services;
 using UnityEngine;
 
-public class CounterSystem : IService
+public class KickSystem : IService
 {
     public bool IsPersistance => false;
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();

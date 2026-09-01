@@ -8,8 +8,8 @@ public enum ClickActionType
 {
     Move,
     Hack,
-    Counter,
-    LagSpike
+    Kick,
+    Punch
 }
 
 public class GameplayButtons : MonoBehaviour
@@ -18,8 +18,8 @@ public class GameplayButtons : MonoBehaviour
 
     [SerializeField] private Button _moveButton;
     [SerializeField] private Button _hackButton;
-    [SerializeField] private Button _counterButton;
-    [SerializeField] private Button _lagSpikeButton;
+    [SerializeField] private Button _KickButton;
+    [SerializeField] private Button _PunchButton;
     [SerializeField] private Button _waitButton;
     [SerializeField] private Button _restartButton;
     [SerializeField] private Button _undoButton;
@@ -42,8 +42,8 @@ public class GameplayButtons : MonoBehaviour
     {
         _moveButton.onClick.AddListener(() => EventBus.Raise<MoveButtonEvent>());
         _hackButton.onClick.AddListener(() => EventBus.Raise<HackButtonEvent>());
-        _counterButton.onClick.AddListener(() => EventBus.Raise<CounterButtonEvent>());
-        _lagSpikeButton.onClick.AddListener(() => EventBus.Raise<LagSpikeButtonEvent>());
+        _KickButton.onClick.AddListener(() => EventBus.Raise<KickButtonEvent>());
+        _PunchButton.onClick.AddListener(() => EventBus.Raise<PunchButtonEvent>());
         _waitButton.onClick.AddListener(() => EventBus.Raise<WaitButtonEvent>());
         _restartButton.onClick.AddListener(() => EventBus.Raise<RestartButtonEvent>());
         _undoButton.onClick.AddListener(() => EventBus.Raise<UndoButtonEvent>());
@@ -52,8 +52,8 @@ public class GameplayButtons : MonoBehaviour
 
         _moveButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Move));
         _hackButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Hack));
-        _counterButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Counter));
-        _lagSpikeButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.LagSpike));
+        _KickButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Kick));
+        _PunchButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Punch));
     }
 
     private void SetCurrentActionText(ClickActionType actionType)
@@ -69,12 +69,12 @@ public class GameplayButtons : MonoBehaviour
                 _actionTypeText.text += "Hack";
                 break;
 
-            case ClickActionType.Counter:
-                _actionTypeText.text += "Counter";
+            case ClickActionType.Kick:
+                _actionTypeText.text += "Kick";
                 break;
 
-            case ClickActionType.LagSpike:
-                _actionTypeText.text += "Lag Spike";
+            case ClickActionType.Punch:
+                _actionTypeText.text += "Punch";
                 break;
 
             default:
@@ -115,7 +115,7 @@ public struct HackButtonEvent : IEvent
     }
 }
 
-public struct CounterButtonEvent : IEvent
+public struct KickButtonEvent : IEvent
 {
     public void Assign(params object[] parameters)
     {
@@ -126,7 +126,7 @@ public struct CounterButtonEvent : IEvent
     }
 }
 
-public struct LagSpikeButtonEvent : IEvent
+public struct PunchButtonEvent : IEvent
 {
     public void Assign(params object[] parameters)
     {

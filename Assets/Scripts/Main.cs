@@ -44,7 +44,7 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());
         ServiceProvider.Instance.AddService<AbilitySystem>(new AbilitySystem());
-        ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
+        ServiceProvider.Instance.AddService<KickSystem>(new KickSystem());
         ServiceProvider.Instance.AddService<HackSystem>(new HackSystem());
         ServiceProvider.Instance.AddService<TileHoverHighlighter>(new TileHoverHighlighter(Camera.main));
 
