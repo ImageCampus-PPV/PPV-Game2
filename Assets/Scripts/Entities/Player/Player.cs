@@ -11,7 +11,7 @@ public class Player : Unit
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
-
+    private FloatingTextInstancer FloatingTextInstancer => ServiceProvider.Instance.GetService<FloatingTextInstancer>();
     public int PlannedAPCost => GetPlannedAPCost();
     private ClickActionType _currentActionTypeSelected;
 
@@ -82,7 +82,7 @@ public class Player : Unit
 
     private void SetClickActionType(ClickActionType actionType)
     {
-       _currentActionTypeSelected = actionType;
+        _currentActionTypeSelected = actionType;
     }
 
     private void Update()
@@ -119,7 +119,14 @@ public class Player : Unit
 
         //R removes all actions
         if (Input.GetKeyUp(KeyCode.R))
+        {
+            Vector3 headPos = transform.position;
+            headPos.y += 1f;
+
+            FloatingTextInstancer.InstantiateText("Reset!", headPos, Color.blue);
+
             ClearPlan();
+        }
 
         //FinishTurn
         if (Input.GetKeyUp(KeyCode.Space))
@@ -192,7 +199,10 @@ public class Player : Unit
     private void TryMove(Cell clickedCell)
     {
         if (!IsCellAvailable(clickedCell))
+        {
+            FloatingTextInstancer.InstantiateText("Cell is not available", clickedCell.GetWorldTopPosition(), Color.red);
             return;
+        }
 
         Cell origin = GetLastPlannedCell();
         List<Cell> path = GetPathCells(origin, clickedCell);
@@ -218,10 +228,17 @@ public class Player : Unit
         }
 
         if (futureAP > APWallet.CurrentAP)
+        {
+            FloatingTextInstancer.InstantiateText("Not enough AP", clickedCell.GetWorldTopPosition(), Color.red);
             return;
+        }
 
         if (futureTicks > _maxTicksPerTurn)
+        {
+            FloatingTextInstancer.InstantiateText("Max ticks per turn reached", clickedCell.GetWorldTopPosition(), Color.red);
+
             return;
+        }
 
         _plannedActions.AddRange(newActions);
 
@@ -238,6 +255,7 @@ public class Player : Unit
 
         if (_plannedHackTerminal != null)
         {
+            FloatingTextInstancer.InstantiateText("Hack already planned this turn", terminal.Cell.GetWorldTopPosition(), Color.red);
             Debug.Log("[Player] Ya hay un hackeo planificado este turno. Confirma el turno (Space) o cancela el plan (R) antes de planificar otro.");
             return false;
         }
@@ -250,6 +268,7 @@ public class Player : Unit
 
         if (ticksNeeded <= 0)
         {
+            FloatingTextInstancer.InstantiateText($"Not enough ticks for hacking ({GetPlannedTickCost()}/{_maxTicksPerTurn})", terminal.Cell.GetWorldTopPosition(), Color.red);
             Debug.Log($"[Player] No queda presupuesto de ticks este turno para hackear ({GetPlannedTickCost()}/{_maxTicksPerTurn} ya planificados). Confirma el turno o saca movimiento planificado.");
             return false;
         }
@@ -270,6 +289,7 @@ public class Player : Unit
 
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
 
+        FloatingTextInstancer.InstantiateText("Hack planned!", terminal.Cell.GetWorldTopPosition(), Color.green);
         Debug.Log($"[Player] Hackeo planificado: {terminal.Type} en {terminal.Cell.Coordinates} ({hackAPCost} AP, {ticksNeeded} ticks). Confirma con Space para ejecutarlo.");
 
         return true;
@@ -279,20 +299,35 @@ public class Player : Unit
 
     private void TryUseAbility(IAbility ability)
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Vector2 mousePos = Input.mousePosition;
+
+        Ray ray = Camera.main.ScreenPointToRay(mousePos);
 
         if (!Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
+        {
+            FloatingTextInstancer.InstantiateText("No cell found", mousePos, Color.red);
+
             return;
+        }
 
         if (!hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
+        {
+            FloatingTextInstancer.InstantiateText("No cell found", clickedCell.GetWorldTopPosition(), Color.red);
+
             return;
+        }
 
         //AbilitySystem.UseAbility(ability, this, clickedCell);
         AbilityAction abilityAction = new AbilityAction(this, ability, clickedCell, 1, ability.APCost + _breakPenalty);
 
         if (!CanAddAction(abilityAction))
-            return;
+        {
+            FloatingTextInstancer.InstantiateText("Action cannot be executed.", clickedCell.GetWorldTopPosition(), Color.red);
 
+            return;
+        }
+
+        FloatingTextInstancer.InstantiateText($"Executed!", clickedCell.GetWorldTopPosition(), Color.red);
         _plannedActions.Add(abilityAction);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
@@ -302,9 +337,14 @@ public class Player : Unit
         AbilityAction abilityAction = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
 
         if (!CanAddAction(abilityAction))
+        {
+            FloatingTextInstancer.InstantiateText("Action cannot be executed.", targetCell.GetWorldTopPosition(), Color.red);
+
             return;
+        }
 
         _plannedActions.Add(abilityAction);
+        FloatingTextInstancer.InstantiateText($"Executed!", targetCell.GetWorldTopPosition(), Color.blue);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
@@ -379,6 +419,7 @@ public class Player : Unit
             return;
 
         _plannedActions.RemoveAt(_plannedActions.Count - 1);
+        FloatingTextInstancer.InstantiateText("Undo!", Input.mousePosition, Color.blue);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
@@ -404,6 +445,8 @@ public class Player : Unit
 
         EventBus.Raise<APConsumeRequestAceptedEvent>(apToRemove);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
+
+        FloatingTextInstancer.InstantiateText("Break!", Input.mousePosition, Color.blue);
     }
 
     private int CalculateBreakCost()

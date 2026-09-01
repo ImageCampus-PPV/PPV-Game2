@@ -25,6 +25,8 @@ public class Main : MonoBehaviour
 
     [SerializeField] private Material _defaultMat;
     [SerializeField] private GameplayButtons _UiButtonsScript;
+    [SerializeField] private GameObject _floatingTextGO;
+    [SerializeField] private GameObject _canvasGO;
 
     private void Awake()
     {
@@ -47,6 +49,7 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<CounterSystem>(new CounterSystem());
         ServiceProvider.Instance.AddService<HackSystem>(new HackSystem());
         ServiceProvider.Instance.AddService<TileHoverHighlighter>(new TileHoverHighlighter(Camera.main));
+        ServiceProvider.Instance.AddService<FloatingTextInstancer>(new FloatingTextInstancer(_floatingTextGO, _canvasGO));
 
         EventBus.Raise<APRefillEvent>();
 
