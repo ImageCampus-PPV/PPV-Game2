@@ -125,6 +125,7 @@ public class Player : Unit
         EventBus.Subscribe<RestartButtonEvent>((in RestartButtonEvent callback) => RestartPlan());
         EventBus.Subscribe<ConfirmActionsButtonEvent>(OnConfirmAction);
         EventBus.Subscribe<EndTurnButtonEvent>(OnEndTurnButton);
+        EventBus.Subscribe<OnTurnEndEvent>((in OnTurnEndEvent callback) => EventBus.Raise<APRefillEvent>());
     }
 
     private void SetClickActionType(ClickActionType actionType)
@@ -175,7 +176,6 @@ public class Player : Unit
             _isTurnReady = true;
     }
 
-
     private void AddWaitAction()
     {
         WaitAction action = new WaitAction();
@@ -191,8 +191,6 @@ public class Player : Unit
     {
         int futureAP = GetPlannedAPCost() + action.APCost;
         int futureTicks = _usedTicksThisTurn + GetPlannedTickCost() + action.TotalTicks;
-
-   
 
         if (futureAP > APWallet.CurrentAP)
         {

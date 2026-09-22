@@ -38,6 +38,9 @@ namespace Assets.Scripts.Combat
         private void OnAPConsume(in APConsumeRequestAceptedEvent apConsumeRequestAceptedEvent)
         {
             _currentAP -= apConsumeRequestAceptedEvent._amountConsume;
+
+            if (_currentAP < 0)
+                _currentAP = 0;
         }
 
         private void OnAPRefill(in APRefillEvent apConsumeRequestAceptedEvent)
