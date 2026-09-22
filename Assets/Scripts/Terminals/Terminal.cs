@@ -42,6 +42,7 @@ public class Terminal : BaseEntity
     public int APCost => _apCost;
     public int RequiredTicks => _requiredTicks;
     public int Range => _range;
+    public Vector3 HeadPos => transform.position + Vector3.up;
 
     public TerminalState RawState => _state;
 

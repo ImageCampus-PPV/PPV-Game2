@@ -194,7 +194,7 @@ public class Player : Unit
 
         if (futureAP > APWallet.CurrentAP)
         {
-            FloatingTextInstancer.InstantiateText("Not enough AP", headPos, Color.red);
+            FloatingTextInstancer.InstantiateText("Not enough AP, need " + futureAP + " AP", headPos, Color.red);
             return false;
         }
 
@@ -220,7 +220,7 @@ public class Player : Unit
 
         if (futureAP > APWallet.CurrentAP)
         {
-            FloatingTextInstancer.InstantiateText("Not enough AP", headPos, Color.red);
+            FloatingTextInstancer.InstantiateText("Not enough AP, need " + futureAP + " AP", headPos, Color.red);
             return false;
         }
 
@@ -339,6 +339,10 @@ public class Player : Unit
         _plannedHackAPCost = hackAPCost;
 
         HackAction hackAction = new HackAction(this, terminal, ticksNeeded, hackAPCost);
+
+        if (!CanAddAction(hackAction))
+            return false;
+
         _plannedActions.Add(hackAction);
 
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);

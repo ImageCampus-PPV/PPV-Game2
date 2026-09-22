@@ -17,19 +17,25 @@ public class FloatingTextInstancer : IService
 
     public GameObject InstantiateText(string text, Vector3 worldPosition, Color color, float scale = 2f, Transform parent = null)
     {
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPosition);
-        worldPosition.z = 0f;
-        GameObject messageGO = Object.Instantiate(_floatingTextGO, _canvasGO.transform);
+        Canvas canvas = _canvasGO.GetComponent<Canvas>();
+        RectTransform canvasRect = _canvasGO.GetComponent<RectTransform>();
 
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);
+        Camera uiCamera = null;
+
+        if (canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            uiCamera = canvas.worldCamera;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPosition, uiCamera, out Vector2 localPosition);
+        Transform actualParent = parent != null ? parent : _canvasGO.transform;
+        GameObject messageGO = Object.Instantiate(_floatingTextGO, actualParent);
         RectTransform rect = messageGO.GetComponent<RectTransform>();
 
-        rect.anchoredPosition = screenPos;
+        rect.anchoredPosition = localPosition;
+        rect.localScale = Vector3.one * scale;
 
-        messageGO.transform.localScale = Vector2.one * scale;
-        Debug.Log(messageGO.transform.parent.name);
-        Debug.Log(rect.position);
-        Debug.Log(rect.anchoredPosition);
         messageGO.GetComponent<FloatingText>()?.SetTextAndColor(text, color);
+
         return messageGO;
     }
 }

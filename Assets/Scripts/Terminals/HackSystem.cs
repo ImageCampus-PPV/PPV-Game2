@@ -11,6 +11,7 @@ public class HackSystem : IService
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
+    private FloatingTextInstancer FloatingTextInstancer => ServiceProvider.Instance.GetService<FloatingTextInstancer>();
 
     private Terminal _activeTerminal;
     public Terminal ActiveTerminal => _activeTerminal;
@@ -22,24 +23,21 @@ public class HackSystem : IService
 
         if (!terminal.CanBeHacked())
         {
+            FloatingTextInstancer.InstantiateText($"Cant hack! Terminal is {terminal.EffectiveState}", terminal.HeadPos, Color.red);
             Debug.Log($"[HackSystem] No se puede hackear: la terminal esta en estado {terminal.EffectiveState} (necesita Active/InProgress/Corrupted).");
             return false;
         }
 
         if (!TurnManager.IsCellNearUnit(originCell, terminal.Cell, terminal.Range))
         {
+            FloatingTextInstancer.InstantiateText($"Cant hack! Terminal is out of range", terminal.HeadPos, Color.red);
             Debug.Log($"[HackSystem] No se puede hackear: la terminal en {terminal.Cell.Coordinates} esta fuera de rango (rango {terminal.Range}) desde {originCell.Coordinates}. Planea un movimiento que te deje adyacente antes de tocar F.");
-            return false;
-        }
-
-        if (totalPlannedAPCost > APWallet.CurrentAP)
-        {
-            Debug.Log($"[HackSystem] No se puede hackear: AP insuficiente (necesita {totalPlannedAPCost}, tenes {APWallet.CurrentAP}).");
             return false;
         }
 
         if (_activeTerminal != null && _activeTerminal != terminal)
         {
+            FloatingTextInstancer.InstantiateText($"Cant hack! Another termina is being hacked", terminal.HeadPos, Color.red);
             Debug.Log("[HackSystem] No se puede hackear: ya hay otro hackeo en curso este turno.");
             return false;
         }
