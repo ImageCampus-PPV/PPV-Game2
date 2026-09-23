@@ -17088,7 +17088,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af51e9a3721c294dafaa15358accce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _playerPrefab: {fileID: 8760379515200357677, guid: a5ae867e382c8fa488ebd8fe88a5f838, type: 3}
+  _playerPrefab: {fileID: 5470477772508839951, guid: 667f93efbb452d840ae4ac6bfcd439bc, type: 3}
   _heavyEnemy: {fileID: 7589995903907880262, guid: 7388995a58020014db8f6612313da850, type: 3}
   _agileEnemy: {fileID: 4770509050278315690, guid: ebeaf250bb93a2442b56cfe82dae3ffa, type: 3}
   _normalEnemy: {fileID: 7418365543870962373, guid: bf3a1103ad16b8240ab766a18e8e57b0, type: 3}
