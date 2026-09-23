@@ -1,4 +1,3 @@
-using Assets.Scripts;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
@@ -392,16 +391,19 @@ public class MapGrid : IService, IDisposable
 
                 case nameof(HeavyEnemy):
                     goEnemy = UnityEngine.Object.Instantiate(_heavyEnemy);
+                    AdjustEntityPositionToCell(goEnemy, goCell);
                     goEnemyScript = goEnemy.AddComponent<HeavyEnemy>();
                     break;
 
                 case nameof(LightEnemy):
                     goEnemy = UnityEngine.Object.Instantiate(_lightEnemy);
+                    AdjustEntityPositionToCell(goEnemy, goCell);
                     goEnemyScript = goEnemy.AddComponent<LightEnemy>();
                     break;
 
                 case nameof(NormalEnemy):
                     goEnemy = UnityEngine.Object.Instantiate(_normalEnemy);
+                    AdjustEntityPositionToCell(goEnemy, goCell);
                     goEnemyScript = goEnemy.AddComponent<NormalEnemy>();
                     break;
 
@@ -426,58 +428,8 @@ public class MapGrid : IService, IDisposable
 
             if (cell._assetToSpawn != null)
             {
-                GameObject decoration = UnityEngine.Object.Instantiate(
-                    cell._assetToSpawn,
-                    goCell.transform
-                );
-
-                Renderer[] renderers = decoration.GetComponentsInChildren<Renderer>();
-
-                if (renderers.Length > 0)
-                {
-                    // Obtenemos los bounds del objeto teniendo en cuenta
-                    // todos sus renderers.
-                    Bounds bounds = renderers[0].bounds;
-
-                    for (int i = 1; i < renderers.Length; i++)
-                        bounds.Encapsulate(renderers[i].bounds);
-
-                    // La Cell es un Cube de 1x1x1.
-                    float cellSizeX = goCell.transform.localScale.x;
-                    float cellSizeZ = goCell.transform.localScale.z;
-
-                    float decorationSizeX = bounds.size.x;
-                    float decorationSizeZ = bounds.size.z;
-
-                    if (decorationSizeX > 0f && decorationSizeZ > 0f)
-                    {
-                        // Calculamos cuánto tenemos que escalar en cada eje.
-                        float scaleX = cellSizeX / decorationSizeX;
-                        float scaleZ = cellSizeZ / decorationSizeZ;
-
-                        // Usamos el menor para mantener las proporciones
-                        // y asegurarnos de que entre completamente en la Cell.
-                        float scale = Mathf.Min(scaleX, scaleZ);
-                        decoration.transform.localScale *= scale;
-
-                        // Después de escalar tenemos que recalcular los bounds.
-                        renderers = decoration.GetComponentsInChildren<Renderer>();
-                        bounds = renderers[0].bounds;
-
-                        for (int i = 1; i < renderers.Length; i++)
-                            bounds.Encapsulate(renderers[i].bounds);
-                    }
-
-                    // Colocamos la decoración apoyada sobre la parte superior
-                    // de la Cell, independientemente de dónde esté su pivot.
-                    float cellTopY = goCell.transform.position.y + (goCell.transform.localScale.y * 0.5f);
-                    float offsetFromPivotToBottom = decoration.transform.position.y - bounds.min.y;
-                    decoration.transform.position = new Vector3(goCell.transform.position.x, cellTopY + offsetFromPivotToBottom, goCell.transform.position.z);
-                }
-                else
-                {
-                    decoration.transform.localPosition = Vector3.zero;
-                }
+                GameObject decoration = UnityEngine.Object.Instantiate(cell._assetToSpawn, goCell.transform);
+                AdjustEntityPositionToCell(decoration, goCell);
             }
 
 
@@ -492,7 +444,43 @@ public class MapGrid : IService, IDisposable
         }
 
         player.Init();
+    }
 
+    public void AdjustEntityPositionToCell(GameObject entity, GameObject cellGO)
+    {
+        Renderer[] renderers = entity.GetComponentsInChildren<Renderer>();
+
+        if (renderers.Length > 0)
+        {
+            Bounds bounds = renderers[0].bounds;
+
+            for (int i = 1; i < renderers.Length; i++)
+                bounds.Encapsulate(renderers[i].bounds);
+
+            float cellSizeX = cellGO.transform.localScale.x;
+            float cellSizeZ = cellGO.transform.localScale.z;
+
+            float entitySizeX = bounds.size.x;
+            float entitySizeZ = bounds.size.z;
+
+            if (entitySizeX > 0f && entitySizeZ > 0f)
+            {
+                float scaleX = cellSizeX / entitySizeX;
+                float scaleZ = cellSizeZ / entitySizeZ;
+                float scale = Mathf.Min(scaleX, scaleZ);
+                entity.transform.localScale *= scale;
+            }
+
+            bounds = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++)
+                bounds = renderers[i].bounds.min.y < bounds.min.y ? renderers[i].bounds : bounds;
+
+            float cellTopY = cellGO.transform.position.y + (cellGO.transform.localScale.y * 0.5f);
+            float offsetFromPivotToBottom = entity.transform.position.y - bounds.min.y;
+            entity.transform.position = new Vector3 (cellGO.transform.position.x, cellTopY + offsetFromPivotToBottom, cellGO.transform.position.z);
+        }
+        else
+            entity.transform.position = Vector3.zero;
     }
 
     public void Tick(float deltaTime)

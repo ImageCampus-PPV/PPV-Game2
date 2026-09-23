@@ -196,7 +196,7 @@ public abstract class Unit : BaseEntity
             yield break;
         }
 
-        if(!targetCell.IsWalkable)
+        if (!targetCell.IsWalkable)
         {
             Debug.Log($"Cell {targetCell} is not walkable. Clearing plan.");
             ClearPlan();
@@ -301,7 +301,15 @@ public abstract class Unit : BaseEntity
 
     protected Vector3 GetStandPosition(Vector3 basePosition)
     {
-        return basePosition + new Vector3(0, transform.localScale.y * 0.5f, 0);
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+            bounds.Encapsulate(renderers[i].bounds);
+
+        float cellTopY = _spawnCell.transform.position.y + (_spawnCell.transform.localScale.y * 0.5f);
+        float offsetFromPivotToBottom = transform.position.y - bounds.min.y;
+        return new Vector3(_spawnCell.transform.position.x, cellTopY + offsetFromPivotToBottom, _spawnCell.transform.position.z);
     }
 
     public virtual void ClearPlan()

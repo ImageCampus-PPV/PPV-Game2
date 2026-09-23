@@ -2,7 +2,6 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
-using System;
 using UnityEngine;
 
 public class Main : MonoBehaviour
@@ -13,16 +12,19 @@ public class Main : MonoBehaviour
     private TileHoverHighlighter TileHoverHighlighter => ServiceProvider.Instance.GetService<TileHoverHighlighter>();
     private TurnManager _turnManager;
 
-    [SerializeField] private GameObject playerPrefab;
-    [SerializeField] private GameObject heavyEngine;
-    [SerializeField] private GameObject lightEnemy;
-    [SerializeField] private GameObject normalEnemy;
+    [Header("Entities")]
+    [SerializeField] private GameObject _playerPrefab;
+    [SerializeField] private GameObject _heavyEnemy;
+    [SerializeField] private GameObject _agileEnemy;
+    [SerializeField] private GameObject _normalEnemy;
 
+    [Header("Configurations")]
     [SerializeField] private APWalletConfiguration _APWalletConfiguration;
-    [SerializeField] private AbilitiesDurationConfiguration _habilitiesDurationConfiguration;
+    [SerializeField] private AbilitiesDurationConfiguration _abilitiesDurationConfiguration;
     [SerializeField] private Floor _cellMap;
     [SerializeField] private TerminalConfiguration _terminalConfiguration;
 
+    [Header("UI Elements")]
     [SerializeField] private Material _defaultMat;
     [SerializeField] private GameplayButtons _UiButtonsScript;
     [SerializeField] private GameObject _floatingTextGO;
@@ -38,10 +40,9 @@ public class Main : MonoBehaviour
             return;
         }
 
-        ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
-        ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_habilitiesDurationConfiguration);
+        ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_abilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<EventBus>(new EventBus());
-        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(playerPrefab, heavyEngine, lightEnemy, normalEnemy, _cellMap, _terminalConfiguration, _defaultMat));
+        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(_playerPrefab, _heavyEnemy, _agileEnemy, _normalEnemy, _cellMap, _terminalConfiguration, _defaultMat));
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());
