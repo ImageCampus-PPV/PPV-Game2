@@ -60,7 +60,8 @@ public abstract class Unit : BaseEntity
 
         if (_currentCell != null)
         {
-            transform.position = GetStandPosition(_currentCell.GetWorldTopPosition());
+            //transform.position = GetStandPosition(_currentCell.GetWorldTopPosition());
+            AdjustEntityPositionToCell(gameObject, _spawnCell.gameObject);
             _currentCell.stander = this;
         }
     }
@@ -310,6 +311,40 @@ public abstract class Unit : BaseEntity
         float cellTopY = _spawnCell.transform.position.y + (_spawnCell.transform.localScale.y * 0.5f);
         float offsetFromPivotToBottom = transform.position.y - bounds.min.y;
         return new Vector3(_spawnCell.transform.position.x, cellTopY + offsetFromPivotToBottom, _spawnCell.transform.position.z);
+    }
+
+    public void AdjustEntityPositionToCell(GameObject entity, GameObject cellGO)
+    {
+        Renderer[] renderers = entity.GetComponentsInChildren<Renderer>();
+
+        if (renderers.Length > 0)
+        {
+            Bounds bounds = renderers[0].bounds;
+
+            for (int i = 1; i < renderers.Length; i++)
+                bounds.Encapsulate(renderers[i].bounds);
+
+            float cellSizeX = cellGO.transform.localScale.x;
+            float cellSizeZ = cellGO.transform.localScale.z;
+
+            float entitySizeX = bounds.size.x;
+            float entitySizeZ = bounds.size.z;
+
+            if (entitySizeX > 0f && entitySizeZ > 0f)
+            {
+                float scaleX = cellSizeX / entitySizeX;
+                float scaleZ = cellSizeZ / entitySizeZ;
+                float scale = Mathf.Min(scaleX, scaleZ);
+                entity.transform.localScale *= scale;
+                entity.transform.localScale *= 1.5f;
+            }
+
+            float cellTopY = cellGO.transform.position.y + (cellGO.transform.localScale.y * 0.5f);
+            float offsetFromPivotToBottom = entity.transform.position.y - bounds.min.y;
+            entity.transform.position = new Vector3(cellGO.transform.position.x, cellTopY + offsetFromPivotToBottom, cellGO.transform.position.z);
+        }
+        else
+            entity.transform.position = Vector3.zero;
     }
 
     public virtual void ClearPlan()
