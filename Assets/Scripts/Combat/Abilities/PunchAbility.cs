@@ -1,6 +1,7 @@
 using Assets.Scripts.Combat;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using UnityEngine;
 
 public class PunchAbility : IAbility
 {
@@ -20,22 +21,29 @@ public class PunchAbility : IAbility
     public bool CanExecute(Player player, Cell targetCell)
     {
         if (targetCell == null)
+        {
+            Debug.LogWarning("[Ability] CanExecute failed: targetCell is null.");
             return false;
+        }
 
         if (targetCell.stander is not Enemy)
-            return false;
-
-        if (APWallet.CurrentAP < APCost)
-            return false;
+        {
+            Debug.LogWarning($"[Ability] CanExecute failed: target cell {targetCell.Coordinates} " + $"does not contain an Enemy. Stander: {targetCell.stander}"); return false;
+        }
 
         if (_remainingCooldown > 0)
+        {
+            Debug.LogWarning($"[Ability] CanExecute failed: ability is on cooldown. " + $"Remaining cooldown: {_remainingCooldown}");
             return false;
+        }
 
         if (!player.IsInAttackRange(player.CurrentCell, targetCell, Range))
+        {
+            Debug.LogWarning($"[Ability] CanExecute failed: target is out of range. " + $"Player cell: {player.CurrentCell?.Coordinates}, " + $"Target cell: {targetCell.Coordinates}, " + $"Range: {Range}");
             return false;
+        }
 
-        //if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
-        //    return false;
+        Debug.Log($"[Ability] CanExecute succeeded. " + $"Target: {targetCell.Coordinates}, " + $"AP: {APWallet.CurrentAP}/{APCost}, " + $"Range: {Range}, " + $"Cooldown: {_remainingCooldown}");
 
         return true;
     }

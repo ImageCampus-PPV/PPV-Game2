@@ -82,40 +82,6 @@ public class Player : Unit
         EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
     }
 
-    /////////////////DEBUG///////////////////////
-    //private Coroutine _shakeCoroutine;
-    //
-    //private void Vibrate()
-    //{
-    //    if (_shakeCoroutine != null)
-    //        StopCoroutine(_shakeCoroutine);
-    //
-    //    _shakeCoroutine = StartCoroutine(VibrateCoroutine());
-    //}
-    //
-    //private IEnumerator VibrateCoroutine()
-    //{
-    //    Vector3 originalPosition = transform.localPosition;
-    //
-    //    FloatingTextInstancer.InstantiateText($"Ouch!", headPos, Color.red);
-    //
-    //    const float duration = 0.12f;
-    //    const float strength = 0.1f;
-    //
-    //    float elapsed = 0f;
-    //
-    //    while (elapsed < duration)
-    //    {
-    //        elapsed += Time.deltaTime;
-    //        transform.localPosition = originalPosition + (Vector3)UnityEngine.Random.insideUnitCircle * strength;
-    //        yield return null;
-    //    }
-    //
-    //    transform.localPosition = originalPosition;
-    //    _shakeCoroutine = null;
-    //}
-    /////////////////END-DEBUG///////////////////////
-
     public override void Init()
     {
         base.Init();
@@ -536,4 +502,24 @@ public class Player : Unit
         base.ClearPlan();
         ResetVariables();
     }
+
+    public override void FaceCell(Cell targetCell)
+    {
+        if (targetCell == null || CurrentCell == null)
+            return;
+
+        Vector2Int direction = targetCell.Coordinates - CurrentCell.Coordinates;
+
+        if (direction.x > 0)
+            FaceLeft();
+        else if (direction.x < 0)
+            FaceRight();
+        else if (direction.y > 0)
+            FaceRight();
+        else if (direction.y < 0)
+            FaceLeft();
+
+        AdjustEntityPositionToCell(gameObject, CurrentCell.gameObject);
+    }
+
 }

@@ -1,6 +1,7 @@
 using Assets.Scripts.Combat;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using UnityEngine;
 
 public class KickAbility : IAbility
 {
@@ -21,24 +22,32 @@ public class KickAbility : IAbility
     public bool CanExecute(Player player, Cell targetCell)
     {
         if (targetCell == null)
+        {
+            Debug.LogWarning("[Ability] No se puede ejecutar: targetCell es null.");
             return false;
+        }
 
         if (targetCell.stander is not Enemy)
+        {
+            Debug.LogWarning($"[Ability] No se puede ejecutar: la celda objetivo no tiene un Enemy. " + $"Stander: {targetCell.stander}");
             return false;
-
-        if (APWallet.CurrentAP < APCost)
-            return false;
+        }
 
         if (_remainingCooldown > 0)
+        {
+            Debug.LogWarning($"[Ability] No se puede ejecutar: habilidad en cooldown. " + $"Cooldown restante: {_remainingCooldown}");
             return false;
+        }
 
         if (!player.IsInAttackRange(player.CurrentCell, targetCell, Range))
+        {
+            Debug.LogWarning($"[Ability] No se puede ejecutar: target fuera de rango. " + $"Player: {player.CurrentCell.Coordinates}, " + $"Target: {targetCell.Coordinates}, " + $"Range: {Range}");
             return false;
-        //if (!TurnManager.IsCellNearUnit(player.CurrentCell, targetCell, Range))
-        //    return false;
+        }
 
         return true;
     }
+
 
     public void Execute(Player player, Cell targetCell)
     {

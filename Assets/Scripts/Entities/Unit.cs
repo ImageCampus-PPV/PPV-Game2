@@ -4,6 +4,7 @@ using ImageCampus.ToolBox.Services;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public abstract class Unit : BaseEntity
 {
@@ -47,7 +48,7 @@ public abstract class Unit : BaseEntity
 
     private Transform _cellPivot;
 
-    private Transform CellPivot
+    protected Transform CellPivot
     {
         get
         {
@@ -241,6 +242,7 @@ public abstract class Unit : BaseEntity
 
         _isTurnPlaying = true;
 
+        FaceCell(targetCell);
         Vector3 startPos = transform.position;
         Vector3 finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
 
@@ -341,8 +343,7 @@ public abstract class Unit : BaseEntity
     }
 
 
-
-    public void AdjustEntityPositionToCell(GameObject entity, GameObject cellGO)
+    protected void AdjustEntityPositionToCell(GameObject entity, GameObject cellGO)
     {
         Renderer[] cellRenderers = cellGO.GetComponentsInChildren<Renderer>(true);
 
@@ -388,7 +389,7 @@ public abstract class Unit : BaseEntity
 
             float scale = Mathf.Min(scaleX, scaleZ);
 
-            entity.transform.localScale *= scale * 1.5f;
+            entity.transform.localScale *= scale * 1.75f;
         }
 
         if (CellPivot == null)
@@ -402,6 +403,38 @@ public abstract class Unit : BaseEntity
 
         entity.transform.position += targetPosition - anchorPosition;
     }
+
+    public virtual void FaceCell(Cell targetCell)
+    {
+        if (targetCell == null || CurrentCell == null)
+            return;
+
+        Vector2Int direction = targetCell.Coordinates - CurrentCell.Coordinates;
+
+        if (direction.x > 0)
+            FaceRight();
+        else if (direction.x < 0)
+            FaceLeft();
+        else if (direction.y > 0)
+            FaceLeft();
+        else if (direction.y < 0)
+            FaceRight();
+    }
+
+    protected void FaceRight()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x);
+        transform.localScale = scale;
+    }
+
+    protected void FaceLeft()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x = -Mathf.Abs(scale.x);
+        transform.localScale = scale;
+    }
+
 
     public IEnumerator PlayAnimationAndWait(AnimationStates state, int playTimes = 1, float timeScale = 1f)
     {
