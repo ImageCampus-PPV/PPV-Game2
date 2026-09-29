@@ -316,7 +316,10 @@ public class Player : Unit
         HackAction hackAction = new HackAction(this, terminal, ticksNeeded, hackAPCost);
 
         if (!CanAddAction(hackAction))
+        {
+            _plannedHackTerminal = null;
             return false;
+        }
 
         _plannedActions.Add(hackAction);
 
