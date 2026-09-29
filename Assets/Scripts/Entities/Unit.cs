@@ -45,6 +45,23 @@ public abstract class Unit : BaseEntity
     private bool _isStun = false;
     public bool IsStun => _isStun;
 
+    private Transform _cellPivot;
+
+    private Transform CellPivot
+    {
+        get
+        {
+            if (_cellPivot == null)
+            {
+                UnitCellPivot anchor = GetComponentInChildren<UnitCellPivot>(true);
+
+                if (anchor != null)
+                    _cellPivot = anchor.transform;
+            }
+
+            return _cellPivot;
+        }
+    }
     public Cell CurrentCell => _currentCell;
     public int MaxTicksPerTurn => _maxTicksPerTurn;
 
@@ -207,39 +224,33 @@ public abstract class Unit : BaseEntity
         _isTurnPlaying = true;
 
         Vector3 startPos = transform.position;
-        Vector3 flatTarget = new Vector3(targetCell.transform.position.x, startPos.y, targetCell.transform.position.z);
-        Vector3 finalTarget;
-
-        if (targetCell.Height != _currentCell.Height)
-        {
-            finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
-        }
-        else
-        {
-            finalTarget = targetCell.transform.position;
-            finalTarget.y = startPos.y;
-        }
+        Vector3 finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
+        Vector3 flatTarget = new Vector3(finalTarget.x, startPos.y, finalTarget.z);
 
         Cell previousCell = _currentCell;
+
         _currentCell = targetCell;
+
         previousCell.stander = null;
         _currentCell.stander = this;
 
-        float elapsed = 0;
-
+        float elapsed = 0f;
         while (elapsed < _timeToMoveCells)
         {
             elapsed += Time.deltaTime;
-            transform.position = Vector3.Lerp(startPos, flatTarget, elapsed / _timeToMoveCells);
+            float t = Mathf.Clamp01(elapsed / _timeToMoveCells);
+            transform.position = Vector3.Lerp(startPos, flatTarget, t);
+
             yield return null;
         }
 
-        elapsed = 0;
-
-        while (elapsed < _timeToMoveCells * .5f)
+        elapsed = 0f;
+        float verticalMoveTime = _timeToMoveCells * 0.5f;
+        while (elapsed < verticalMoveTime)
         {
             elapsed += Time.deltaTime;
-            transform.position = Vector3.Lerp(flatTarget, finalTarget, elapsed / (_timeToMoveCells * 0.5f));
+            float t = Mathf.Clamp01(elapsed / verticalMoveTime);
+            transform.position = Vector3.Lerp(flatTarget, finalTarget, t);
 
             yield return null;
         }
@@ -248,6 +259,7 @@ public abstract class Unit : BaseEntity
 
         _isTurnPlaying = false;
     }
+
 
     public IEnumerator Wait()
     {
@@ -273,6 +285,7 @@ public abstract class Unit : BaseEntity
 
         transform.position = GetStandPosition(targetCell.GetWorldTopPosition());
     }
+
 
     protected int GetPlannedTickCost()
     {
@@ -302,50 +315,79 @@ public abstract class Unit : BaseEntity
 
     protected Vector3 GetStandPosition(Vector3 basePosition)
     {
-        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        if (CellPivot == null)
+        {
+            Debug.LogWarning($"{gameObject.name} has no UnitCellPivot.");
+            return basePosition;
+        }
 
-        Bounds bounds = renderers[0].bounds;
-        for (int i = 1; i < renderers.Length; i++)
-            bounds.Encapsulate(renderers[i].bounds);
-
-        float cellTopY = _spawnCell.transform.position.y + (_spawnCell.transform.localScale.y * 0.5f);
-        float offsetFromPivotToBottom = transform.position.y - bounds.min.y;
-        return new Vector3(_spawnCell.transform.position.x, cellTopY + offsetFromPivotToBottom, _spawnCell.transform.position.z);
+        Vector3 anchorOffset = CellPivot.position - transform.position;
+        return basePosition - anchorOffset;
     }
+
+
 
     public void AdjustEntityPositionToCell(GameObject entity, GameObject cellGO)
     {
-        Renderer[] renderers = entity.GetComponentsInChildren<Renderer>();
+        Renderer[] cellRenderers = cellGO.GetComponentsInChildren<Renderer>(true);
 
-        if (renderers.Length > 0)
+        if (cellRenderers.Length == 0)
         {
-            Bounds bounds = renderers[0].bounds;
-
-            for (int i = 1; i < renderers.Length; i++)
-                bounds.Encapsulate(renderers[i].bounds);
-
-            float cellSizeX = cellGO.transform.localScale.x;
-            float cellSizeZ = cellGO.transform.localScale.z;
-
-            float entitySizeX = bounds.size.x;
-            float entitySizeZ = bounds.size.z;
-
-            if (entitySizeX > 0f && entitySizeZ > 0f)
-            {
-                float scaleX = cellSizeX / entitySizeX;
-                float scaleZ = cellSizeZ / entitySizeZ;
-                float scale = Mathf.Min(scaleX, scaleZ);
-                entity.transform.localScale *= scale;
-                entity.transform.localScale *= 1.5f;
-            }
-
-            float cellTopY = cellGO.transform.position.y + (cellGO.transform.localScale.y * 0.5f);
-            float offsetFromPivotToBottom = entity.transform.position.y - bounds.min.y;
-            entity.transform.position = new Vector3(cellGO.transform.position.x, cellTopY + offsetFromPivotToBottom, cellGO.transform.position.z);
+            Debug.LogWarning($"{cellGO.name} has no Renderer.");
+            return;
         }
-        else
-            entity.transform.position = Vector3.zero;
+
+        Bounds cellBounds = cellRenderers[0].bounds;
+        for (int i = 1; i < cellRenderers.Length; i++)
+            cellBounds.Encapsulate(cellRenderers[i].bounds);
+
+        float cellWidth = cellBounds.size.x;
+        float cellDepth = cellBounds.size.z;
+
+        float cellX = cellBounds.center.x;
+        float cellZ = cellBounds.center.z;
+
+        float cellTopY = cellBounds.max.y;
+
+
+        Renderer[] entityRenderers = entity.GetComponentsInChildren<Renderer>(true);
+
+        if (entityRenderers.Length == 0)
+        {
+            Debug.LogWarning($"{entity.name} has no Renderer.");
+            return;
+        }
+
+        Bounds entityBounds = entityRenderers[0].bounds;
+        for (int i = 1; i < entityRenderers.Length; i++)
+            entityBounds.Encapsulate(entityRenderers[i].bounds);
+
+        float entityWidth = entityBounds.size.x;
+        float entityDepth = entityBounds.size.z;
+
+
+        if (entityWidth > 0f && entityDepth > 0f)
+        {
+            float scaleX = cellWidth / entityWidth;
+            float scaleZ = cellDepth / entityDepth;
+
+            float scale = Mathf.Min(scaleX, scaleZ);
+
+            entity.transform.localScale *= scale * 1.5f;
+        }
+
+        if (CellPivot == null)
+        {
+            Debug.LogWarning($"{entity.name} has no UnitCellAnchor.");
+            return;
+        }
+
+        Vector3 anchorPosition = CellPivot.position;
+        Vector3 targetPosition = new Vector3(cellX, cellTopY, cellZ);
+
+        entity.transform.position += targetPosition - anchorPosition;
     }
+
 
     public virtual void ClearPlan()
     {

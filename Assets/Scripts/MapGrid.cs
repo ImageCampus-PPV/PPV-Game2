@@ -391,19 +391,16 @@ public class MapGrid : IService, IDisposable
 
                 case nameof(HeavyEnemy):
                     goEnemy = UnityEngine.Object.Instantiate(_heavyEnemy);
-                    AdjustEntityPositionToCell(goEnemy, goCell);
                     goEnemyScript = goEnemy.AddComponent<HeavyEnemy>();
                     break;
 
                 case nameof(LightEnemy):
                     goEnemy = UnityEngine.Object.Instantiate(_lightEnemy);
-                    AdjustEntityPositionToCell(goEnemy, goCell);
                     goEnemyScript = goEnemy.AddComponent<LightEnemy>();
                     break;
 
                 case nameof(NormalEnemy):
                     goEnemy = UnityEngine.Object.Instantiate(_normalEnemy);
-                    AdjustEntityPositionToCell(goEnemy, goCell);
                     goEnemyScript = goEnemy.AddComponent<NormalEnemy>();
                     break;
 

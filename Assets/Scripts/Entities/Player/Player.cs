@@ -95,10 +95,7 @@ public class Player : Unit
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-
-            transform.localPosition =
-                originalPosition + (Vector3)UnityEngine.Random.insideUnitCircle * strength;
-
+            transform.localPosition = originalPosition + (Vector3)UnityEngine.Random.insideUnitCircle * strength;
             yield return null;
         }
 
