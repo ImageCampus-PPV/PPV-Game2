@@ -62,6 +62,20 @@ public abstract class Unit : BaseEntity
             return _cellPivot;
         }
     }
+
+    private CustomAnimator _customAnimator;
+    public CustomAnimator CustomAnimator
+    {
+        get
+        {
+            if (_customAnimator == null)
+                _customAnimator = GetComponentInChildren<CustomAnimator>(true);
+
+            return _customAnimator;
+        }
+    }
+
+
     public Cell CurrentCell => _currentCell;
     public int MaxTicksPerTurn => _maxTicksPerTurn;
 
@@ -85,11 +99,13 @@ public abstract class Unit : BaseEntity
 
     public void Stun()
     {
+        CustomAnimator.Play(AnimationStates.Stun);
         _isStun = true;
     }
 
     public void Unstun()
     {
+        CustomAnimator.Play(AnimationStates.Idle);
         _isStun = false;
     }
 
@@ -209,7 +225,8 @@ public abstract class Unit : BaseEntity
     {
         if (targetCell.isOccupied)
         {
-            Debug.Log($"Cell {targetCell} is occupied (stander: {targetCell.stander}). Clearing plan.");
+            Debug.Log($"Cell {targetCell} is occupied " + $"(stander: {targetCell.stander}). Clearing plan.");
+
             ClearPlan();
             yield break;
         }
@@ -217,6 +234,7 @@ public abstract class Unit : BaseEntity
         if (!targetCell.IsWalkable)
         {
             Debug.Log($"Cell {targetCell} is not walkable. Clearing plan.");
+
             ClearPlan();
             yield break;
         }
@@ -225,40 +243,37 @@ public abstract class Unit : BaseEntity
 
         Vector3 startPos = transform.position;
         Vector3 finalTarget = GetStandPosition(targetCell.GetWorldTopPosition());
-        Vector3 flatTarget = new Vector3(finalTarget.x, startPos.y, finalTarget.z);
 
         Cell previousCell = _currentCell;
-
         _currentCell = targetCell;
 
         previousCell.stander = null;
         _currentCell.stander = this;
 
+        CustomAnimator.Play(AnimationStates.Walk, 0, 1.5f);
+
+        float movementDuration = CustomAnimator.GetAnimationDuration(AnimationStates.Walk);
+
+        if (movementDuration <= 0f)
+            movementDuration = _timeToMoveCells;
+
         float elapsed = 0f;
-        while (elapsed < _timeToMoveCells)
+        while (elapsed < movementDuration)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / _timeToMoveCells);
-            transform.position = Vector3.Lerp(startPos, flatTarget, t);
-
-            yield return null;
-        }
-
-        elapsed = 0f;
-        float verticalMoveTime = _timeToMoveCells * 0.5f;
-        while (elapsed < verticalMoveTime)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / verticalMoveTime);
-            transform.position = Vector3.Lerp(flatTarget, finalTarget, t);
+            float t = Mathf.Clamp01(elapsed / movementDuration);
+            transform.position = Vector3.Lerp(startPos, finalTarget, t);
 
             yield return null;
         }
 
         transform.position = finalTarget;
 
+        CustomAnimator.Play(AnimationStates.Idle);
+
         _isTurnPlaying = false;
     }
+
 
 
     public IEnumerator Wait()
@@ -387,6 +402,24 @@ public abstract class Unit : BaseEntity
 
         entity.transform.position += targetPosition - anchorPosition;
     }
+
+    public IEnumerator PlayAnimationAndWait(AnimationStates state, int playTimes = 1, float timeScale = 1f)
+    {
+        CustomAnimator.Play(state, playTimes, timeScale, true);
+
+        float duration = CustomAnimator.GetAnimationDuration(state);
+
+        if (duration > 0f)
+        {
+            yield return new WaitForSeconds(duration);
+        }
+        else
+        {
+                yield return null;
+        }
+    }
+
+
 
 
     public virtual void ClearPlan()

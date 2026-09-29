@@ -13,14 +13,21 @@ public class AttackAction : TurnAction, IAttackAction
 
     public override IEnumerator Execute(Unit unit)
     {
-        if (_target != null)
+        if (_target == null)
         {
-            if (_target is Player player)
-                player.ReduceHp(_damage);
+            AdvanceTick();
+            yield break;
         }
+
+        yield return unit.PlayAnimationAndWait(AnimationStates.Attack);
+
+        if (_target is Player player)
+            yield return player.ReduceHp(_damage);
 
         AdvanceTick();
 
-        yield return null;
+        unit.CustomAnimator.Play(AnimationStates.Idle);
     }
+
+
 }

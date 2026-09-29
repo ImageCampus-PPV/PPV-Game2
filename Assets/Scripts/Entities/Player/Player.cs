@@ -1,6 +1,7 @@
 using Assets.Scripts.Combat;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -46,9 +47,19 @@ public class Player : Unit
         EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
     }
 
-    public void ReduceHp(uint hpToReduce)
+    public IEnumerator ReduceHp(uint hpToReduce)
     {
-        Vibrate();
+        CustomAnimator.Play(AnimationStates.TakeDamage, 1, 1f, true);
+
+        ApplyDamage(hpToReduce);
+
+        yield return new WaitForSeconds(CustomAnimator.GetAnimationDuration(AnimationStates.TakeDamage));
+
+        CustomAnimator.Play(AnimationStates.Idle);
+    }
+
+    private void ApplyDamage(uint hpToReduce)
+    {
         if ((int)_currentHp - hpToReduce <= 0)
             _currentHp = 0;
         else
@@ -59,6 +70,7 @@ public class Player : Unit
         if (_currentHp <= 0)
             EventBus.Raise<LevelFailedEvent>();
     }
+
 
     public void AddHp(uint hpToAdd)
     {
@@ -71,37 +83,37 @@ public class Player : Unit
     }
 
     /////////////////DEBUG///////////////////////
-    private Coroutine _shakeCoroutine;
-
-    private void Vibrate()
-    {
-        if (_shakeCoroutine != null)
-            StopCoroutine(_shakeCoroutine);
-
-        _shakeCoroutine = StartCoroutine(VibrateCoroutine());
-    }
-
-    private IEnumerator VibrateCoroutine()
-    {
-        Vector3 originalPosition = transform.localPosition;
-
-        FloatingTextInstancer.InstantiateText($"Ouch!", headPos, Color.red);
-
-        const float duration = 0.12f;
-        const float strength = 0.1f;
-
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            transform.localPosition = originalPosition + (Vector3)UnityEngine.Random.insideUnitCircle * strength;
-            yield return null;
-        }
-
-        transform.localPosition = originalPosition;
-        _shakeCoroutine = null;
-    }
+    //private Coroutine _shakeCoroutine;
+    //
+    //private void Vibrate()
+    //{
+    //    if (_shakeCoroutine != null)
+    //        StopCoroutine(_shakeCoroutine);
+    //
+    //    _shakeCoroutine = StartCoroutine(VibrateCoroutine());
+    //}
+    //
+    //private IEnumerator VibrateCoroutine()
+    //{
+    //    Vector3 originalPosition = transform.localPosition;
+    //
+    //    FloatingTextInstancer.InstantiateText($"Ouch!", headPos, Color.red);
+    //
+    //    const float duration = 0.12f;
+    //    const float strength = 0.1f;
+    //
+    //    float elapsed = 0f;
+    //
+    //    while (elapsed < duration)
+    //    {
+    //        elapsed += Time.deltaTime;
+    //        transform.localPosition = originalPosition + (Vector3)UnityEngine.Random.insideUnitCircle * strength;
+    //        yield return null;
+    //    }
+    //
+    //    transform.localPosition = originalPosition;
+    //    _shakeCoroutine = null;
+    //}
     /////////////////END-DEBUG///////////////////////
 
     public override void Init()

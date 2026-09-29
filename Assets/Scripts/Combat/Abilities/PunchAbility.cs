@@ -11,6 +11,7 @@ public class PunchAbility : IAbility
 
     private int _remainingCooldown;
     public int RemainingCooldown => _remainingCooldown;
+    public AnimationStates AnimationState => AnimationStates.LagSpikeAbility;
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();

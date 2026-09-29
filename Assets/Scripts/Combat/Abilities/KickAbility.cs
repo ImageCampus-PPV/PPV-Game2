@@ -11,10 +11,12 @@ public class KickAbility : IAbility
 
     private int _remainingCooldown;
     public int RemainingCooldown => _remainingCooldown;
+    public AnimationStates AnimationState => AnimationStates.CounterAbilty;
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private KickSystem KickSystem => ServiceProvider.Instance.GetService<KickSystem>();
+
 
     public bool CanExecute(Player player, Cell targetCell)
     {

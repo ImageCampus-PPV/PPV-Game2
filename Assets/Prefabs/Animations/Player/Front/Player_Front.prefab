@@ -1721,6 +1721,7 @@ GameObject:
   - component: {fileID: 7225262026916096939}
   - component: {fileID: 2668789673851675504}
   - component: {fileID: 4967455771338303281}
+  - component: {fileID: 3328130676610081614}
   m_Layer: 0
   m_Name: Player_Front
   m_TagString: Untagged
@@ -1805,6 +1806,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DragonBones.UnityCombineMeshs
   slotNames: []
   dirty: 0
+--- !u!114 &3328130676610081614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8841275049678000971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bcb134d04dcd46488091bd58e669561, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAnimator
+  _armatureComponent: {fileID: 2668789673851675504}
+  _animationMappings:
+  - state: 0
+    animationName: J2_NME00_PLAYER_IDLE_FRONT
+  - state: 4
+    animationName: J2_NME00_PLAYER_DAMAGE_FRONT
+  - state: 5
+    animationName: J2_NME00_PLAYER_COUNTER_FRONT
+  - state: 6
+    animationName: J2_NME00_PLAYER_LAGSPIKE_FRONT
 --- !u!1 &8891980951853333458
 GameObject:
   m_ObjectHideFlags: 0

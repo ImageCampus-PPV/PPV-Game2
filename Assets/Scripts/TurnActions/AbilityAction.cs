@@ -17,10 +17,21 @@ public class AbilityAction : TurnAction, IAttackAction
     public override IEnumerator Execute(Unit unit)
     {
         unit.CurrentAction++;
-        if (_ability.CanExecute(_player, _targetCell))
-            _ability.Execute(_player, _targetCell);
 
-        yield return null;
+        yield return unit.PlayAnimationAndWait(_ability.AnimationState);
+
+        if (!_ability.CanExecute(_player, _targetCell))
+        {
+            unit.CustomAnimator.Play(AnimationStates.Idle);
+            yield break;
+        }
+
+        _ability.Execute(_player, _targetCell);
+
         AdvanceTick();
+        unit.CustomAnimator.Play(AnimationStates.Idle);
     }
+
+
+
 }

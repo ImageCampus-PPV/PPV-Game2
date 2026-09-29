@@ -234,7 +234,7 @@ public class TurnManager : IService
         foreach (KeyValuePair<uint, uint> stunEntity in _stunUnits)
             if (stunEntity.Value == _currenturn)
             {
-                EntityRegistry.GetAs<Unit>(stunEntity.Key).GetComponent<Renderer>().material.color = Color.red;
+                //EntityRegistry.GetAs<Unit>(stunEntity.Key).GetComponent<Renderer>().material.color = Color.red;
                 EntityRegistry.GetAs<Unit>(stunEntity.Key).Unstun();
                 removeFromStunList.Add(stunEntity.Key);
             }
@@ -248,7 +248,7 @@ public class TurnManager : IService
         unit.Stun();
         unit.ClearPlan();
         _stunUnits[unit.ID] = _currenturn + 1 + AbilitiesDurationConfiguration.stunDuration;
-        unit.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+        //unit.gameObject.GetComponent<Renderer>().material.color = Color.blue;
         Debug.Log("EnemyStunned");
     }
 
