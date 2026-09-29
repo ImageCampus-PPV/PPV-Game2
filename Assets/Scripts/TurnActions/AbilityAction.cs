@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class AbilityAction : TurnAction, IAttackAction
 {
@@ -18,6 +19,7 @@ public class AbilityAction : TurnAction, IAttackAction
     {
         unit.CurrentAction++;
 
+        unit.FaceCell(_targetCell);
         yield return unit.PlayAnimationAndWait(_ability.AnimationState);
 
         if (!_ability.CanExecute(_player, _targetCell))

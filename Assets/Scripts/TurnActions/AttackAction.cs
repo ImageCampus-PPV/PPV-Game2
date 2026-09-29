@@ -19,6 +19,7 @@ public class AttackAction : TurnAction, IAttackAction
             yield break;
         }
 
+        unit.FaceCell(_target.CurrentCell);
         yield return unit.PlayAnimationAndWait(AnimationStates.Attack);
 
         if (_target is Player player)
