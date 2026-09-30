@@ -84,13 +84,6 @@ public abstract class Enemy : Unit
         return GetGridDistance(_currentCell, playerCell) <= _movementRange;
     }
 
-    private bool IsInGoodCover(Cell playerCell)
-    {
-        if (_currentCell == null)
-            return false;
-
-        return HasCoverAgainstPlayer(_currentCell, playerCell) && IsInRange(playerCell);
-    }
 
     private Cell FindBestCell(Cell playerCell)
     {

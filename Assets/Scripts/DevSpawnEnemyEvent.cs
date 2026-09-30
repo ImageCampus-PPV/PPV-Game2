@@ -5,11 +5,11 @@ public struct DevSpawnEnemyEvent : IEvent
     public string enemyTypeName;
     public int coordX;
     public int coordY;
-    public void Assign(params object[] p) 
+    public void Assign(params object[] parameters) 
     { 
-        enemyTypeName = (string)p[0];
-        coordX = (int)p[1];
-        coordY = (int)p[2]; 
+        enemyTypeName = (string)parameters[0];
+        coordX = (int)parameters[1];
+        coordY = (int)parameters[2]; 
     }
 
     public void Reset() 

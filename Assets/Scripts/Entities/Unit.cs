@@ -1,6 +1,7 @@
 
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -434,8 +435,6 @@ public abstract class Unit : BaseEntity
         scale.x = -Mathf.Abs(scale.x);
         transform.localScale = scale;
     }
-
-
     public IEnumerator PlayAnimationAndWait(AnimationStates state, int playTimes = 1, float timeScale = 1f)
     {
         CustomAnimator.Play(state, playTimes, timeScale, true);
