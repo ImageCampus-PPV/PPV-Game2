@@ -5,8 +5,10 @@ public class CameraMovement : MonoBehaviour
     [SerializeField][Range(.1f, .2f)] private float _scrollSpeed = .1f;
     [SerializeField] private float _maxZoomDifference = 5;
     private float _zoom;
+    private float _defaultZoom;
 
-    [SerializeField] private float _moveSpeed = 15f;
+    [SerializeField] private float _moveSpeedBorder = 15f;
+    [SerializeField] private float _moveSpeedButton = 3f;
     [SerializeField][Range(0.8f, 1f)] private float _marginToDetect = .95f;
     [SerializeField] private Vector3 _maxMovement;
 
@@ -22,31 +24,62 @@ public class CameraMovement : MonoBehaviour
     private const float SMOOTH_TIME = 0.15f;
     private float _velocity = 0;
 
+    private Vector3 _lastMousePosition;
+
     private void Start()
     {
         if (_camera == null)
             TryGetComponent(out _camera);
 
         _zoom = _camera.orthographicSize;
+        _defaultZoom = _camera.orthographicSize;
         _centerPosition = transform.position;
 
         _minPossiblePosition = new Vector3(
             _centerPosition.x - _maxMovement.x,
             _centerPosition.y - _maxMovement.y,
-            _centerPosition.z
+            _centerPosition.z - _maxMovement.x
         );
 
         _maxPossiblePosition = new Vector3(
             _centerPosition.x + _maxMovement.x,
             _centerPosition.y + _maxMovement.y,
-            _centerPosition.z
+            _centerPosition.z + _maxMovement.x
         );
     }
 
     private void Update()
     {
-        ManageMovementByScreenBorder();
+        if (Input.GetMouseButton(2))
+        {
+            Debug.Log("WHEEL PRESSED");
+            ManageMovementByMouseButton();
+        }
+        else
+            ManageMovementByScreenBorder();
+
         ManageZoom();
+
+        Mathf.Clamp(transform.position.x, _minPossiblePosition.x, _maxPossiblePosition.x);
+        Mathf.Clamp(transform.position.y, _minPossiblePosition.y, _maxPossiblePosition.y);
+        Mathf.Clamp(transform.position.z, _minPossiblePosition.x, _maxPossiblePosition.x);
+    }
+
+    private void ManageMovementByMouseButton()
+    {
+        if (Input.GetMouseButtonDown(2))
+            _lastMousePosition = Input.mousePosition;
+
+        if (Input.GetMouseButton(2))
+        {
+            Vector3 mouseDelta = Input.mousePosition - _lastMousePosition;
+            Vector3 movement = new Vector3(-mouseDelta.x / 2, -mouseDelta.y, mouseDelta.x / 2) * _camera.orthographicSize / _defaultZoom;
+
+            transform.Translate(movement * _moveSpeedButton * Time.deltaTime, Space.Self);
+
+            ClampPosition();
+            _lastMousePosition = Input.mousePosition;
+        }
     }
 
     private void ManageZoom()
@@ -68,31 +101,26 @@ public class CameraMovement : MonoBehaviour
 
         if (mousePosition.y >= Screen.height * 0.98f)
         {
-            movement.y = _moveSpeed * Time.deltaTime;
+            movement.y = _moveSpeedBorder * Time.deltaTime;
         }
         else if (mousePosition.y <= Screen.height * 0.02f)
         {
-            movement.y = -_moveSpeed * Time.deltaTime;
+            movement.y = -_moveSpeedBorder * Time.deltaTime;
         }
 
         if (mousePosition.x >= Screen.width * 0.98f)
         {
-            movement.x = _moveSpeed / 2 * Time.deltaTime;
-            movement.z = -_moveSpeed / 2 * Time.deltaTime;
+            movement.x = _moveSpeedBorder / 2 * Time.deltaTime;
+            movement.z = -_moveSpeedBorder / 2 * Time.deltaTime;
         }
         else if (mousePosition.x <= Screen.width * 0.02f)
         {
-            movement.x = -_moveSpeed / 2 * Time.deltaTime;
-            movement.z = _moveSpeed / 2 * Time.deltaTime;
+            movement.x = -_moveSpeedBorder / 2 * Time.deltaTime;
+            movement.z = _moveSpeedBorder / 2 * Time.deltaTime;
         }
 
-        Vector3 newPosition = transform.position + movement;
-
-        newPosition.x = Mathf.Clamp(newPosition.x, _minPossiblePosition.x, _maxPossiblePosition.x);
-        newPosition.y = Mathf.Clamp(newPosition.y, _minPossiblePosition.y, _maxPossiblePosition.y);
-        newPosition.z = Mathf.Clamp(newPosition.z, _minPossiblePosition.x, _maxPossiblePosition.x);
-
-        transform.position = newPosition;
+        transform.position += movement;
+        ClampPosition();
     }
 
     [ContextMenu("Center camera")]
@@ -100,4 +128,16 @@ public class CameraMovement : MonoBehaviour
     {
         transform.position = _centerPosition;
     }
+
+    private void ClampPosition()
+    {
+        Vector3 position = transform.position;
+
+        position.x = Mathf.Clamp(position.x, _minPossiblePosition.x, _maxPossiblePosition.x);
+        position.y = Mathf.Clamp(position.y, _minPossiblePosition.y, _maxPossiblePosition.y);
+        position.z = Mathf.Clamp(position.z, _minPossiblePosition.z, _maxPossiblePosition.z);
+
+        transform.position = position;
+    }
+
 }
