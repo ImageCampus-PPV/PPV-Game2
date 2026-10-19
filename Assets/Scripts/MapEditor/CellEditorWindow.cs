@@ -18,6 +18,7 @@ public class CellEditorWindow : EditorWindow
     private DropdownField terminalTypeDropdown;
     private Label cellInfoLabel;
     private ObjectField spawnDecorationField;
+    private ObjectField cellVisualSetField;
 
     public static void ShowWindow(CellData inCell, Action<CellData> onChanged = null)
     {
@@ -34,13 +35,17 @@ public class CellEditorWindow : EditorWindow
 
     private void RefreshGUI()
     {
-        if (cellTypeDropdown == null || cellTypeDropdown == null)
+        if (cellTypeDropdown == null || unitSpawnType == null)
             return;
 
         unitSpawnType.SetValueWithoutNotify(cell._spawnUnit);
         cellTypeDropdown.SetValueWithoutNotify(cell._initialState);
+
         terminalTypeDropdown?.SetValueWithoutNotify(string.IsNullOrEmpty(cell._terminalType) ? "None" : cell._terminalType);
+
         spawnDecorationField?.SetValueWithoutNotify(cell._assetToSpawn);
+        cellVisualSetField?.SetValueWithoutNotify(cell._cellVisualSet);
+
         cellInfoLabel.text = $"Editing Cell ({cell._coordinates.x}, {cell._coordinates.y})";
     }
 
@@ -102,6 +107,18 @@ public class CellEditorWindow : EditorWindow
             onStateChanged?.Invoke(cell);
         });
 
+        cellVisualSetField = new ObjectField("Floor Visual Set")
+        {
+            objectType = typeof(CellVisualSet),
+            allowSceneObjects = false
+        };
+
+        cellVisualSetField.RegisterValueChangedCallback(evt =>
+        {
+            cell._cellVisualSet = evt.newValue as CellVisualSet;
+            onStateChanged?.Invoke(cell);
+        });
+
         cellInfoLabel = new Label();
         root.Add(cellInfoLabel);
 
@@ -143,6 +160,11 @@ public class CellEditorWindow : EditorWindow
 
         root.Add(unitSpawnType);
         root.Add(cellTypeDropdown);
+        root.Add(unitSpawnType);
+        root.Add(cellTypeDropdown);
+        root.Add(cellVisualSetField);
+        root.Add(terminalTypeDropdown);
+        root.Add(spawnDecorationField);
         root.Add(terminalTypeDropdown);
         root.Add(spawnDecorationField);
 

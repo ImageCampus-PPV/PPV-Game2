@@ -18593,6 +18593,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 502082462492533850, guid: 880b1327529ecdd4787e8f339b22f2d0, type: 3}
+      propertyPath: _scrollSpeed
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 502082462492533850, guid: 880b1327529ecdd4787e8f339b22f2d0, type: 3}
       propertyPath: _maxMovement.x
       value: 5
       objectReference: {fileID: 0}

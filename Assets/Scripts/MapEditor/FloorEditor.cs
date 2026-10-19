@@ -143,6 +143,8 @@ public class FloorEditor : EditorWindow
                 _cells[i, j]._spawnUnit = "None";
                 _cells[i, j]._initialState = nameof(DefaultCell);
                 _cells[i, j]._terminalType = "None";
+                _cells[i, j]._cellVisualSet = null;
+                _cells[i, j]._assetToSpawn = null;
 
                 ApplyCellVisual(_cellButtons[_cells[i, j]._coordinates], _cells[i, j]);
             }
@@ -393,7 +395,8 @@ public class FloorEditor : EditorWindow
             bg = Color.magenta;
         }
 
-        Texture2D preview = cell._assetToSpawn != null ? AssetPreview.GetAssetPreview(cell._assetToSpawn) : null;
+        GameObject previewPrefab = cell._cellVisualSet != null ? cell._cellVisualSet.GetPrefab(cell._initialState) : cell._assetToSpawn;
+        Texture2D preview = previewPrefab != null ? AssetPreview.GetAssetPreview(previewPrefab) : null;
 
         Background icon = btn.iconImage;
         icon.texture = preview != null ? preview : null;

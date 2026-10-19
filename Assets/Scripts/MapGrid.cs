@@ -381,7 +381,7 @@ public class MapGrid : IService, IDisposable
             _gridArray[cell._coordinates.x, cell._coordinates.y] = cellObject;
 
             cellObject.SetCoordinate(cell._coordinates);
-            cellObject.Init(_cellStatesPerName[cell._initialState]);
+            cellObject.Init(_cellStatesPerName[cell._initialState], cell._cellVisualSet);
 
             switch (cell._spawnUnit)
             {
@@ -474,7 +474,7 @@ public class MapGrid : IService, IDisposable
 
             float cellTopY = cellGO.transform.position.y + (cellGO.transform.localScale.y * 0.5f);
             float offsetFromPivotToBottom = entity.transform.position.y - bounds.min.y;
-            entity.transform.position = new Vector3 (cellGO.transform.position.x, cellTopY + offsetFromPivotToBottom, cellGO.transform.position.z);
+            entity.transform.position = new Vector3(cellGO.transform.position.x, cellTopY + offsetFromPivotToBottom, cellGO.transform.position.z);
         }
         else
             entity.transform.position = Vector3.zero;

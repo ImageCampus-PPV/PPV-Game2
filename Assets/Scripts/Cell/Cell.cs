@@ -14,6 +14,12 @@ public class Cell : BaseEntity
     [SerializeField] private float _heightStep = 1f;
     [SerializeField] private Vector2Int _coordinates;
 
+    private CellVisualSet _cellVisualSet;
+    private GameObject _visualInstance;
+    private GameObject _currentVisualPrefab;
+    private Type _visualStateType;
+    private Renderer _logicRenderer;
+
     [Header("Pathfinding")]
     [HideInInspector] public int gCost;
     [HideInInspector] public int hCost;
@@ -45,22 +51,95 @@ public class Cell : BaseEntity
         _coordinates = coordinates;
     }
 
-    public void Init(Type initialState)
+    public void Init(Type initialState, CellVisualSet visualSet = null)
     {
+        _cellVisualSet = visualSet;
+        _logicRenderer = GetComponent<Renderer>();
+
         _fsm = new FSM(typeof(DefaultCell));
 
-        _bounds = GetComponent<MeshRenderer>().bounds;
+        Renderer renderer = _logicRenderer;
 
-        Renderer renderer = GetComponent<Renderer>();
+        _fsm.AddState<DefaultCell>(
+            onEnterParameters: () => new object[] { this },
+            onExitParameters: () => new object[] { this });
 
-        _fsm.AddState<DefaultCell>(onEnterParameters: () => new object[] { this }, onExitParameters: () => new object[] { this });
-        _fsm.AddState<Unstable>(onEnterParameters: () => new object[] { this, renderer, 1 }, onExitParameters: () => new object[] { this });
-        _fsm.AddState<Broken>(onEnterParameters: () => new object[] { this, renderer }, onExitParameters: () => new object[] { this });
-        _fsm.AddState<Healing>(onEnterParameters: () => new object[] { this, renderer }, onTickParameters: () => new object[] { stander }, onExitParameters: () => new object[] { this });
-        _fsm.AddState<Contagious>(onEnterParameters: () => new object[] { this, 10u, _coordinates, renderer }, onTickParameters: () => new object[] { stander }, onExitParameters: () => new object[] { this });
-        _fsm.AddState<Infected>(onEnterParameters: () => new object[] { this, 10u, renderer }, onTickParameters: () => new object[] { stander }, onExitParameters: () => new object[] { this });
+        _fsm.AddState<Empty>(
+            onEnterParameters: () => new object[] { this, renderer },
+            onExitParameters: () => new object[] { this });
+
+        _fsm.AddState<Unstable>(
+            onEnterParameters: () => new object[] { this, renderer, 1 },
+            onExitParameters: () => new object[] { this });
+
+        _fsm.AddState<Broken>(
+            onEnterParameters: () => new object[] { this, renderer },
+            onExitParameters: () => new object[] { this });
+
+        _fsm.AddState<Healing>(
+            onEnterParameters: () => new object[] { this, renderer },
+            onTickParameters: () => new object[] { stander },
+            onExitParameters: () => new object[] { this });
+
+        _fsm.AddState<Contagious>(
+            onEnterParameters: () => new object[] { this, 10u, _coordinates, renderer },
+            onTickParameters: () => new object[] { stander },
+            onExitParameters: () => new object[] { this });
+
+        _fsm.AddState<Infected>(
+            onEnterParameters: () => new object[] { this, 10u, renderer },
+            onTickParameters: () => new object[] { stander },
+            onExitParameters: () => new object[] { this });
 
         _fsm.Transition(initialState);
+
+        UpdateVisual(_fsm.GetState());
+    }
+
+    private void UpdateVisual(Type stateType)
+    {
+        if (stateType == null)
+            return;
+
+        _visualStateType = stateType;
+
+        if (_cellVisualSet == null)
+            return;
+
+        GameObject prefab = _cellVisualSet.GetPrefab(stateType);
+
+        if (prefab != null && prefab == _currentVisualPrefab && _visualInstance != null)
+            return;
+
+        if (_visualInstance != null)
+            Destroy(_visualInstance);
+
+        _visualInstance = null;
+        _currentVisualPrefab = null;
+
+        if (prefab == null)
+        {
+            if (_logicRenderer != null)
+                _logicRenderer.enabled = true;
+
+            return;
+        }
+
+        _visualInstance = Instantiate(prefab, transform, false);
+        _visualInstance.name = $"{prefab.name}_Visual";
+
+        _currentVisualPrefab = prefab;
+
+        if (_logicRenderer != null)
+            _logicRenderer.enabled = false;
+    }
+
+    public void Transition(Type type)
+    {
+        _justTransitioned = true;
+        _fsm.Transition(type);
+
+        UpdateVisual(_fsm.GetState());
     }
 
     public void Tick(float deltTime)
@@ -68,13 +147,12 @@ public class Cell : BaseEntity
         if (!_justTransitioned)
             _fsm.Tick();
 
-        _justTransitioned = false;
-    }
+        Type currentState = _fsm.GetState();
 
-    public void Transition(Type type)
-    {
-        _justTransitioned = true;
-        _fsm.Transition(type);
+        if (currentState != _visualStateType)
+            UpdateVisual(currentState);
+
+        _justTransitioned = false;
     }
 
     public Type GetState()
@@ -106,7 +184,10 @@ public class Cell : BaseEntity
 
     public Vector3 GetWorldTopPosition()
     {
-        return new Vector3(transform.position.x, _bounds.max.y, transform.position.z);
+        Collider cellCollider = GetComponent<Collider>();
+        float topY = cellCollider != null ? cellCollider.bounds.max.y : transform.position.y;
+
+        return new Vector3(transform.position.x, topY, transform.position.z);
     }
 
 #if UNITY_EDITOR
