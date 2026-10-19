@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a64e5b0e436d4bed9780211ae245f7b, type: 3}
+  m_Name: J2_NME_02_HEAVY_FRONT_Data
+  m_EditorClassIdentifier: Assembly-CSharp::DragonBones.UnityDragonBonesData
+  dataName: J2_NME_02_HEAVY_FRONT
+  dragonBonesJSON: {fileID: 4900000, guid: 8e9f2fe3a804a934ab5d9fce4ad30dd8, type: 3}
+  textureAtlas:
+  - textureAtlasJSON: {fileID: 4900000, guid: bd63f0e7e8240a64781e2065cc51d893, type: 3}
+    texture: {fileID: 2800000, guid: 6d9d04a6f4f36e642a97d43c35732a93, type: 3}
+    material: {fileID: 2100000, guid: d7b5c3232180a474e9f694ddecc6566e, type: 2}
+    uiMaterial: {fileID: 0}

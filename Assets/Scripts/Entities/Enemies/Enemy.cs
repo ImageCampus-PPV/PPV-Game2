@@ -4,49 +4,79 @@ using UnityEngine;
 
 public abstract class Enemy : Unit
 {
-    private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
-
-    protected uint _damage = 10;
+    //Normal enemy values
+    protected uint _damage = 25;
     protected int _movementRange = 1;
     protected int _fortitude = 2;
     protected int _pushDistance = 2;
+    protected int _attackTickCost = 1;
 
     public uint Damage => _damage;
     public int MovementRange => _movementRange;
     public int Fortitude => _fortitude;
     public int PushDistance => _pushDistance;
+    public int AttackTickCost => _attackTickCost;
 
-    public void TakeTurn(Cell playerCell)
+
+    public void PlanTurn(Cell playerCell, int emptyActions)
     {
-        if (IsInGoodCover(playerCell))
-        {
-            Debug.Log($"{name} holding position");
-            return;
-        }
+        _plannedActions.Clear();
+        _usedTicksThisTurn = 0;
+
+        for (int i = 0; i < emptyActions; i++)
+            _plannedActions.Add(new WaitAction());
+
+        Cell newCurrentCell = _currentCell;
+        if (!IsInAttackRange(_currentCell, playerCell, _attackRange))
+            newCurrentCell = PlanMovementActions(playerCell);
+
+        if (IsInAttackRange(newCurrentCell, playerCell, _attackRange))
+            PlanCombatActions(playerCell);
+
+
+        //Move one tile per turn
+        //_currentPath = new List<Cell>()
+        //{
+        //    path[0],
+        //    path[1]
+        //};
+        //
+        //_pathIndex = 1;
+        //
+        //StartCoroutine(FollowPath());
+    }
+
+    private Cell PlanMovementActions(Cell playerCell)
+    {
+        Cell newCurrentCell = CurrentCell;
+        //if (IsInGoodCover(playerCell))
+        //{
+        //    Debug.Log($"{name} holding position");
+        //    return;
+        //}
 
         Cell targetCell = FindBestCell(playerCell);
 
         if (targetCell == null)
         {
             Debug.Log($"{name} found no valid move");
-            return;
+            return newCurrentCell;
         }
 
         List<Cell> path = PathFinding.FindPath(_currentCell.Coordinates, targetCell.Coordinates);
 
         if (path == null || path.Count <= 1)
-            return;
+            return newCurrentCell;
 
-        //Move one tile per turn
-        _currentPath = new List<Cell>()
+        int actionLimit = path.Count < _maxTicksPerTurn ? path.Count : _maxTicksPerTurn;
+
+        for (int i = 1; i < actionLimit; i++)
         {
-            path[0],
-            path[1]
-        };
+            _plannedActions.Add(new MoveAction(path[i - 1], path[i], 0));
+            newCurrentCell = path[i];
+        }
 
-        _pathIndex = 1;
-
-        StartCoroutine(FollowPath());
+        return newCurrentCell;
     }
 
     private bool IsInRange(Cell playerCell)
@@ -54,13 +84,6 @@ public abstract class Enemy : Unit
         return GetGridDistance(_currentCell, playerCell) <= _movementRange;
     }
 
-    private bool IsInGoodCover(Cell playerCell)
-    {
-        if (_currentCell == null)
-            return false;
-
-        return HasCoverAgainstPlayer(_currentCell, playerCell) && IsInRange(playerCell);
-    }
 
     private Cell FindBestCell(Cell playerCell)
     {
@@ -158,5 +181,9 @@ public abstract class Enemy : Unit
     private int GetGridDistance(Cell a, Cell b)
     {
         return Mathf.Abs(a.Coordinates.x - b.Coordinates.x) + Mathf.Abs(a.Coordinates.y - b.Coordinates.y);
+    }
+
+    protected virtual void PlanCombatActions(Cell playerCell)
+    {
     }
 }

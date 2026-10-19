@@ -1,129 +1,126 @@
 using Assets.Scripts.Combat;
+using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Services;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MovementPreviewRenderer : MonoBehaviour
 {
     APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();
+    EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
 
     [Header("References")]
-    [SerializeField] private Player _player;
+    private Player _player ;
 
     [Header("Visual Prefabs")]
     [SerializeField] private GameObject _reachableCellPrefab;
     [SerializeField] private GameObject _pathCellPrefab;
     [SerializeField] private GameObject _targetCellPrefab;
+    [SerializeField] private GameObject _waypointCellPrefab;
 
     [Header("Offset")]
-    [SerializeField] private float _YOffset;
+    [SerializeField] private float _yOffset = 0.1f;
 
-    private List<GameObject> _spawnedVisuals = new();
-    private List<Cell> _drawnCells = new();
+    private readonly List<GameObject> _spawnedVisuals = new();
+    private readonly HashSet<Cell> _drawnCells = new();
 
-    private Cell _lastTarget;
-    private int _lastAP;
-    private Cell _lastPlayerCell;
+    private void Start()
+    {
+        _player = EntityRegistry.FilterEntities<Player>().First();
+    }
 
     private void Update()
     {
         if (_player == null)
             return;
 
-        bool shouldRefresh =
-            _lastTarget != _player.SelectedTargetCell ||
-            _lastAP != APWallet.CurrentAP ||
-            _lastPlayerCell != _player.CurrentCell;
-
-        //if (!shouldRefresh)
-        //    return;
-
         RefreshVisuals();
-
-        _lastTarget = _player.SelectedTargetCell;
-        _lastAP = APWallet.CurrentAP;
-        _lastPlayerCell = _player.CurrentCell;
     }
 
     private void RefreshVisuals()
     {
         ClearVisuals();
 
-        if (_player.SelectedTargetCell != null)
+        if (_player.PlannedActions.Count > 0)
         {
-            DrawSelectedTarget();
             DrawPlannedPath();
         }
 
-        if (!_player.IsMoving)
+        if (!_player.IsTurnPlaying)
             DrawReachableCells();
     }
 
     private void DrawReachableCells()
     {
+        Cell origin = _player.GetLastPlannedCell();
+
+        int remainingAP = APWallet.CurrentAP - _player.PlannedAPCost;
+        int remainingTicks = _player.MaxTicksPerTurn - _player.PlannedTicks - _player.UsedTicksThisTurn;
+
         for (int x = 0; x < MapGrid.Width; x++)
         {
             for (int z = 0; z < MapGrid.Height; z++)
             {
                 Cell cell = MapGrid.GetCell(x, z);
+
+                if (cell == null)
+                    continue;
+
                 if (_drawnCells.Contains(cell))
                     continue;
 
-                int cost = _player.GetPathCostPreview(cell);
+                int apCost = _player.GetPathCostPreview(origin, cell);
 
-                if (cost <= 0)
+                if (apCost <= 0)
                     continue;
 
-                if (cost > APWallet.CurrentAP)
+                if (apCost > remainingAP)
                     continue;
 
-                SpawnVisual(_reachableCellPrefab, cell.GetWorldTopPosition() + Vector3.up * _YOffset);
+                int ticksCost = _player.GetPathTicksPreview(origin, cell);
+
+                if (ticksCost > remainingTicks)
+                    continue;
+
+                SpawnVisual(_reachableCellPrefab, cell.GetWorldTopPosition() + Vector3.up * _yOffset);
             }
         }
     }
 
     private void DrawPlannedPath()
     {
-        if (_player.PlannedPath == null)
-            return;
-
         foreach (Cell cell in _player.PlannedPath)
         {
+            if (cell == null)
+                continue;
+
             if (_drawnCells.Contains(cell))
                 continue;
 
-            SpawnVisual(_pathCellPrefab, cell.GetWorldTopPosition() + Vector3.up * _YOffset);
+            SpawnVisual(_pathCellPrefab, cell.GetWorldTopPosition() + Vector3.up * _yOffset);
             _drawnCells.Add(cell);
         }
     }
 
-    private void DrawSelectedTarget()
-    {
-        _drawnCells.Add(_player.SelectedTargetCell);
-        SpawnVisual(_targetCellPrefab, _player.SelectedTargetCell.GetWorldTopPosition() + Vector3.up * _YOffset);
-    }
 
     private void SpawnVisual(GameObject prefab, Vector3 position)
     {
         if (prefab == null)
             return;
 
-        GameObject obj = Instantiate(
-            prefab,
-            position,
-            Quaternion.identity,
-            transform
-        );
-
+        GameObject obj = Instantiate(prefab, position, Quaternion.identity, transform);
         _spawnedVisuals.Add(obj);
     }
 
     private void ClearVisuals()
     {
-        for (int i = 0; i < _spawnedVisuals.Count; i++)
-            if (_spawnedVisuals[i] != null)
-                Destroy(_spawnedVisuals[i]);
+        foreach (GameObject visual in _spawnedVisuals)
+        {
+            if (visual != null)
+                Destroy(visual);
+        }
 
         _spawnedVisuals.Clear();
         _drawnCells.Clear();
