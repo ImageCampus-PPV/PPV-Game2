@@ -126,6 +126,7 @@ public class Cell : BaseEntity
         }
 
         _visualInstance = Instantiate(prefab, transform, false);
+        _visualInstance.transform.localPosition = Vector3.zero;
         _visualInstance.name = $"{prefab.name}_Visual";
 
         _currentVisualPrefab = prefab;
