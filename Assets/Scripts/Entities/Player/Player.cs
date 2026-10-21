@@ -34,12 +34,8 @@ public class Player : Unit
     public uint CurrentHp => _currentHp;
 
     protected const int MOVEMENT_COST = 1;
-    protected const int BREAK_MIN_COST = 3;
-    private int _breakPenalty;
 
     private Vector3 headPos => transform.position + Vector3.up;
-
-    public int BreakPenalty => _breakPenalty;
 
     public void SetHp(uint hp)
     {
@@ -86,7 +82,6 @@ public class Player : Unit
     {
         base.Init();
 
-        _breakPenalty = 0;
         _currentActionTypeSelected = ClickActionType.Move;
         APWallet.Init();
         AbilitySystem.Init();
@@ -111,12 +106,7 @@ public class Player : Unit
     private void Update()
     {
         if (_isTurnPlaying)
-        {
-            if (Input.GetKeyUp(KeyCode.Z))
-                EventBus.Raise<BreakEvent>();
-
             return;
-        }
 
         if (Input.GetMouseButtonUp(0))
         {
@@ -264,7 +254,7 @@ public class Player : Unit
 
         for (int i = 1; i < path.Count; i++)
         {
-            TurnAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST + _breakPenalty);
+            TurnAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST);
             newActions.Add(action);
         }
 
@@ -346,7 +336,7 @@ public class Player : Unit
         if (!hit.collider.TryGetComponent<Cell>(out Cell targetCell))
             return;
 
-        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
+        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost);
 
         if (!CanAddAction(action))
             return;
@@ -365,7 +355,7 @@ public class Player : Unit
         if (ability == null)
             return;
 
-        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
+        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost);
 
         if (!CanAddAction(action))
             return;
@@ -479,25 +469,6 @@ public class Player : Unit
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 
-    public override void Break(in BreakEvent callback)
-    {
-        base.Break(callback);
-        int apToRemove = CalculateBreakCost();
-        _breakPenalty++;
-
-        EventBus.Raise<APConsumeRequestAceptedEvent>(apToRemove);
-        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
-    }
-
-    private int CalculateBreakCost()
-    {
-        int plannedApCost = 0;
-
-        foreach (TurnAction action in _plannedActions)
-            plannedApCost += action.APCost;
-
-        return plannedApCost % 4 > BREAK_MIN_COST ? plannedApCost : BREAK_MIN_COST;
-    }
 
     public override void ClearPlan()
     {
