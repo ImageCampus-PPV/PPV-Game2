@@ -81,7 +81,7 @@ public class Player : Unit
 
     public override void Init()
     {
-        _visualScaleMultiplier *= 1.4f;
+        //_visualScaleMultiplier *= 1.25f;
         base.Init();
 
         _currentActionTypeSelected = ClickActionType.Move;
