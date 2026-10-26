@@ -477,23 +477,4 @@ public class Player : Unit
         ResetVariables();
     }
 
-    public override void FaceCell(Cell targetCell)
-    {
-        if (targetCell == null || CurrentCell == null)
-            return;
-
-        Vector2Int direction = targetCell.Coordinates - CurrentCell.Coordinates;
-
-        if (direction.x > 0)
-            FaceLeft();
-        else if (direction.x < 0)
-            FaceRight();
-        else if (direction.y > 0)
-            FaceRight();
-        else if (direction.y < 0)
-            FaceLeft();
-
-        AdjustEntityPositionToCell(gameObject, CurrentCell.gameObject);
-    }
-
 }

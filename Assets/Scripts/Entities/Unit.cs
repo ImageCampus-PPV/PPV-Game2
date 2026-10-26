@@ -65,24 +65,31 @@ public abstract class Unit : BaseEntity
         }
     }
 
-    private CustomAnimator _customAnimator;
+    private CustomAnimator _frontAnimator;
+    private CustomAnimator _backAnimator;
+    private CustomAnimator _activeAnimator;
+
+    private Vector3 _frontInitialScale;
+    private Vector3 _backInitialScale;
+
+    private bool _animatorsInitialized;
+    private bool _isFacingLeft;
+
     public CustomAnimator CustomAnimator
     {
         get
         {
-            if (_customAnimator == null)
-                _customAnimator = GetComponentInChildren<CustomAnimator>(true);
-
-            return _customAnimator;
+            InitializeAnimators();
+            return _activeAnimator;
         }
     }
-
 
     public Cell CurrentCell => _currentCell;
     public int MaxTicksPerTurn => _maxTicksPerTurn;
 
     public virtual void Init()
     {
+        InitializeAnimators();
         Spawn();
     }
 
@@ -411,29 +418,35 @@ public abstract class Unit : BaseEntity
 
         Vector2Int direction = targetCell.Coordinates - CurrentCell.Coordinates;
 
-        if (direction.x > 0)
-            FaceRight();
-        else if (direction.x < 0)
-            FaceLeft();
-        else if (direction.y > 0)
-            FaceLeft();
+        if (direction.y > 0)
+            SetArmatureView(ArmatureView.Back);
         else if (direction.y < 0)
-            FaceRight();
-    }
+            SetArmatureView(ArmatureView.Front);
 
-    protected void FaceRight()
-    {
-        Vector3 scale = transform.localScale;
-        scale.x = Mathf.Abs(scale.x);
-        transform.localScale = scale;
+        if (direction.x > 0)
+            FaceLeft();
+        else if (direction.x < 0)
+            FaceRight();
+        else if (direction.y > 0)
+            FaceRight();
+        else if (direction.y < 0)
+            FaceLeft();
     }
 
     protected void FaceLeft()
     {
-        Vector3 scale = transform.localScale;
-        scale.x = -Mathf.Abs(scale.x);
-        transform.localScale = scale;
+        _isFacingLeft = true;
+        InitializeAnimators();
+        ApplyHorizontalFacing();
     }
+
+    protected void FaceRight()
+    {
+        _isFacingLeft = false;
+        InitializeAnimators();
+        ApplyHorizontalFacing();
+    }
+
     public IEnumerator PlayAnimationAndWait(AnimationStates state, int playTimes = 1, float timeScale = 1f)
     {
         CustomAnimator.Play(state, playTimes, timeScale, true);
@@ -441,16 +454,92 @@ public abstract class Unit : BaseEntity
         float duration = CustomAnimator.GetAnimationDuration(state);
 
         if (duration > 0f)
-        {
             yield return new WaitForSeconds(duration);
-        }
         else
-        {
-                yield return null;
-        }
+            yield return null;
     }
 
+    private void InitializeAnimators()
+    {
+        if (_animatorsInitialized)
+            return;
 
+        _animatorsInitialized = true;
+
+        CustomAnimator[] animators = GetComponentsInChildren<CustomAnimator>(true);
+
+        foreach (CustomAnimator animator in animators)
+        {
+            switch (animator.View)
+            {
+                case ArmatureView.Front:
+                    _frontAnimator = animator;
+                    break;
+
+                case ArmatureView.Back:
+                    _backAnimator = animator;
+                    break;
+            }
+        }
+
+        if (_frontAnimator == null && _backAnimator == null)
+        {
+            Debug.LogError($"{name} has no front or back CustomAnimator.");
+            return;
+        }
+
+        if (_frontAnimator != null)
+            _frontInitialScale = _frontAnimator.transform.localScale;
+
+        if (_backAnimator != null)
+            _backInitialScale = _backAnimator.transform.localScale;
+
+        _activeAnimator = _frontAnimator != null ? _frontAnimator : _backAnimator;
+
+        UpdateArmatureActivation();
+        ApplyHorizontalFacing();
+    }
+
+    private void SetArmatureView(ArmatureView view)
+    {
+        InitializeAnimators();
+
+        CustomAnimator selectedAnimator = view == ArmatureView.Front ? _frontAnimator : _backAnimator;
+
+        if (selectedAnimator == null)
+            return;
+
+        if (_activeAnimator == selectedAnimator)
+            return;
+
+        _activeAnimator = selectedAnimator;
+
+        UpdateArmatureActivation();
+        ApplyHorizontalFacing();
+    }
+
+    private void UpdateArmatureActivation()
+    {
+        if (_frontAnimator != null)
+            _frontAnimator.gameObject.SetActive(_activeAnimator == _frontAnimator);
+
+        if (_backAnimator != null)
+            _backAnimator.gameObject.SetActive(_activeAnimator == _backAnimator);
+    }
+
+    private void ApplyHorizontalFacing()
+    {
+        if (_activeAnimator == null)
+            return;
+
+        Vector3 initialScale = _activeAnimator == _frontAnimator ? _frontInitialScale : _backInitialScale;
+
+        bool shouldFlip = _isFacingLeft != _activeAnimator.FacesLeftByDefault;
+
+        initialScale.x = Mathf.Abs(initialScale.x) * (shouldFlip ? -1f : 1f);
+
+        _activeAnimator.transform.localScale = initialScale;
+    }
 
 
     public virtual void ClearPlan()

@@ -2,6 +2,11 @@ using System;
 using System.Collections.Generic;
 using DragonBones;
 using UnityEngine;
+public enum ArmatureView
+{
+    Front,
+    Back
+}
 
 public class CustomAnimator : MonoBehaviour
 {
@@ -16,10 +21,14 @@ public class CustomAnimator : MonoBehaviour
         public string animationName;
     }
 
-    [SerializeField]
-    private List<AnimationMapping> _animationMappings = new();
-
+    [SerializeField] private List<AnimationMapping> _animationMappings = new();
     private AnimationStates _currentState;
+
+    [SerializeField] private ArmatureView _view;
+    public ArmatureView View => _view;
+
+    [SerializeField] private bool _facesLeftByDefault;
+    public bool FacesLeftByDefault => _facesLeftByDefault;
 
     public void Play(AnimationStates state, int playTimes = 0, float timeScale = 1f, bool forceRestart = false)
     {
