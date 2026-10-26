@@ -15,6 +15,7 @@ public abstract class Unit : BaseEntity
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
+    [SerializeField] protected float _visualScaleMultiplier = 1.10f;
 
     public Cell SpawnCell => _spawnCell;
     public void SetSpawnCell(Cell spawnCell) => _spawnCell = spawnCell;
@@ -91,6 +92,7 @@ public abstract class Unit : BaseEntity
     {
         InitializeAnimators();
         Spawn();
+        CustomAnimator.Play(AnimationStates.Idle);
     }
 
     protected virtual void Spawn()
@@ -395,6 +397,7 @@ public abstract class Unit : BaseEntity
             float scaleZ = cellDepth / entityDepth;
 
             float scale = Mathf.Min(scaleX, scaleZ);
+            scale *= _visualScaleMultiplier;
 
             entity.transform.localScale *= scale * 1.75f;
         }
@@ -436,14 +439,12 @@ public abstract class Unit : BaseEntity
     protected void FaceLeft()
     {
         _isFacingLeft = true;
-        InitializeAnimators();
         ApplyHorizontalFacing();
     }
 
     protected void FaceRight()
     {
         _isFacingLeft = false;
-        InitializeAnimators();
         ApplyHorizontalFacing();
     }
 
@@ -532,13 +533,7 @@ public abstract class Unit : BaseEntity
         if (_activeAnimator == null)
             return;
 
-        Vector3 initialScale = _activeAnimator == _frontAnimator ? _frontInitialScale : _backInitialScale;
-
-        bool shouldFlip = _isFacingLeft != _activeAnimator.FacesLeftByDefault;
-
-        initialScale.x = Mathf.Abs(initialScale.x) * (shouldFlip ? -1f : 1f);
-
-        _activeAnimator.transform.localScale = initialScale;
+        _activeAnimator.SetFacing(_isFacingLeft);
     }
 
 

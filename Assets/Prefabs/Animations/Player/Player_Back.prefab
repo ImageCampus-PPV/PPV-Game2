@@ -1376,8 +1376,8 @@ MonoBehaviour:
     animationName: J2_PLAYER_COUNTER_BACK
   - state: 6
     animationName: J2_PLAYER_LAGSPIKE_BACK
-  _view: 0
-  _facesLeftByDefault: 0
+  _view: 1
+  _facesLeftByDefault: 1
 --- !u!1 &6841540205749607058
 GameObject:
   m_ObjectHideFlags: 0

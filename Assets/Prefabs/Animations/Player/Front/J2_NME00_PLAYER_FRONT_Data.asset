@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: J2_NME00_PLAYER_FRONT_Data
   m_EditorClassIdentifier: Assembly-CSharp::DragonBones.UnityDragonBonesData
   dataName: J2_NME00_PLAYER_FRONT
-  dragonBonesJSON: {fileID: 4900000, guid: edb3d88a3b23c3c4e98943d2a675160e, type: 3}
+  dragonBonesJSON: {fileID: 4900000, guid: 67492297e6a4a8a44b720111e035c41d, type: 3}
   textureAtlas:
-  - textureAtlasJSON: {fileID: 4900000, guid: 26b14987877d5424d9e6e1534642dde0, type: 3}
-    texture: {fileID: 2800000, guid: 046857579887d5a4c9d341c866324f01, type: 3}
-    material: {fileID: 2100000, guid: 8bd839c965614614bae46d45d1dc5958, type: 2}
+  - textureAtlasJSON: {fileID: 4900000, guid: b4c012241f56b5b4490687b75877036c, type: 3}
+    texture: {fileID: 2800000, guid: 90f16fad9ede4d84ba8076428de2481c, type: 3}
+    material: {fileID: 2100000, guid: 742adb60fc363b94987c16722a9e119f, type: 2}
     uiMaterial: {fileID: 0}

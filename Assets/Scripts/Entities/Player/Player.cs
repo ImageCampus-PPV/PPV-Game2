@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class Player : Unit
 {
@@ -80,6 +81,7 @@ public class Player : Unit
 
     public override void Init()
     {
+        _visualScaleMultiplier *= 1.4f;
         base.Init();
 
         _currentActionTypeSelected = ClickActionType.Move;
@@ -476,5 +478,4 @@ public class Player : Unit
         base.ClearPlan();
         ResetVariables();
     }
-
 }

@@ -102,6 +102,14 @@ public class CustomAnimator : MonoBehaviour
 
         return null;
     }
+
+    public void SetFacing(bool isFacingLeft)
+    {
+        if (_armatureComponent == null || _armatureComponent.armature == null)
+            return;
+
+        _armatureComponent.armature.flipX = isFacingLeft != _facesLeftByDefault;
+    }
 }
 
 

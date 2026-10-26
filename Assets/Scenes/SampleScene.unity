@@ -16128,10 +16128,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af51e9a3721c294dafaa15358accce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _playerPrefab: {fileID: 8841275049678000971, guid: c641ee747666e0a47b9510cf4df73217, type: 3}
-  _heavyEnemy: {fileID: 7589995903907880262, guid: 7388995a58020014db8f6612313da850, type: 3}
-  _agileEnemy: {fileID: 4770509050278315690, guid: ebeaf250bb93a2442b56cfe82dae3ffa, type: 3}
-  _normalEnemy: {fileID: 7418365543870962373, guid: bf3a1103ad16b8240ab766a18e8e57b0, type: 3}
+  _playerPrefab: {fileID: 5726460908733791784, guid: 43b94595c479e1e44945bc443c439703, type: 3}
+  _heavyEnemy: {fileID: 1931976581163317388, guid: d168687b89798f04484e74acd529d594, type: 3}
+  _agileEnemy: {fileID: 1378291586416432389, guid: 231ff6d608943434f90422ab8b5e5ca4, type: 3}
+  _normalEnemy: {fileID: 9007829729774965016, guid: 6dfad93fedae5ce4397ef6ae02e2d6fa, type: 3}
   _APWalletConfiguration: {fileID: 11400000, guid: 1607d20703f07974f9114552afa18576, type: 2}
   _abilitiesDurationConfiguration: {fileID: 11400000, guid: 9bd95554dc7745d44afb09cf0ffb9ea5, type: 2}
   _cellMap: {fileID: 11400000, guid: 092fc2a8b9c837d42a8ba904ad473a8d, type: 2}
