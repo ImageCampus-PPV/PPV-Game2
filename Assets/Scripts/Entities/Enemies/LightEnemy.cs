@@ -11,6 +11,7 @@ public class LightEnemy : Enemy
         _pushDistance = 3;
         _maxTicksPerTurn = base.MaxTicksPerTurn - 1;
         _attackTickCost = 1;
+        _maxHp = 70;
     }
 
     protected override void PlanCombatActions(Cell playerCell)

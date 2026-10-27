@@ -10,13 +10,11 @@ using static UnityEngine.EventSystems.EventTrigger;
 public class Player : Unit
 {
     public int PlannedTicks => GetPlannedTickCost();
-
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
     private FloatingTextInstancer FloatingTextInstancer => ServiceProvider.Instance.GetService<FloatingTextInstancer>();
     public int PlannedAPCost => GetPlannedAPCost();
     private ClickActionType _currentActionTypeSelected;
-
 
 
     private Terminal _plannedHackTerminal;
