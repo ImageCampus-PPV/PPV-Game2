@@ -612,5 +612,5 @@ MonoBehaviour:
     _coordinates: {x: 9, y: 9}
     _spawnUnit: None
     _assetToSpawn: {fileID: 1517379098189983311, guid: 28fd8324cedcd574f8af561901aa549e, type: 3}
-    _terminalType: None
+    _terminalType: FloorObjective
     _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}

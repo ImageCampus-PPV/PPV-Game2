@@ -107,6 +107,11 @@ public abstract class Enemy : Unit
         if (_currentCell != null && _currentCell.stander == this)
             _currentCell.stander = null;
 
+        TurnManager turnManager = ServiceProvider.Instance.GetService<TurnManager>();
+
+        if (turnManager != null)
+            turnManager.RemoveStun(this);
+
         EntityRegistry registry = ServiceProvider.Instance.GetService<EntityRegistry>();
 
         if (registry != null)

@@ -252,6 +252,14 @@ public class TurnManager : IService
         Debug.Log("EnemyStunned");
     }
 
+    public void RemoveStun(Unit unit)
+    {
+        if (unit == null)
+            return;
+
+        _stunUnits.Remove(unit.ID);
+    }
+
     private void OnPlayerExecuteAction(in PlayerExecuteActionEvent callback)
     {
         if (_executing)
