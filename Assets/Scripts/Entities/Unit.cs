@@ -66,6 +66,24 @@ public abstract class Unit : BaseEntity
         }
     }
 
+    private Transform _visualPivot;
+    private Vector3 _visualPivotInitialScale;
+    protected Transform VisualPivot
+    {
+        get
+        {
+            if (_visualPivot == null)
+            {
+                UnitVisualPivot anchor = GetComponentInChildren<UnitVisualPivot>(true);
+
+                if (anchor != null)
+                    _visualPivot = anchor.transform;
+            }
+
+            return _visualPivot;
+        }
+    }
+
     private CustomAnimator _frontAnimator;
     private CustomAnimator _backAnimator;
     private CustomAnimator _activeAnimator;
@@ -414,7 +432,7 @@ public abstract class Unit : BaseEntity
         entity.transform.position += targetPosition - anchorPosition;
     }
 
-    public virtual void FaceCell(Cell targetCell)
+    public void FaceCell(Cell targetCell)
     {
         if (targetCell == null || CurrentCell == null)
             return;
@@ -425,6 +443,10 @@ public abstract class Unit : BaseEntity
             SetArmatureView(ArmatureView.Back);
         else if (direction.y < 0)
             SetArmatureView(ArmatureView.Front);
+        else if (direction.x < 0)
+            SetArmatureView(ArmatureView.Front);
+        else if (direction.x > 0)
+            SetArmatureView(ArmatureView.Back);
 
         if (direction.x > 0)
             FaceLeft();
@@ -495,6 +517,9 @@ public abstract class Unit : BaseEntity
         if (_backAnimator != null)
             _backInitialScale = _backAnimator.transform.localScale;
 
+        if (VisualPivot != null)
+            _visualPivotInitialScale = VisualPivot.localScale;
+
         _activeAnimator = _frontAnimator != null ? _frontAnimator : _backAnimator;
 
         UpdateArmatureActivation();
@@ -533,7 +558,24 @@ public abstract class Unit : BaseEntity
         if (_activeAnimator == null)
             return;
 
-        _activeAnimator.SetFacing(_isFacingLeft);
+        bool shouldFlip = _isFacingLeft != _activeAnimator.FacesLeftByDefault;
+
+        Transform target;
+        Vector3 initialScale;
+
+        if (VisualPivot != null)
+        {
+            target = VisualPivot;
+            initialScale = _visualPivotInitialScale;
+        }
+        else
+        {
+            target = _activeAnimator.transform;
+            initialScale = _activeAnimator == _frontAnimator ? _frontInitialScale : _backInitialScale;
+        }
+
+        initialScale.x = Mathf.Abs(initialScale.x) * (shouldFlip ? -1f : 1f);
+        target.localScale = initialScale;
     }
 
 
