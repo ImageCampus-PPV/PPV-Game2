@@ -477,7 +477,7 @@ Transform:
   m_GameObject: {fileID: 2659175311909623574}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.000000008382555, w: 1}
-  m_LocalPosition: {x: -1.544633, y: 0.8387966, z: -0.011000001}
+  m_LocalPosition: {x: -1.544633, y: 0.8220432, z: -0.011000001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -567,7 +567,7 @@ Transform:
   m_GameObject: {fileID: 3246062764138453088}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.0000009776466, w: 1}
-  m_LocalPosition: {x: -1.5217775, y: 2.8766556, z: -0.013}
+  m_LocalPosition: {x: -1.5217775, y: 2.8599021, z: -0.013}
   m_LocalScale: {x: 1.0000001, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -746,9 +746,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3916615274861100277}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.000001075127, w: 1}
-  m_LocalPosition: {x: -1.4587926, y: 3.5394876, z: -0.012}
-  m_LocalScale: {x: 1.0000001, y: 0.99999994, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.04288108, w: 0.9990802}
+  m_LocalPosition: {x: -1.4093099, y: 3.5106785, z: -0.012}
+  m_LocalScale: {x: 1.0000001, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3112413702736724600}
@@ -1330,7 +1330,7 @@ MonoBehaviour:
   armatureName: Armature
   isUGUI: 0
   debugDraw: 0
-  animationName: 
+  animationName: J2_PLAYER_INTERACT2_BACK
   _playTimes: 0
   _timeScale: 1
   _sortingMode: 0
@@ -1376,6 +1376,12 @@ MonoBehaviour:
     animationName: J2_PLAYER_COUNTER_BACK
   - state: 6
     animationName: J2_PLAYER_LAGSPIKE_BACK
+  - state: 7
+    animationName: J2_PLAYER_ENTERINTERACT_BACK
+  - state: 8
+    animationName: J2_PLAYER_INTERACT_BACK
+  - state: 9
+    animationName: J2_PLAYER_FINISHINTERACT_BACK
   _view: 1
   _facesLeftByDefault: 1
 --- !u!1 &6841540205749607058
@@ -1405,7 +1411,7 @@ Transform:
   m_GameObject: {fileID: 6841540205749607058}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.000001312259, w: 1}
-  m_LocalPosition: {x: -1.0966467, y: 0.33617452, z: -0.018000001}
+  m_LocalPosition: {x: -1.0966467, y: 0.31942108, z: -0.018000001}
   m_LocalScale: {x: 1.6000001, y: 1.5999999, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

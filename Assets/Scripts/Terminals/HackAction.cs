@@ -20,9 +20,7 @@ public class HackAction : TurnAction
 
     public override IEnumerator Execute(Unit unit)
     {
-        HackSystem.ResolvePlannedHack(_player, _terminal, _ticksToResolve);
-
-        yield return null;
+        yield return _player.PlayHackAnimation(_terminal, _ticksToResolve);
 
         AdvanceTick();
     }

@@ -368,6 +368,39 @@ public class Player : Unit
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
     }
 
+    public IEnumerator PlayHackAnimation(Terminal terminal, int ticksToResolve)
+    {
+        if (terminal == null || ticksToResolve <= 0)
+            yield break;
+
+        FaceCell(terminal.Cell);
+
+        if (IsStun || _currentHp == 0)
+        {
+            HackSystem.ResolvePlannedHack(this, terminal, ticksToResolve);
+            yield break;
+        }
+
+        yield return PlayAnimationAndWait(AnimationStates.StartInteract);
+
+        CustomAnimator.Play(AnimationStates.Interact, 0, 1f, true);
+        float interactDuration = CustomAnimator.GetAnimationDuration(AnimationStates.Interact);
+
+        if (interactDuration > 0f)
+            yield return new WaitForSeconds(interactDuration);
+        else
+            yield return null;
+
+        HackSystem.ResolvePlannedHack(this, terminal, ticksToResolve);
+
+        if (_currentHp == 0)
+            yield break;
+
+        yield return PlayAnimationAndWait(AnimationStates.EndInteract);
+
+        CustomAnimator.Play(AnimationStates.Idle, 0, 1f, true);
+    }
+
     private int GetPlannedAPCost()
     {
         int cost = 0;

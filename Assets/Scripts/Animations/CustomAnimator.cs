@@ -122,6 +122,9 @@ public enum AnimationStates
     Attack,
     TakeDamage,
     CounterAbilty,
-    LagSpikeAbility
+    LagSpikeAbility,
+    StartInteract,
+    Interact,
+    EndInteract
 }
 
