@@ -12,6 +12,7 @@ public class KickAbility : IAbility
 
     private int _remainingCooldown;
     public int RemainingCooldown => _remainingCooldown;
+    public int Damage => 60;
     public AnimationStates AnimationState => AnimationStates.CounterAbilty;
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
@@ -53,9 +54,15 @@ public class KickAbility : IAbility
     {
         Enemy enemy = targetCell.stander as Enemy;
 
-        //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
+        if (enemy == null || enemy.IsDead)
+            return;
+
         KickSystem.Execute(player, enemy);
+
+        enemy.TakeDamage(Damage);
+
         StartCooldown();
+
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 

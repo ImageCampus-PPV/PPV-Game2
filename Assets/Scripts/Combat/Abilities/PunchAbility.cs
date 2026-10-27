@@ -12,11 +12,13 @@ public class PunchAbility : IAbility
 
     private int _remainingCooldown;
     public int RemainingCooldown => _remainingCooldown;
+    public int Damage => 35;
     public AnimationStates AnimationState => AnimationStates.LagSpikeAbility;
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
     private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
+
 
     public bool CanExecute(Player player, Cell targetCell)
     {
@@ -52,10 +54,14 @@ public class PunchAbility : IAbility
     {
         Enemy enemy = targetCell.stander as Enemy;
 
-        //EventBus.Raise<APConsumeRequestAceptedEvent>(APCost);
+        if (enemy == null || enemy.IsDead)
+            return;
 
         TurnManager.ApplyStun(enemy);
+        enemy.TakeDamage(Damage);
+
         StartCooldown();
+
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 
