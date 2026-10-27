@@ -17,6 +17,7 @@ public class MapGrid : IService, IDisposable
     private int _cellsX;
     private int _cellsZ;
     private Material _defaultMat;
+    private float _cellSpacing = 1f;
 
     public int Width => _cellsX;
     public int Height => _cellsZ;
@@ -147,7 +148,7 @@ public class MapGrid : IService, IDisposable
             for (int z = 0; z < _cellsZ; z++)
             {
                 GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                goCell.transform.position = new Vector3(x * 1f, 0f, z * 1f);
+                goCell.transform.position = new Vector3(x * _cellSpacing, 0f, z * _cellSpacing);
                 goCell.GetComponent<MeshRenderer>().material = _defaultMat;
                 goCell.layer = 6;
 
@@ -372,7 +373,7 @@ public class MapGrid : IService, IDisposable
         foreach (CellData cell in _cellMap._cellsData)
         {
             GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            goCell.transform.position = new Vector3(cell._coordinates.x * 1f, 0.0f, cell._coordinates.y * 1f);
+            goCell.transform.position = new Vector3(cell._coordinates.x * _cellSpacing, 0.0f, cell._coordinates.y * _cellSpacing);
             goCell.GetComponent<MeshRenderer>().material = _defaultMat;
 
             Cell cellObject = goCell.AddComponent<Cell>();
