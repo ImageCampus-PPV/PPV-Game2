@@ -114,9 +114,9 @@ public class GameplayButtons : MonoBehaviour
 
     private void OnAbilityCooldownChanged(in AbilityCooldownChangedEvent callback)
     {
-        if (callback.Ability is KickAbility)
+        if (callback.Ability is PushAbility)
             UpdateAbilityText(callback.Ability, _kickText);
-        else if (callback.Ability is PunchAbility)
+        else if (callback.Ability is StunAbility)
             UpdateAbilityText(callback.Ability, _punchText);
     }
 

@@ -119,10 +119,10 @@ public class Player : Unit
         }
 
         if (Input.GetKeyDown(KeyCode.Q))
-            TryUseAbility<PunchAbility>();
+            TryUseAbility<StunAbility>();
 
         if (Input.GetKeyDown(KeyCode.E))
-            TryUseAbility<KickAbility>();
+            TryUseAbility<PushAbility>();
 
         if (Input.GetKeyDown(KeyCode.W))
             AddWaitAction();
@@ -216,13 +216,13 @@ public class Player : Unit
 
             case ClickActionType.Kick:
                 {
-                    TryUseAbility<KickAbility>(clickedCell);
+                    TryUseAbility<PushAbility>(clickedCell);
                     break;
                 }
 
             case ClickActionType.Punch:
                 {
-                    TryUseAbility<PunchAbility>(clickedCell);
+                    TryUseAbility<StunAbility>(clickedCell);
                     break;
                 }
 

@@ -1,7 +1,7 @@
 using ImageCampus.ToolBox.Services;
 using UnityEngine;
 
-public class KickSystem : IService
+public class PushSystem : IService
 {
     public bool IsPersistance => false;
     private MapGrid MapGrid => ServiceProvider.Instance.GetService<MapGrid>();

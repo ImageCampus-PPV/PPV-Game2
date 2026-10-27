@@ -3,52 +3,52 @@ using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
 using UnityEngine;
 
-public class KickAbility : IAbility
+public class StunAbility : IAbility
 {
-    public string Name => "Kick";
+    public string Name => "Stun";
     public int APCost => 1;
-    public int Range => 1;
-    public int Cooldown => 1;
+    public int Range => 2;
+    public int Cooldown => 2;
 
     private int _remainingCooldown;
     public int RemainingCooldown => _remainingCooldown;
-    public int Damage => 60;
-    public AnimationStates AnimationState => AnimationStates.CounterAbilty;
+    public int Damage => 35;
+    public AnimationStates AnimationState => AnimationStates.LagSpikeAbility;
 
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
-    private KickSystem KickSystem => ServiceProvider.Instance.GetService<KickSystem>();
+    private TurnManager TurnManager => ServiceProvider.Instance.GetService<TurnManager>();
 
 
     public bool CanExecute(Player player, Cell targetCell)
     {
         if (targetCell == null)
         {
-            Debug.LogWarning("[Ability] No se puede ejecutar: targetCell es null.");
+            Debug.LogWarning("[Ability] CanExecute failed: targetCell is null.");
             return false;
         }
 
         if (targetCell.stander is not Enemy)
         {
-            Debug.LogWarning($"[Ability] No se puede ejecutar: la celda objetivo no tiene un Enemy. " + $"Stander: {targetCell.stander}");
-            return false;
+            Debug.LogWarning($"[Ability] CanExecute failed: target cell {targetCell.Coordinates} " + $"does not contain an Enemy. Stander: {targetCell.stander}"); return false;
         }
 
         if (_remainingCooldown > 0)
         {
-            Debug.LogWarning($"[Ability] No se puede ejecutar: habilidad en cooldown. " + $"Cooldown restante: {_remainingCooldown}");
+            Debug.LogWarning($"[Ability] CanExecute failed: ability is on cooldown. " + $"Remaining cooldown: {_remainingCooldown}");
             return false;
         }
 
         if (!player.IsInAttackRange(player.CurrentCell, targetCell, Range))
         {
-            Debug.LogWarning($"[Ability] No se puede ejecutar: target fuera de rango. " + $"Player: {player.CurrentCell.Coordinates}, " + $"Target: {targetCell.Coordinates}, " + $"Range: {Range}");
+            Debug.LogWarning($"[Ability] CanExecute failed: target is out of range. " + $"Player cell: {player.CurrentCell?.Coordinates}, " + $"Target cell: {targetCell.Coordinates}, " + $"Range: {Range}");
             return false;
         }
 
+        Debug.Log($"[Ability] CanExecute succeeded. " + $"Target: {targetCell.Coordinates}, " + $"AP: {APWallet.CurrentAP}/{APCost}, " + $"Range: {Range}, " + $"Cooldown: {_remainingCooldown}");
+
         return true;
     }
-
 
     public void Execute(Player player, Cell targetCell)
     {
@@ -57,8 +57,7 @@ public class KickAbility : IAbility
         if (enemy == null || enemy.IsDead)
             return;
 
-        KickSystem.Execute(player, enemy);
-
+        TurnManager.ApplyStun(enemy);
         enemy.TakeDamage(Damage);
 
         StartCooldown();

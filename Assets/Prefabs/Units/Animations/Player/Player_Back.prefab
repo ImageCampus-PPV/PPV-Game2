@@ -1330,7 +1330,7 @@ MonoBehaviour:
   armatureName: Armature
   isUGUI: 0
   debugDraw: 0
-  animationName: J2_PLAYER_INTERACT2_BACK
+  animationName: J2_PLAYER_IDLE_BACK
   _playTimes: 0
   _timeScale: 1
   _sortingMode: 0
