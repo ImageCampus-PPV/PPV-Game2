@@ -147,7 +147,7 @@ public class MapGrid : IService, IDisposable
             for (int z = 0; z < _cellsZ; z++)
             {
                 GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                goCell.transform.position = new Vector3(x * 1.25f, 0f, z * 1.25f);
+                goCell.transform.position = new Vector3(x * 1f, 0f, z * 1f);
                 goCell.GetComponent<MeshRenderer>().material = _defaultMat;
                 goCell.layer = 6;
 
@@ -372,7 +372,7 @@ public class MapGrid : IService, IDisposable
         foreach (CellData cell in _cellMap._cellsData)
         {
             GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            goCell.transform.position = new Vector3(cell._coordinates.x * 1.25f, 0.0f, cell._coordinates.y * 1.25f);
+            goCell.transform.position = new Vector3(cell._coordinates.x * 1f, 0.0f, cell._coordinates.y * 1f);
             goCell.GetComponent<MeshRenderer>().material = _defaultMat;
 
             Cell cellObject = goCell.AddComponent<Cell>();
