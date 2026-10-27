@@ -1,4 +1,3 @@
-using ImageCampus.ToolBox.Services;
 using System.Collections;
 
 public class HackAction : TurnAction
@@ -6,8 +5,6 @@ public class HackAction : TurnAction
     private readonly Player _player;
     private readonly Terminal _terminal;
     private readonly int _ticksToResolve;
-
-    private HackSystem HackSystem => ServiceProvider.Instance.GetService<HackSystem>();
 
     public HackAction(Player player, Terminal terminal, int ticksToResolve, int apCost) : base(ticksToResolve, apCost)
     {
