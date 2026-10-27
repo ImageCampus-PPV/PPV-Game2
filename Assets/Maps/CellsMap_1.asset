@@ -1,0 +1,616 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bc868eea6f78d343b3fe357547b1552, type: 3}
+  m_Name: CellsMap_1
+  m_EditorClassIdentifier: Assembly-CSharp::Floor
+  size: {x: 10, y: 10}
+  _cellsData:
+  - _initialState: Healing
+    _coordinates: {x: 0, y: 0}
+    _spawnUnit: Player
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Healing
+    _coordinates: {x: 0, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 0, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 9215778569877319087, guid: f40d3a8593b90764ea18738c2cd8cb32, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 0, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 3888430729215622355, guid: 36fdade3b48c3904b9c939a09c9d2cbe, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 0, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 0, y: 5}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 0, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 0, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 0, y: 8}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 0, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 4608132664604347486, guid: 3368d927e551bd9449e3c1af8d1d00f6, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 1, y: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 1, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Infected
+    _coordinates: {x: 1, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Healing
+    _coordinates: {x: 1, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Healing
+    _coordinates: {x: 1, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 1, y: 5}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 1, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 3725597101923827863, guid: cb8245ccd38781643bd94c8d8067caec, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 1, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 1, y: 8}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 1, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 4608132664604347486, guid: 64dcfb99ec73ddc4792790e677fb3bf8, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 2, y: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 2, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 2, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 2, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 2, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 2, y: 5}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 2, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 2, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 2, y: 8}
+    _spawnUnit: LightEnemy
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Healing
+    _coordinates: {x: 2, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 3, y: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 3, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 3, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 3, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Healing
+    _coordinates: {x: 3, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 3, y: 5}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 3, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 3, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 3, y: 8}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 3, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 3725597101923827863, guid: cb8245ccd38781643bd94c8d8067caec, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 4, y: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 4, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 4, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 4, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 205849611690011842, guid: a102493a399e69b4590f43cfa537c2ae, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 4, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 4, y: 5}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 4, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 4, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 4, y: 8}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 4, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 5, y: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 5, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 5, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 5, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 5, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 5, y: 5}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 5, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 5, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 1159119940590888160, guid: 2697087932a89674cb2f4215a9ffa8ba, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 5, y: 8}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 5, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 6, y: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 6, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 6, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 6, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 6, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 6, y: 5}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 6, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 6, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 6, y: 8}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 6, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 7, y: 0}
+    _spawnUnit: NormalEnemy
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 7, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 7, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 7, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 7, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 1159119940590888160, guid: 2697087932a89674cb2f4215a9ffa8ba, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 7, y: 5}
+    _spawnUnit: HeavyEnemy
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 7, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 7, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 7, y: 8}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 7, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 8, y: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 8, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 8, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 8, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 8287265627710503836, guid: 8d9ebd22745b55841a595c6f4da66801, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 8, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 8, y: 5}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 8, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 8, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 4608132664604347486, guid: 3368d927e551bd9449e3c1af8d1d00f6, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 8, y: 8}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 8, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 9, y: 0}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 3888430729215622355, guid: 36fdade3b48c3904b9c939a09c9d2cbe, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 9, y: 1}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 9, y: 2}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 9, y: 3}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 9, y: 4}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 9, y: 5}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 9, y: 6}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 3725597101923827863, guid: cb8245ccd38781643bd94c8d8067caec, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: Broken
+    _coordinates: {x: 9, y: 7}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 4608132664604347486, guid: 64dcfb99ec73ddc4792790e677fb3bf8, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 9, y: 8}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 0}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
+  - _initialState: DefaultCell
+    _coordinates: {x: 9, y: 9}
+    _spawnUnit: None
+    _assetToSpawn: {fileID: 1517379098189983311, guid: 28fd8324cedcd574f8af561901aa549e, type: 3}
+    _terminalType: None
+    _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
