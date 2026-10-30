@@ -417,7 +417,7 @@ public abstract class Unit : BaseEntity
             float scale = Mathf.Min(scaleX, scaleZ);
             scale *= _visualScaleMultiplier;
 
-            entity.transform.localScale *= scale * 1.75f;
+            entity.transform.localScale *= scale * 1.3f;
         }
 
         if (CellPivot == null)

@@ -17,7 +17,7 @@ public class MapGrid : IService, IDisposable
     private int _cellsX;
     private int _cellsZ;
     private Material _defaultMat;
-    private float _cellSpacing = 1f;
+    private float _cellSpacing = 3f;
 
     public int Width => _cellsX;
     public int Height => _cellsZ;
@@ -467,6 +467,7 @@ public class MapGrid : IService, IDisposable
                 float scaleZ = cellSizeZ / entitySizeZ;
                 float scale = Mathf.Min(scaleX, scaleZ);
                 entity.transform.localScale *= scale;
+                entity.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f); //mi hardcodeo, el resto no lo toqué
             }
 
             bounds = renderers[0].bounds;
