@@ -42,7 +42,7 @@ public class GameplayButtons : MonoBehaviour
 
         EventBus.Subscribe<EntityTurnStartEvent>(OnEntityTurnStart);
         EventBus.Subscribe<AbilityCooldownChangedEvent>(OnAbilityCooldownChanged);
-        _entityTurnText.text = "Turn: Player";
+        //_entityTurnText.text = "Turn: Player";
     }
 
     private void AssignButtonEvents()
@@ -98,10 +98,10 @@ public class GameplayButtons : MonoBehaviour
         if (callback.Entity == null)
             return;
 
-        if (callback.Entity is Player)
-            _entityTurnText.text = "Turn: Player";
-        else
-            _entityTurnText.text = $"Turn: {callback.Entity.name}";
+        //if (callback.Entity is Player)
+        //    _entityTurnText.text = "Turn: Player";
+        //else
+        //    _entityTurnText.text = $"Turn: {callback.Entity.name}";
     }
 
     private void UpdateAbilityText(IAbility ability, TMP_Text text)
@@ -114,9 +114,9 @@ public class GameplayButtons : MonoBehaviour
 
     private void OnAbilityCooldownChanged(in AbilityCooldownChangedEvent callback)
     {
-        if (callback.Ability is KickAbility)
+        if (callback.Ability is PushAbility)
             UpdateAbilityText(callback.Ability, _kickText);
-        else if (callback.Ability is PunchAbility)
+        else if (callback.Ability is StunAbility)
             UpdateAbilityText(callback.Ability, _punchText);
     }
 

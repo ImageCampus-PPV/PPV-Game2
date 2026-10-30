@@ -11,6 +11,7 @@ using UnityEngine.UI;
 public class HudManager : MonoBehaviour
 {
     [SerializeField] private Button _exitButton;
+    [SerializeField] private Button _restartButton;
     [SerializeField] private TMP_Text _turnText;
     [SerializeField] private TMP_Text _APText;
     [SerializeField] private TMP_Text _playerLife;
@@ -37,6 +38,7 @@ public class HudManager : MonoBehaviour
         }
 
         _exitButton.onClick.AddListener(ExitProgram);
+        _restartButton.onClick.AddListener(ResetButtonClicked);
         _endTextGO.SetActive(false);
     }
 
@@ -64,6 +66,11 @@ public class HudManager : MonoBehaviour
         _endText.text = endMessage;
         _endTextGO.SetActive(true);
         StartCoroutine(ResetLevel());
+    }
+
+    private void ResetButtonClicked()
+    {
+        EndLevel("Restarting");
     }
 
     //TODO: Use our scene manager (when available)

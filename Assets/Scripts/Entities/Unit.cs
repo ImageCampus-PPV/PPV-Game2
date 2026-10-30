@@ -15,6 +15,7 @@ public abstract class Unit : BaseEntity
 
     [Header("Spawn")]
     [SerializeField] protected Cell _spawnCell;
+    [SerializeField] protected float _visualScaleMultiplier = 1.10f;
 
     public Cell SpawnCell => _spawnCell;
     public void SetSpawnCell(Cell spawnCell) => _spawnCell = spawnCell;
@@ -65,26 +66,51 @@ public abstract class Unit : BaseEntity
         }
     }
 
-    private CustomAnimator _customAnimator;
+    private Transform _visualPivot;
+    private Vector3 _visualPivotInitialScale;
+    protected Transform VisualPivot
+    {
+        get
+        {
+            if (_visualPivot == null)
+            {
+                UnitVisualPivot anchor = GetComponentInChildren<UnitVisualPivot>(true);
+
+                if (anchor != null)
+                    _visualPivot = anchor.transform;
+            }
+
+            return _visualPivot;
+        }
+    }
+
+    private CustomAnimator _frontAnimator;
+    private CustomAnimator _backAnimator;
+    private CustomAnimator _activeAnimator;
+
+    private Vector3 _frontInitialScale;
+    private Vector3 _backInitialScale;
+
+    private bool _animatorsInitialized;
+    private bool _isFacingLeft;
+
     public CustomAnimator CustomAnimator
     {
         get
         {
-            if (_customAnimator == null)
-                _customAnimator = GetComponentInChildren<CustomAnimator>(true);
-
-            return _customAnimator;
+            InitializeAnimators();
+            return _activeAnimator;
         }
     }
-
 
     public Cell CurrentCell => _currentCell;
     public int MaxTicksPerTurn => _maxTicksPerTurn;
 
     public virtual void Init()
     {
+        InitializeAnimators();
         Spawn();
-        EventBus.Subscribe<BreakEvent>(Break);
+        CustomAnimator.Play(AnimationStates.Idle);
     }
 
     protected virtual void Spawn()
@@ -389,6 +415,7 @@ public abstract class Unit : BaseEntity
             float scaleZ = cellDepth / entityDepth;
 
             float scale = Mathf.Min(scaleX, scaleZ);
+            scale *= _visualScaleMultiplier;
 
             entity.transform.localScale *= scale * 1.75f;
         }
@@ -405,36 +432,44 @@ public abstract class Unit : BaseEntity
         entity.transform.position += targetPosition - anchorPosition;
     }
 
-    public virtual void FaceCell(Cell targetCell)
+    public void FaceCell(Cell targetCell)
     {
         if (targetCell == null || CurrentCell == null)
             return;
 
         Vector2Int direction = targetCell.Coordinates - CurrentCell.Coordinates;
 
-        if (direction.x > 0)
-            FaceRight();
-        else if (direction.x < 0)
-            FaceLeft();
-        else if (direction.y > 0)
-            FaceLeft();
+        if (direction.y > 0)
+            SetArmatureView(ArmatureView.Back);
         else if (direction.y < 0)
-            FaceRight();
-    }
+            SetArmatureView(ArmatureView.Front);
+        else if (direction.x < 0)
+            SetArmatureView(ArmatureView.Front);
+        else if (direction.x > 0)
+            SetArmatureView(ArmatureView.Back);
 
-    protected void FaceRight()
-    {
-        Vector3 scale = transform.localScale;
-        scale.x = Mathf.Abs(scale.x);
-        transform.localScale = scale;
+        if (direction.x > 0)
+            FaceLeft();
+        else if (direction.x < 0)
+            FaceRight();
+        else if (direction.y > 0)
+            FaceRight();
+        else if (direction.y < 0)
+            FaceLeft();
     }
 
     protected void FaceLeft()
     {
-        Vector3 scale = transform.localScale;
-        scale.x = -Mathf.Abs(scale.x);
-        transform.localScale = scale;
+        _isFacingLeft = true;
+        ApplyHorizontalFacing();
     }
+
+    protected void FaceRight()
+    {
+        _isFacingLeft = false;
+        ApplyHorizontalFacing();
+    }
+
     public IEnumerator PlayAnimationAndWait(AnimationStates state, int playTimes = 1, float timeScale = 1f)
     {
         CustomAnimator.Play(state, playTimes, timeScale, true);
@@ -442,36 +477,112 @@ public abstract class Unit : BaseEntity
         float duration = CustomAnimator.GetAnimationDuration(state);
 
         if (duration > 0f)
-        {
             yield return new WaitForSeconds(duration);
+        else
+            yield return null;
+    }
+
+    private void InitializeAnimators()
+    {
+        if (_animatorsInitialized)
+            return;
+
+        _animatorsInitialized = true;
+
+        CustomAnimator[] animators = GetComponentsInChildren<CustomAnimator>(true);
+
+        foreach (CustomAnimator animator in animators)
+        {
+            switch (animator.View)
+            {
+                case ArmatureView.Front:
+                    _frontAnimator = animator;
+                    break;
+
+                case ArmatureView.Back:
+                    _backAnimator = animator;
+                    break;
+            }
+        }
+
+        if (_frontAnimator == null && _backAnimator == null)
+        {
+            Debug.LogError($"{name} has no front or back CustomAnimator.");
+            return;
+        }
+
+        if (_frontAnimator != null)
+            _frontInitialScale = _frontAnimator.transform.localScale;
+
+        if (_backAnimator != null)
+            _backInitialScale = _backAnimator.transform.localScale;
+
+        if (VisualPivot != null)
+            _visualPivotInitialScale = VisualPivot.localScale;
+
+        _activeAnimator = _frontAnimator != null ? _frontAnimator : _backAnimator;
+
+        UpdateArmatureActivation();
+        ApplyHorizontalFacing();
+    }
+
+    private void SetArmatureView(ArmatureView view)
+    {
+        InitializeAnimators();
+
+        CustomAnimator selectedAnimator = view == ArmatureView.Front ? _frontAnimator : _backAnimator;
+
+        if (selectedAnimator == null)
+            return;
+
+        if (_activeAnimator == selectedAnimator)
+            return;
+
+        _activeAnimator = selectedAnimator;
+
+        UpdateArmatureActivation();
+        ApplyHorizontalFacing();
+    }
+
+    private void UpdateArmatureActivation()
+    {
+        if (_frontAnimator != null)
+            _frontAnimator.gameObject.SetActive(_activeAnimator == _frontAnimator);
+
+        if (_backAnimator != null)
+            _backAnimator.gameObject.SetActive(_activeAnimator == _backAnimator);
+    }
+
+    private void ApplyHorizontalFacing()
+    {
+        if (_activeAnimator == null)
+            return;
+
+        bool shouldFlip = _isFacingLeft != _activeAnimator.FacesLeftByDefault;
+
+        Transform target;
+        Vector3 initialScale;
+
+        if (VisualPivot != null)
+        {
+            target = VisualPivot;
+            initialScale = _visualPivotInitialScale;
         }
         else
         {
-                yield return null;
+            target = _activeAnimator.transform;
+            initialScale = _activeAnimator == _frontAnimator ? _frontInitialScale : _backInitialScale;
         }
+
+        initialScale.x = Mathf.Abs(initialScale.x) * (shouldFlip ? -1f : 1f);
+        target.localScale = initialScale;
     }
-
-
 
 
     public virtual void ClearPlan()
     {
         Debug.Log($"{gameObject.name} plan cleared");
         _plannedActions.Clear();
-    }
-
-    public virtual void Break(in BreakEvent callback)
-    {
-        if (_plannedActions.Count <= 0)
-            return;
-
-        int rangeToRemove = _plannedActions.Count - (_currentAction);
-
-        if (rangeToRemove <= 0)
-            return;
-
-        Debug.Log($"{gameObject.name}| _plannedActions.Count: {_plannedActions.Count}, rangeToRemove: {rangeToRemove}, _currentAction + 1: {_currentAction + 1}");
-        _plannedActions.RemoveRange(_currentAction - 1, rangeToRemove);
     }
 
     public virtual void ResetActionsKick()

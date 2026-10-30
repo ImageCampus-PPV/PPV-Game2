@@ -1,4 +1,3 @@
-using ImageCampus.ToolBox.Services;
 using System.Collections;
 
 public class HackAction : TurnAction
@@ -6,8 +5,6 @@ public class HackAction : TurnAction
     private readonly Player _player;
     private readonly Terminal _terminal;
     private readonly int _ticksToResolve;
-
-    private HackSystem HackSystem => ServiceProvider.Instance.GetService<HackSystem>();
 
     public HackAction(Player player, Terminal terminal, int ticksToResolve, int apCost) : base(ticksToResolve, apCost)
     {
@@ -20,9 +17,7 @@ public class HackAction : TurnAction
 
     public override IEnumerator Execute(Unit unit)
     {
-        HackSystem.ResolvePlannedHack(_player, _terminal, _ticksToResolve);
-
-        yield return null;
+        yield return _player.PlayHackAnimation(_terminal, _ticksToResolve);
 
         AdvanceTick();
     }

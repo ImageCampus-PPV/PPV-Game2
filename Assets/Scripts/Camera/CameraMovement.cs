@@ -2,14 +2,11 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    [SerializeField][Range(.1f, .2f)] private float _scrollSpeed = .1f;
-    [SerializeField] private float _maxZoomDifference = 5;
     private float _zoom;
     private float _defaultZoom;
 
     [SerializeField] private float _moveSpeedBorder = 15f;
     [SerializeField] private float _moveSpeedButton = 3f;
-    [SerializeField][Range(0.8f, 1f)] private float _marginToDetect = .95f;
     [SerializeField] private Vector3 _maxMovement;
 
     private Camera _camera;
