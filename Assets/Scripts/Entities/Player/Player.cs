@@ -36,6 +36,9 @@ public class Player : Unit
 
     private Vector3 headPos => transform.position + Vector3.up;
 
+    private int _clickCounterForConfirmation = 0;
+    private ClickActionType _previousActionTypeSelected = ClickActionType.Move;
+
     public void SetHp(uint hp)
     {
         _currentHp = hp;
@@ -83,6 +86,7 @@ public class Player : Unit
         base.Init();
 
         _currentActionTypeSelected = ClickActionType.Move;
+
         APWallet.Init();
         AbilitySystem.Init();
 
@@ -93,13 +97,14 @@ public class Player : Unit
         EventBus.Subscribe<WaitButtonEvent>((in WaitButtonEvent callback) => AddWaitAction());
         EventBus.Subscribe<UndoButtonEvent>(OnUndoButton);
         EventBus.Subscribe<RestartButtonEvent>((in RestartButtonEvent callback) => RestartPlan());
-        EventBus.Subscribe<ConfirmActionsButtonEvent>(OnConfirmAction);
+        //EventBus.Subscribe<ConfirmActionsButtonEvent>(OnConfirmAction);
         EventBus.Subscribe<EndTurnButtonEvent>(OnEndTurnButton);
         EventBus.Subscribe<OnTurnEndEvent>((in OnTurnEndEvent callback) => EventBus.Raise<APRefillEvent>());
     }
 
     private void SetClickActionType(ClickActionType actionType)
     {
+        _previousActionTypeSelected = _currentActionTypeSelected;
         _currentActionTypeSelected = actionType;
     }
 
@@ -228,11 +233,28 @@ public class Player : Unit
 
             default:
                 {
-                    Debug.LogWarning("Click action type switche entered default");
+                    Debug.LogWarning("Click action type switch entered default");
                     break;
                 }
         }
 
+        if (_plannedActions.Count > 0 && _clickCounterForConfirmation == 0 ||
+            (_plannedActions.Count > 0 && _currentActionTypeSelected == _previousActionTypeSelected && _clickCounterForConfirmation == 1))
+            _clickCounterForConfirmation++;
+
+        if (_clickCounterForConfirmation == 2)
+        {
+            if (_plannedActions.Count == 0)
+                return;
+
+            EventBus.Raise<PlayerExecuteActionEvent>();
+            _clickCounterForConfirmation = 0;
+
+            return;
+        }
+
+        if (_plannedActions.Count == 0 || _currentActionTypeSelected != _previousActionTypeSelected)
+            _clickCounterForConfirmation = 0;
 
     }
 
