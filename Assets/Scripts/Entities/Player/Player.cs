@@ -144,6 +144,9 @@ public class Player : Unit
         //FinishTurn
         if (Input.GetKeyUp(KeyCode.Space))
             _isTurnReady = true;
+
+        if (Input.GetKeyUp(KeyCode.F6))
+            EventBus.Raise<ToggleToolsEvent>();
     }
 
     private void AddWaitAction()
