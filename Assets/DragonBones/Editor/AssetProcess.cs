@@ -115,14 +115,19 @@ namespace DragonBones
             }
         }
 
-        public static bool IsValidDragonBonesData (TextAsset asset)
+        public static bool IsValidDragonBonesData(TextAsset asset)
         {
+            if (asset == null)
+            {
+                return false;
+            }
+
             if (asset.name.Contains("_ske"))
             {
                 return true;
             }
 
-            if(asset.text == "DBDT")
+            if (asset.text == "DBDT")
             {
                 return true;
             }
@@ -131,7 +136,6 @@ namespace DragonBones
             {
                 return true;
             }
-
 
             return false;
         }
