@@ -2,7 +2,10 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
+using Systems.SceneLoader;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour
 {
@@ -29,6 +32,8 @@ public class Main : MonoBehaviour
     [SerializeField] private GameplayButtons _UiButtonsScript;
     [SerializeField] private GameObject _floatingTextGO;
     [SerializeField] private GameObject _canvasGO;
+
+    [SerializeField] private SceneRef _nextLevel;
 
     private void Awake()
     {
@@ -60,6 +65,13 @@ public class Main : MonoBehaviour
         MapGrid.Init();
         _UiButtonsScript.Init();
         EntityRegistry.Init();
+
+        EventBus.Subscribe<NextLevelEvent>(OnNextLevel);
+    }
+
+    private void OnNextLevel(in NextLevelEvent callback)
+    {
+        SceneManager.LoadScene(_nextLevel.Index);
     }
 
     private void Start()
