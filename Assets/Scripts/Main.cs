@@ -69,8 +69,11 @@ public class Main : MonoBehaviour
         EventBus.Subscribe<NextLevelEvent>(OnNextLevel);
     }
 
+    static int i = 0;
+
     private void OnNextLevel(in NextLevelEvent callback)
     {
+        ++i;
         SceneManager.LoadScene(_nextLevel.Index);
     }
 

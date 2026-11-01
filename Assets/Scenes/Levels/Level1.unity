@@ -19696,7 +19696,7 @@ MonoBehaviour:
   _canvasGO: {fileID: 1587193797}
   _nextLevel:
     sceneAsset: {fileID: 102900000, guid: 35d9c38daa91988469b5c8bcd2d4f9e2, type: 3}
-    <Index>k__BackingField: 1
+    <Index>k__BackingField: 3
     <Name>k__BackingField: Level2
 --- !u!4 &1973655150
 Transform:
