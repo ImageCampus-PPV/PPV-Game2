@@ -15,6 +15,7 @@ public class HudManager : MonoBehaviour
     [SerializeField] private TMP_Text _turnText;
     [SerializeField] private TMP_Text _APText;
     [SerializeField] private TMP_Text _playerLife;
+    [SerializeField] private GameObject _toolsGO;
 
     [Header("End level UI")]
     [SerializeField] private float _endLevelDelay = 2f;
@@ -39,6 +40,7 @@ public class HudManager : MonoBehaviour
 
         _exitButton.onClick.AddListener(ExitProgram);
         _restartButton.onClick.AddListener(ResetButtonClicked);
+        _toolsGO.SetActive(false);
         _endTextGO.SetActive(false);
     }
 
@@ -49,6 +51,12 @@ public class HudManager : MonoBehaviour
         EventBus.Subscribe<PlayerChangeLifeEvent>(OnPlayerLifeChange);
         EventBus.Subscribe<LevelCompleteEvent>(OnWin);
         EventBus.Subscribe<LevelFailedEvent>(OnLoss);
+        EventBus.Subscribe<ToggleToolsEvent>(OnToggleTools);
+    }
+
+    private void OnToggleTools(in ToggleToolsEvent callback)
+    {
+        _toolsGO.SetActive(!(_toolsGO.activeSelf));
     }
 
     private void OnLoss(in LevelFailedEvent callback)
