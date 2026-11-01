@@ -53,7 +53,7 @@ public class GameplayButtons : MonoBehaviour
         _restartButton.onClick.AddListener(() => EventBus.Raise<RestartButtonEvent>());
         _undoButton.onClick.AddListener(() => EventBus.Raise<UndoButtonEvent>());
         _endTurnButton.onClick.AddListener(() => EventBus.Raise<EndTurnButtonEvent>());
-        _confirmActionsButton.onClick.AddListener(() => EventBus.Raise<ConfirmActionsButtonEvent>());
+        //_confirmActionsButton.onClick.AddListener(() => EventBus.Raise<ConfirmActionsButtonEvent>());
 
         _moveButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Move));
         _hackButton.onClick.AddListener(() => SetCurrentActionText(ClickActionType.Hack));
