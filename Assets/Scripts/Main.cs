@@ -38,6 +38,8 @@ public class Main : MonoBehaviour
     private void Awake()
     {
         ServiceProvider.Instance.ClearAllNonPersistanceServices();
+        gameObject.transform.position = Vector3.zero;
+        gameObject.transform.localScale = Vector3.one;
 
         if (_defaultMat == null)
         {
@@ -47,7 +49,7 @@ public class Main : MonoBehaviour
 
         ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_abilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<EventBus>(new EventBus());
-        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(_playerPrefab, _heavyEnemy, _agileEnemy, _normalEnemy, _cellMap, _terminalConfiguration, _defaultMat));
+        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(gameObject.AddComponent<Grid>(), _playerPrefab, _heavyEnemy, _agileEnemy, _normalEnemy, _cellMap, _terminalConfiguration, _defaultMat));
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());
