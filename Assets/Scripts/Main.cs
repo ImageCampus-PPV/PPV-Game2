@@ -2,7 +2,10 @@ using Assets.Scripts.Combat;
 using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
+using System;
+using Systems.SceneLoader;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour
 {
@@ -30,9 +33,13 @@ public class Main : MonoBehaviour
     [SerializeField] private GameObject _floatingTextGO;
     [SerializeField] private GameObject _canvasGO;
 
+    [SerializeField] private SceneRef _nextLevel;
+
     private void Awake()
     {
         ServiceProvider.Instance.ClearAllNonPersistanceServices();
+        gameObject.transform.position = Vector3.zero;
+        gameObject.transform.localScale = Vector3.one;
 
         if (_defaultMat == null)
         {
@@ -42,7 +49,7 @@ public class Main : MonoBehaviour
 
         ServiceProvider.Instance.AddService<AbilitiesDurationConfiguration>(_abilitiesDurationConfiguration);
         ServiceProvider.Instance.AddService<EventBus>(new EventBus());
-        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(_playerPrefab, _heavyEnemy, _agileEnemy, _normalEnemy, _cellMap, _terminalConfiguration, _defaultMat));
+        ServiceProvider.Instance.AddService<MapGrid>(new MapGrid(gameObject.AddComponent<Grid>(), _playerPrefab, _heavyEnemy, _agileEnemy, _normalEnemy, _cellMap, _terminalConfiguration, _defaultMat));
         ServiceProvider.Instance.AddService<PathFinding>(new PathFinding());
         ServiceProvider.Instance.AddService<APWallet>(new APWallet(_APWalletConfiguration));
         ServiceProvider.Instance.AddService<EntityRegistry>(new EntityRegistry());
@@ -60,6 +67,16 @@ public class Main : MonoBehaviour
         MapGrid.Init();
         _UiButtonsScript.Init();
         EntityRegistry.Init();
+
+        EventBus.Subscribe<NextLevelEvent>(OnNextLevel);
+    }
+
+    static int i = 0;
+
+    private void OnNextLevel(in NextLevelEvent callback)
+    {
+        ++i;
+        SceneManager.LoadScene(_nextLevel.Index);
     }
 
     private void Start()

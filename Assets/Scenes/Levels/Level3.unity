@@ -16015,6 +16015,7 @@ MonoBehaviour:
   _endLevelDelay: 2
   _endTextGO: {fileID: 1066927097}
   _endText: {fileID: 1151352278}
+  _isLastLevel: 1
 --- !u!114 &1587193799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19687,12 +19688,16 @@ MonoBehaviour:
   _normalEnemy: {fileID: 9007829729774965016, guid: 6dfad93fedae5ce4397ef6ae02e2d6fa, type: 3}
   _APWalletConfiguration: {fileID: 11400000, guid: 1607d20703f07974f9114552afa18576, type: 2}
   _abilitiesDurationConfiguration: {fileID: 11400000, guid: 9bd95554dc7745d44afb09cf0ffb9ea5, type: 2}
-  _cellMap: {fileID: 11400000, guid: 545cdff62540ab74bbabd5968f764bf6, type: 2}
+  _cellMap: {fileID: 11400000, guid: dae991f230c8c7743a26d12a98e5e4d4, type: 2}
   _terminalConfiguration: {fileID: 11400000, guid: e868794dc2b1444ab06653880e3c6238, type: 2}
   _defaultMat: {fileID: 2100000, guid: 230651a71114c43448e5afb86dbb5ece, type: 2}
   _UiButtonsScript: {fileID: 83016665}
   _floatingTextGO: {fileID: 5434869071130886376, guid: 18a493cfbca72b2429ba2bc1d16d921e, type: 3}
   _canvasGO: {fileID: 1587193797}
+  _nextLevel:
+    sceneAsset: {fileID: 102900000, guid: 64e7bc5f610f3f040a1b41e264896e8d, type: 3}
+    <Index>k__BackingField: 0
+    <Name>k__BackingField: MainMenu
 --- !u!4 &1973655150
 Transform:
   m_ObjectHideFlags: 0
@@ -20608,9 +20613,9 @@ Transform:
   m_GameObject: {fileID: 2083993869}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.84, y: -0.03, z: 18.71}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: -8.279999, y: -0.03, z: 28.000002}
+  m_LocalScale: {x: 1.42, y: 1.42, z: 1.42}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 359039600}
   - {fileID: 1839179493}

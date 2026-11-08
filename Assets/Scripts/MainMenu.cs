@@ -14,13 +14,12 @@ public class MainMenu : MonoBehaviour
     {
         for (int i = 0; i < scenes.Length; ++i)
         {
+            if (i == buttons.Length)
+                break;
+
             int index = i;
 
-            if (i != scenes.Length - 1)
-                buttons[i].onClick.AddListener(() => { SceneManager.LoadScene(scenes[index].Index); });
-
-            if (i == buttons.Length - 1)
-                break;
+            buttons[i].onClick.AddListener(() => { SceneManager.LoadScene(scenes[index].Index); });
         }
 
         buttons[buttons.Length - 1].onClick.AddListener(() =>

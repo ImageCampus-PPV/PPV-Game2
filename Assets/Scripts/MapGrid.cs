@@ -5,11 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 using EventBus = ImageCampus.ToolBox.Events.EventBus;
 
 public class MapGrid : IService, IDisposable
 {
+    private const float CELL_SIZE = 1.5f;
+    private const int CELL_LAYER = 6;
+
+    private EntityRegistry EntityRegistry => ServiceProvider.Instance.GetService<EntityRegistry>();
     public bool IsPersistance => false;
 
     EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
@@ -17,7 +22,6 @@ public class MapGrid : IService, IDisposable
     private int _cellsX;
     private int _cellsZ;
     private Material _defaultMat;
-    private float _cellSpacing = 1f;
 
     public int Width => _cellsX;
     public int Height => _cellsZ;
@@ -37,8 +41,16 @@ public class MapGrid : IService, IDisposable
 
     [SerializeField] private GameObject _cellPrefab;
 
-    public MapGrid(GameObject playerPrefab, GameObject heavyEnemy, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps, TerminalConfiguration terminalConfiguration, Material defaultMat)
+    private Grid _grid;
+
+    public MapGrid(Grid grid, GameObject playerPrefab, GameObject heavyEnemy, GameObject lightEnemy, GameObject normalEnemy, Floor cellsMaps, TerminalConfiguration terminalConfiguration, Material defaultMat)
     {
+        _grid = grid;
+
+        _grid.cellSwizzle = GridLayout.CellSwizzle.XZY;
+        _grid.cellSize = new Vector3(CELL_SIZE, CELL_SIZE, 1f);
+        _grid.cellGap = Vector3.zero;
+
         _playerPrefab = playerPrefab;
         _heavyEnemy = heavyEnemy;
         _lightEnemy = lightEnemy;
@@ -67,6 +79,22 @@ public class MapGrid : IService, IDisposable
         Build();
     }
 
+    private GameObject CreateCellObject(Vector2Int coordinates)
+    {
+        GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        goCell.name = $"Cell_{coordinates.x}_{coordinates.y}";
+        goCell.layer = CELL_LAYER;
+        goCell.GetComponent<MeshRenderer>().material = _defaultMat;
+
+        goCell.transform.position = _grid.GetCellCenterWorld(new Vector3Int(coordinates.x, coordinates.y, 0));
+
+        goCell.transform.localScale = new Vector3(_grid.cellSize.x, 1f, _grid.cellSize.y);
+
+        goCell.transform.SetParent(_grid.transform, true);
+
+        return goCell;
+    }
+
     private void OnDevAddTerminal(in DevAddTerminalEvent addTerminalEvent)
     {
         if (addTerminalEvent.coordX < 0 || addTerminalEvent.coordX >= Width ||
@@ -90,14 +118,14 @@ public class MapGrid : IService, IDisposable
         }
     }
 
-
     private void OnDevResizeGrid(in DevResizeGridEvent resizeGridEvent)
     {
         int newWidth = Mathf.Max(1, resizeGridEvent.width);
         int newHeight = Mathf.Max(1, resizeGridEvent.height);
 
-        EntityRegistry registry = ServiceProvider.Instance.GetService<EntityRegistry>();
-        Player player = registry.FilterEntities<Player>().First();
+        IEnumerator<Player> players = EntityRegistry.FilterEntities<Player>().GetEnumerator();
+        players.MoveNext();
+        Player player = players.Current;
 
         if (player == null)
         {
@@ -117,19 +145,14 @@ public class MapGrid : IService, IDisposable
 
         List<(Type enemyType, Vector2Int coord)> survivors = new();
 
-        List<Enemy> enemies = new();
-
-        foreach (Enemy enemy in registry.FilterEntities<Enemy>())
-            enemies.Add(enemy);
-
-        foreach (Enemy enemy in enemies)
+        foreach (Enemy enemy in EntityRegistry.FilterEntities<Enemy>())
         {
             Vector2Int coord = enemy.CurrentCell.Coordinates;
 
             if (coord.x < newWidth && coord.y < newHeight)
                 survivors.Add((enemy.GetType(), coord));
 
-            registry.Remove(enemy);
+            EntityRegistry.Remove(enemy);
             UnityEngine.Object.Destroy(enemy.gameObject);
         }
 
@@ -147,13 +170,11 @@ public class MapGrid : IService, IDisposable
         {
             for (int z = 0; z < _cellsZ; z++)
             {
-                GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                goCell.transform.position = new Vector3(x * _cellSpacing, 0f, z * _cellSpacing);
-                goCell.GetComponent<MeshRenderer>().material = _defaultMat;
-                goCell.layer = 6;
+                Vector2Int coord = new Vector2Int(x, z);
+                GameObject goCell = CreateCellObject(coord);
 
                 Cell cellObject = goCell.AddComponent<Cell>();
-                cellObject.SetCoordinate(new Vector2Int(x, z));
+                cellObject.SetCoordinate(coord);
                 cellObject.Init(defaultState);
 
                 _gridArray[x, z] = cellObject;
@@ -180,7 +201,7 @@ public class MapGrid : IService, IDisposable
             Unit unit = (Unit)go.AddComponent(enemyType);
             unit.SetSpawnCell(GetCell(coord));
             unit.Init();
-            registry.Add(unit);
+            EntityRegistry.Add(unit);
         }
     }
 
@@ -372,12 +393,9 @@ public class MapGrid : IService, IDisposable
 
         foreach (CellData cell in _cellMap._cellsData)
         {
-            GameObject goCell = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            goCell.transform.position = new Vector3(cell._coordinates.x * _cellSpacing, 0.0f, cell._coordinates.y * _cellSpacing);
-            goCell.GetComponent<MeshRenderer>().material = _defaultMat;
+            GameObject goCell = CreateCellObject(cell._coordinates);
 
             Cell cellObject = goCell.AddComponent<Cell>();
-            goCell.layer = 6;
 
             _gridArray[cell._coordinates.x, cell._coordinates.y] = cellObject;
 
@@ -501,11 +519,7 @@ public class MapGrid : IService, IDisposable
 
     public Vector3 GetWorldPosition(int x, int z)
     {
-        return _gridArray[x, z].transform.position;
-        //return
-        //    new Vector3(x, 0, 0) * _cellsSize +
-        //    new Vector3(0, 0, z) * _cellsSize * VERTICAL_OFFSET_MULTIPLIER +
-        //    ((Mathf.Abs(z) % 2) == 1 ? new Vector3(1, 0, 0) * _cellsSize * .5f : Vector3.zero);
+        return _grid.GetCellCenterWorld(new Vector3Int(x, z, 0));
     }
 
     private void OnTileContagiousSpread(in InfectTilesEvent _)
@@ -520,10 +534,10 @@ public class MapGrid : IService, IDisposable
 
         Vector2Int[] directions =
         {
-        Vector2Int.up,
-        Vector2Int.down,
-        Vector2Int.left,
-        Vector2Int.right
+            Vector2Int.up,
+            Vector2Int.down,
+            Vector2Int.left,
+            Vector2Int.right
         };
 
         ShuffleDirections(directions);

@@ -21,6 +21,7 @@ public class HudManager : MonoBehaviour
     [SerializeField] private float _endLevelDelay = 2f;
     [SerializeField] private GameObject _endTextGO;
     [SerializeField] private TextMeshProUGUI _endText;
+    [SerializeField] private bool _isLastLevel = false;
 
     EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
 
@@ -66,7 +67,7 @@ public class HudManager : MonoBehaviour
 
     private void OnWin(in LevelCompleteEvent callback)
     {
-        EndLevel("You WON!");
+        NextLevel();
     }
 
     private void EndLevel(string endMessage)
@@ -74,6 +75,12 @@ public class HudManager : MonoBehaviour
         _endText.text = endMessage;
         _endTextGO.SetActive(true);
         StartCoroutine(ResetLevel());
+    }
+    private void NextLevel()
+    {
+        _endText.text = _isLastLevel ? "You WON!" : "To next level...";
+        _endTextGO.SetActive(true);
+        StartCoroutine(GoToNextLevel());
     }
 
     private void ResetButtonClicked()
@@ -86,6 +93,13 @@ public class HudManager : MonoBehaviour
     {
         yield return new WaitForSeconds(_endLevelDelay);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        yield break;
+    }
+
+    private IEnumerator GoToNextLevel()
+    {
+        yield return new WaitForSeconds(_endLevelDelay);
+        EventBus.Raise<NextLevelEvent>();
         yield break;
     }
 
@@ -116,5 +130,17 @@ public class HudManager : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+}
+
+
+public struct NextLevelEvent : IEvent
+{
+    public void Assign(params object[] parameters)
+    {
+    }
+
+    public void Reset()
+    {
     }
 }
