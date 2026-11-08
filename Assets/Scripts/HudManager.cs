@@ -10,12 +10,15 @@ using UnityEngine.UI;
 
 public class HudManager : MonoBehaviour
 {
-    [SerializeField] private Button _exitButton;
     [SerializeField] private Button _restartButton;
+    [SerializeField] private Button _pauseButton;
     [SerializeField] private TMP_Text _turnText;
     [SerializeField] private TMP_Text _APText;
     [SerializeField] private TMP_Text _playerLife;
     [SerializeField] private GameObject _toolsGO;
+    [SerializeField] private GameObject _successBgGO;
+    [SerializeField] private GameObject _failedBgGO;
+    [SerializeField] private GameplayButtons _gameplayButtons;
 
     [Header("End level UI")]
     [SerializeField] private float _endLevelDelay = 2f;
@@ -25,24 +28,27 @@ public class HudManager : MonoBehaviour
 
     EventBus EventBus => ServiceProvider.Instance.GetService<EventBus>();
 
-    private void Awake()
+    public void Init()
     {
-        if (_exitButton == null)
-        {
-            Debug.LogError("No exit button provided");
-            return;
-        }
-
         if (_endText == null || _endTextGO == null)
         {
             Debug.LogError("No end text or GO provided");
             return;
         }
 
-        _exitButton.onClick.AddListener(ExitProgram);
+        _gameplayButtons.Init();
+
         _restartButton.onClick.AddListener(ResetButtonClicked);
+        _pauseButton.onClick.AddListener(OnPause);
         _toolsGO.SetActive(false);
         _endTextGO.SetActive(false);
+        _successBgGO.SetActive(false);
+        _failedBgGO.SetActive(false);
+    }
+
+    private void OnPause()
+    {
+        EventBus.Raise<PauseEvent>();
     }
 
     private void Start()
@@ -62,11 +68,15 @@ public class HudManager : MonoBehaviour
 
     private void OnLoss(in LevelFailedEvent callback)
     {
-        EndLevel("You LOST!");
+        _successBgGO.SetActive(false);
+        _failedBgGO.SetActive(true);
+        EndLevel("FAILED");
     }
 
     private void OnWin(in LevelCompleteEvent callback)
     {
+        _successBgGO.SetActive(true);
+        _failedBgGO.SetActive(false);
         NextLevel();
     }
 
@@ -78,7 +88,7 @@ public class HudManager : MonoBehaviour
     }
     private void NextLevel()
     {
-        _endText.text = _isLastLevel ? "You WON!" : "To next level...";
+        _endText.text = "SUCCESS";
         _endTextGO.SetActive(true);
         StartCoroutine(GoToNextLevel());
     }
@@ -92,7 +102,7 @@ public class HudManager : MonoBehaviour
     private IEnumerator ResetLevel()
     {
         yield return new WaitForSeconds(_endLevelDelay);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        EventBus.Raise<ResetLevelEvent>();
         yield break;
     }
 
