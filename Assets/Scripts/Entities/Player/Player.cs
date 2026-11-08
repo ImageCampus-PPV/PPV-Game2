@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class Player : Unit
 {
@@ -15,7 +14,6 @@ public class Player : Unit
     private FloatingTextInstancer FloatingTextInstancer => ServiceProvider.Instance.GetService<FloatingTextInstancer>();
     public int PlannedAPCost => GetPlannedAPCost();
     private ClickActionType _currentActionTypeSelected;
-
 
     private Terminal _plannedHackTerminal;
     private int _plannedHackTicks;
@@ -36,8 +34,11 @@ public class Player : Unit
 
     private Vector3 headPos => transform.position + Vector3.up;
 
-    private int _clickCounterForConfirmation = 0;
-    private ClickActionType _previousActionTypeSelected = ClickActionType.Move;
+    private const float DoubleClickThreshold = 0.4f;
+
+    private Cell _lastClickedCell;
+    private ClickActionType _lastActionType;
+    private float _lastClickTime = float.NegativeInfinity;
 
     public void SetHp(uint hp)
     {
@@ -104,8 +105,16 @@ public class Player : Unit
 
     private void SetClickActionType(ClickActionType actionType)
     {
-        _previousActionTypeSelected = _currentActionTypeSelected;
+        if (_currentActionTypeSelected != actionType)
+            ResetDoubleClickTracking();
+
         _currentActionTypeSelected = actionType;
+    }
+
+    private void ResetDoubleClickTracking()
+    {
+        _lastClickedCell = null;
+        _lastClickTime = float.NegativeInfinity;
     }
 
     private void Update()
@@ -121,6 +130,18 @@ public class Player : Unit
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("Cells")))
                 if (hit.collider.TryGetComponent<Cell>(out Cell clickedCell))
                     ReactToClick(clickedCell);
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            //TODO: fix it, probably(not sorry)
+            bool overUI = UnityEngine.EventSystems.EventSystem.current != null && UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+
+            if (!overUI)
+            {
+                RestartPlan();
+                ResetDoubleClickTracking();
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Q))
@@ -208,6 +229,21 @@ public class Player : Unit
 
     private void ReactToClick(Cell clickedCell)
     {
+        bool isDoubleClick = clickedCell == _lastClickedCell && _currentActionTypeSelected == _lastActionType;
+
+        if (isDoubleClick)
+        {
+            ResetDoubleClickTracking();
+
+            if (_plannedActions.Count > 0)
+                EventBus.Raise<PlayerExecuteActionEvent>();
+
+            return;
+        }
+
+        int plannedBefore = _plannedActions.Count;
+
+
         switch (_currentActionTypeSelected)
         {
             case ClickActionType.Move:
@@ -241,23 +277,14 @@ public class Player : Unit
                 }
         }
 
-        if (_plannedActions.Count > 0 && _clickCounterForConfirmation == 0 ||
-            (_plannedActions.Count > 0 && _currentActionTypeSelected == _previousActionTypeSelected && _clickCounterForConfirmation == 1))
-            _clickCounterForConfirmation++;
-
-        if (_clickCounterForConfirmation == 2)
+        if (_plannedActions.Count > plannedBefore)
         {
-            if (_plannedActions.Count == 0)
-                return;
-
-            EventBus.Raise<PlayerExecuteActionEvent>();
-            _clickCounterForConfirmation = 0;
-
-            return;
+            _lastClickedCell = clickedCell;
+            _lastActionType = _currentActionTypeSelected;
+            _lastClickTime = Time.time;
         }
-
-        if (_plannedActions.Count == 0 || _currentActionTypeSelected != _previousActionTypeSelected)
-            _clickCounterForConfirmation = 0;
+        else
+            ResetDoubleClickTracking();
 
     }
 
@@ -484,6 +511,9 @@ public class Player : Unit
 
     private void RestartPlan()
     {
+        if (_plannedActions.Count == 0)
+            return;
+
         FloatingTextInstancer.InstantiateText("Reset!", headPos, Color.blue);
         ClearPlan();
     }
@@ -533,5 +563,6 @@ public class Player : Unit
         Debug.Log("Clear plan");
         base.ClearPlan();
         ResetVariables();
+        ResetDoubleClickTracking();
     }
 }
