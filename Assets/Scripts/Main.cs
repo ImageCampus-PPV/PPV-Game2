@@ -29,14 +29,25 @@ public class Main : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private Material _defaultMat;
-    [SerializeField] private GameplayButtons _UiButtonsScript;
     [SerializeField] private GameObject _floatingTextGO;
-    [SerializeField] private GameObject _canvasGO;
+    [SerializeField] private GameObject _hudPrefab;
+    [SerializeField] private GameObject _pausedScreenPrefab;
 
     [SerializeField] private SceneRef _nextLevel;
+    [SerializeField] private SceneRef _menuScene;
+
+    private bool _isPaused = false;
+    private GameObject _pausedScreenGO;
+    private GameObject _hudGO;
+    private static int i = 0;
 
     private void Awake()
     {
+        _pausedScreenGO = Instantiate(_pausedScreenPrefab);
+        _hudGO = Instantiate(_hudPrefab);
+
+        SetPaused(false);
+
         ServiceProvider.Instance.ClearAllNonPersistanceServices();
         gameObject.transform.position = Vector3.zero;
         gameObject.transform.localScale = Vector3.one;
@@ -57,7 +68,7 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<PushSystem>(new PushSystem());
         ServiceProvider.Instance.AddService<HackSystem>(new HackSystem());
         ServiceProvider.Instance.AddService<TileHoverHighlighter>(new TileHoverHighlighter(Camera.main));
-        ServiceProvider.Instance.AddService<FloatingTextInstancer>(new FloatingTextInstancer(_floatingTextGO, _canvasGO));
+        ServiceProvider.Instance.AddService<FloatingTextInstancer>(new FloatingTextInstancer(_floatingTextGO, _hudGO));
 
         EventBus.Raise<APRefillEvent>();
 
@@ -65,13 +76,42 @@ public class Main : MonoBehaviour
         ServiceProvider.Instance.AddService<TurnManager>(_turnManager);
 
         MapGrid.Init();
-        _UiButtonsScript.Init();
         EntityRegistry.Init();
+        _hudGO.GetComponent<HudManager>().Init();
 
         EventBus.Subscribe<NextLevelEvent>(OnNextLevel);
+        EventBus.Subscribe<ResumeGameEvent>(ResumeGame);
+        EventBus.Subscribe<ResetLevelEvent>(RestartGame);
+        EventBus.Subscribe<BackToMenuEvent>(ExitToMenu);
+        EventBus.Subscribe<PauseEvent>(PauseGame);
     }
 
-    static int i = 0;
+    private void RestartGame(in ResetLevelEvent callback)
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void PauseGame(in PauseEvent callback)
+    {
+        SetPaused(!_isPaused);
+    }
+
+    private void SetPaused(bool isPaused)
+    {
+        _pausedScreenGO.SetActive(isPaused);
+        _isPaused = isPaused;
+    }
+
+    private void ResumeGame(in ResumeGameEvent resumeGameEvent)
+    {
+        SetPaused(false);
+    }
+
+    private void ExitToMenu(in BackToMenuEvent backToMenuEvent)
+    {
+        SetPaused(false);
+        SceneManager.LoadScene(_menuScene.Index);
+    }
 
     private void OnNextLevel(in NextLevelEvent callback)
     {
@@ -86,6 +126,9 @@ public class Main : MonoBehaviour
 
     private void Update()
     {
+        if (_isPaused)
+            return;
+
         TileHoverHighlighter.Tick();
 
         _turnManager.Tick();
@@ -100,5 +143,39 @@ public class Main : MonoBehaviour
     private void OnApplicationQuit()
     {
         ServiceProvider.Instance.ClearAllServices();
+    }
+}
+
+
+public struct ResumeGameEvent : IEvent
+{
+    public void Assign(params object[] parameters)
+    {
+    }
+
+    public void Reset()
+    {
+    }
+}
+
+public struct BackToMenuEvent : IEvent
+{
+    public void Assign(params object[] parameters)
+    {
+    }
+
+    public void Reset()
+    {   
+    }
+}
+
+public struct PauseEvent : IEvent
+{
+    public void Assign(params object[] parameters)
+    {
+    }
+
+    public void Reset()
+    {
     }
 }
