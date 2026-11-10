@@ -275,7 +275,7 @@ MonoBehaviour:
   - _initialState: Broken
     _coordinates: {x: 4, y: 3}
     _spawnUnit: None
-    _assetToSpawn: {fileID: 205849611690011842, guid: a102493a399e69b4590f43cfa537c2ae, type: 3}
+    _assetToSpawn: {fileID: 4608132664604347486, guid: 0dfcc4a10ad1e184d90e68e4d56c8d16, type: 3}
     _terminalType: None
     _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
   - _initialState: DefaultCell
@@ -332,10 +332,10 @@ MonoBehaviour:
     _assetToSpawn: {fileID: 0}
     _terminalType: None
     _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
-  - _initialState: DefaultCell
+  - _initialState: Broken
     _coordinates: {x: 5, y: 3}
     _spawnUnit: None
-    _assetToSpawn: {fileID: 0}
+    _assetToSpawn: {fileID: 4608132664604347486, guid: b52ff289bf885234986d8ccab53022f6, type: 3}
     _terminalType: None
     _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
   - _initialState: DefaultCell
@@ -612,5 +612,5 @@ MonoBehaviour:
     _coordinates: {x: 9, y: 9}
     _spawnUnit: None
     _assetToSpawn: {fileID: 1517379098189983311, guid: 28fd8324cedcd574f8af561901aa549e, type: 3}
-    _terminalType: None
+    _terminalType: FloorObjective
     _cellVisualSet: {fileID: 11400000, guid: df3e4146e42bb1f43b910974cfc05c5b, type: 2}
