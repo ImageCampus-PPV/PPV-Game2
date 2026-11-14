@@ -19,16 +19,24 @@ public class MainMenu : MonoBehaviour
 
             int index = i;
 
-            buttons[i].onClick.AddListener(() => { SceneManager.LoadScene(scenes[index].Index); });
+            buttons[i].onClick.AddListener(() => { LoadScene(scenes[index].Index); });
         }
 
-        buttons[buttons.Length - 1].onClick.AddListener(() =>
-        {
+        buttons[buttons.Length - 1].onClick.AddListener(ExitGame);
+    }
+
+    private void LoadScene(int index)
+    {
+        SceneManager.LoadScene(index);
+    }
+
+    private void ExitGame()
+    {
+        ;
 #if UNITY_EDITOR
-            EditorApplication.isPlaying = false;
+        EditorApplication.isPlaying = false;
 #else
                     Application.Quit(); 
 #endif
-        });
     }
 }

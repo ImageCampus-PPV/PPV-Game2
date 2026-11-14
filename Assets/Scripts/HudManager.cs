@@ -1,16 +1,13 @@
 using ImageCampus.ToolBox.Events;
 using ImageCampus.ToolBox.Services;
-using System;
 using System.Collections;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HudManager : MonoBehaviour
 {
-    [SerializeField] private Button _restartButton;
     [SerializeField] private Button _pauseButton;
     [SerializeField] private TMP_Text _turnText;
     [SerializeField] private TMP_Text _APText;
@@ -38,7 +35,6 @@ public class HudManager : MonoBehaviour
 
         _gameplayButtons.Init();
 
-        _restartButton.onClick.AddListener(ResetButtonClicked);
         _pauseButton.onClick.AddListener(OnPause);
         _toolsGO.SetActive(false);
         _endTextGO.SetActive(false);
