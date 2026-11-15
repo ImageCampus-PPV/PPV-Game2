@@ -9,14 +9,11 @@ using UnityEngine;
 public class Player : Unit
 {
     public int PlannedTicks => GetPlannedTickCost();
-
     private APWallet APWallet => ServiceProvider.Instance.GetService<APWallet>();
     private AbilitySystem AbilitySystem => ServiceProvider.Instance.GetService<AbilitySystem>();
     private FloatingTextInstancer FloatingTextInstancer => ServiceProvider.Instance.GetService<FloatingTextInstancer>();
     public int PlannedAPCost => GetPlannedAPCost();
     private ClickActionType _currentActionTypeSelected;
-
-
 
     private Terminal _plannedHackTerminal;
     private int _plannedHackTicks;
@@ -31,20 +28,23 @@ public class Player : Unit
 
     private uint _maxHp = 100;
     private uint _currentHp = 100;
-    public uint CurrentHp => _currentHp;
+    public uint MaxHP => _maxHp;
+    public uint CurrentHP => _currentHp;
 
     protected const int MOVEMENT_COST = 1;
-    protected const int BREAK_MIN_COST = 3;
-    private int _breakPenalty;
 
     private Vector3 headPos => transform.position + Vector3.up;
 
-    public int BreakPenalty => _breakPenalty;
+    private const float DoubleClickThreshold = 0.4f;
+
+    private Cell _lastClickedCell;
+    private ClickActionType _lastActionType;
+    private float _lastClickTime = float.NegativeInfinity;
 
     public void SetHp(uint hp)
     {
         _currentHp = hp;
-        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
+        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp, _maxHp);
     }
 
     public IEnumerator ReduceHp(uint hpToReduce)
@@ -65,7 +65,7 @@ public class Player : Unit
         else
             _currentHp -= hpToReduce;
 
-        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
+        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp, _maxHp);
 
         if (_currentHp <= 0)
             EventBus.Raise<LevelFailedEvent>();
@@ -79,15 +79,16 @@ public class Player : Unit
         if (_currentHp > _maxHp)
             _currentHp = _maxHp;
 
-        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
+        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp, _maxHp);
     }
 
     public override void Init()
     {
+        //_visualScaleMultiplier *= 1.25f;
         base.Init();
 
-        _breakPenalty = 0;
         _currentActionTypeSelected = ClickActionType.Move;
+
         APWallet.Init();
         AbilitySystem.Init();
 
@@ -98,25 +99,29 @@ public class Player : Unit
         EventBus.Subscribe<WaitButtonEvent>((in WaitButtonEvent callback) => AddWaitAction());
         EventBus.Subscribe<UndoButtonEvent>(OnUndoButton);
         EventBus.Subscribe<RestartButtonEvent>((in RestartButtonEvent callback) => RestartPlan());
-        EventBus.Subscribe<ConfirmActionsButtonEvent>(OnConfirmAction);
+        //EventBus.Subscribe<ConfirmActionsButtonEvent>(OnConfirmAction);
         EventBus.Subscribe<EndTurnButtonEvent>(OnEndTurnButton);
         EventBus.Subscribe<OnTurnEndEvent>((in OnTurnEndEvent callback) => EventBus.Raise<APRefillEvent>());
     }
 
     private void SetClickActionType(ClickActionType actionType)
     {
+        if (_currentActionTypeSelected != actionType)
+            ResetDoubleClickTracking();
+
         _currentActionTypeSelected = actionType;
+    }
+
+    private void ResetDoubleClickTracking()
+    {
+        _lastClickedCell = null;
+        _lastClickTime = float.NegativeInfinity;
     }
 
     private void Update()
     {
         if (_isTurnPlaying)
-        {
-            if (Input.GetKeyUp(KeyCode.Z))
-                EventBus.Raise<BreakEvent>();
-
             return;
-        }
 
         if (Input.GetMouseButtonUp(0))
         {
@@ -128,11 +133,23 @@ public class Player : Unit
                     ReactToClick(clickedCell);
         }
 
+        if (Input.GetMouseButtonUp(1))
+        {
+            //TODO: fix it, probably(not sorry)
+            bool overUI = UnityEngine.EventSystems.EventSystem.current != null && UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+
+            if (!overUI)
+            {
+                RestartPlan();
+                ResetDoubleClickTracking();
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Q))
-            TryUseAbility<PunchAbility>();
+            TryUseAbility<StunAbility>();
 
         if (Input.GetKeyDown(KeyCode.E))
-            TryUseAbility<KickAbility>();
+            TryUseAbility<PushAbility>();
 
         if (Input.GetKeyDown(KeyCode.W))
             AddWaitAction();
@@ -149,6 +166,9 @@ public class Player : Unit
         //FinishTurn
         if (Input.GetKeyUp(KeyCode.Space))
             _isTurnReady = true;
+
+        if (Input.GetKeyUp(KeyCode.F6))
+            EventBus.Raise<ToggleToolsEvent>();
     }
 
     private void AddWaitAction()
@@ -210,6 +230,21 @@ public class Player : Unit
 
     private void ReactToClick(Cell clickedCell)
     {
+        bool isDoubleClick = clickedCell == _lastClickedCell && _currentActionTypeSelected == _lastActionType;
+
+        if (isDoubleClick)
+        {
+            ResetDoubleClickTracking();
+
+            if (_plannedActions.Count > 0)
+                EventBus.Raise<PlayerExecuteActionEvent>();
+
+            return;
+        }
+
+        int plannedBefore = _plannedActions.Count;
+
+
         switch (_currentActionTypeSelected)
         {
             case ClickActionType.Move:
@@ -226,23 +261,31 @@ public class Player : Unit
 
             case ClickActionType.Kick:
                 {
-                    TryUseAbility<KickAbility>(clickedCell);
+                    TryUseAbility<PushAbility>(clickedCell);
                     break;
                 }
 
             case ClickActionType.Punch:
                 {
-                    TryUseAbility<PunchAbility>(clickedCell);
+                    TryUseAbility<StunAbility>(clickedCell);
                     break;
                 }
 
             default:
                 {
-                    Debug.LogWarning("Click action type switche entered default");
+                    Debug.LogWarning("Click action type switch entered default");
                     break;
                 }
         }
 
+        if (_plannedActions.Count > plannedBefore)
+        {
+            _lastClickedCell = clickedCell;
+            _lastActionType = _currentActionTypeSelected;
+            _lastClickTime = Time.time;
+        }
+        else
+            ResetDoubleClickTracking();
 
     }
 
@@ -264,7 +307,7 @@ public class Player : Unit
 
         for (int i = 1; i < path.Count; i++)
         {
-            TurnAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST + _breakPenalty);
+            TurnAction action = new MoveAction(path[i - 1], path[i], MOVEMENT_COST);
             newActions.Add(action);
         }
 
@@ -346,7 +389,7 @@ public class Player : Unit
         if (!hit.collider.TryGetComponent<Cell>(out Cell targetCell))
             return;
 
-        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
+        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost);
 
         if (!CanAddAction(action))
             return;
@@ -365,7 +408,7 @@ public class Player : Unit
         if (ability == null)
             return;
 
-        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost + _breakPenalty);
+        AbilityAction action = new AbilityAction(this, ability, targetCell, 1, ability.APCost);
 
         if (!CanAddAction(action))
             return;
@@ -376,6 +419,39 @@ public class Player : Unit
         _plannedActions.Add(action);
         FloatingTextInstancer.InstantiateText($"Planned!", targetCell.GetWorldTopPosition(), Color.blue);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP - GetPlannedAPCost(), APWallet.MaxAP);
+    }
+
+    public IEnumerator PlayHackAnimation(Terminal terminal, int ticksToResolve)
+    {
+        if (terminal == null || ticksToResolve <= 0)
+            yield break;
+
+        FaceCell(terminal.Cell);
+
+        if (IsStun || _currentHp == 0)
+        {
+            HackSystem.ResolvePlannedHack(this, terminal, ticksToResolve);
+            yield break;
+        }
+
+        yield return PlayAnimationAndWait(AnimationStates.StartInteract);
+
+        CustomAnimator.Play(AnimationStates.Interact, 0, 1f, true);
+        float interactDuration = CustomAnimator.GetAnimationDuration(AnimationStates.Interact);
+
+        if (interactDuration > 0f)
+            yield return new WaitForSeconds(interactDuration);
+        else
+            yield return null;
+
+        HackSystem.ResolvePlannedHack(this, terminal, ticksToResolve);
+
+        if (_currentHp == 0)
+            yield break;
+
+        yield return PlayAnimationAndWait(AnimationStates.EndInteract);
+
+        CustomAnimator.Play(AnimationStates.Idle, 0, 1f, true);
     }
 
     private int GetPlannedAPCost()
@@ -436,6 +512,9 @@ public class Player : Unit
 
     private void RestartPlan()
     {
+        if (_plannedActions.Count == 0)
+            return;
+
         FloatingTextInstancer.InstantiateText("Reset!", headPos, Color.blue);
         ClearPlan();
     }
@@ -479,50 +558,12 @@ public class Player : Unit
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
     }
 
-    public override void Break(in BreakEvent callback)
-    {
-        base.Break(callback);
-        int apToRemove = CalculateBreakCost();
-        _breakPenalty++;
-
-        EventBus.Raise<APConsumeRequestAceptedEvent>(apToRemove);
-        EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
-    }
-
-    private int CalculateBreakCost()
-    {
-        int plannedApCost = 0;
-
-        foreach (TurnAction action in _plannedActions)
-            plannedApCost += action.APCost;
-
-        return plannedApCost % 4 > BREAK_MIN_COST ? plannedApCost : BREAK_MIN_COST;
-    }
 
     public override void ClearPlan()
     {
         Debug.Log("Clear plan");
         base.ClearPlan();
         ResetVariables();
+        ResetDoubleClickTracking();
     }
-
-    public override void FaceCell(Cell targetCell)
-    {
-        if (targetCell == null || CurrentCell == null)
-            return;
-
-        Vector2Int direction = targetCell.Coordinates - CurrentCell.Coordinates;
-
-        if (direction.x > 0)
-            FaceLeft();
-        else if (direction.x < 0)
-            FaceRight();
-        else if (direction.y > 0)
-            FaceRight();
-        else if (direction.y < 0)
-            FaceLeft();
-
-        AdjustEntityPositionToCell(gameObject, CurrentCell.gameObject);
-    }
-
 }

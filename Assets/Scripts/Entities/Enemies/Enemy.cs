@@ -1,4 +1,6 @@
+using Assets.Scripts.Entities;
 using ImageCampus.ToolBox.Services;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,6 +19,123 @@ public abstract class Enemy : Unit
     public int PushDistance => _pushDistance;
     public int AttackTickCost => _attackTickCost;
 
+    [Header("Health")]
+    protected int _maxHp = 100;
+
+    private int _currentHp;
+    private bool _isDead;
+
+    private EnemyHealthBar _healthBar;
+    private Coroutine _damageCoroutine;
+
+    public int CurrentHp => _currentHp;
+    public int MaxHp => _maxHp;
+    public bool IsDead => _isDead;
+
+
+    public override void Init()
+    {
+        _currentHp = Mathf.Max(1, _maxHp);
+        _healthBar = GetComponentInChildren<EnemyHealthBar>(true);
+
+        if (_healthBar != null)
+            _healthBar.SetHealth(_currentHp, _maxHp);
+        else
+            Debug.LogWarning($"{name} has no EnemyHealthBar.");
+
+        base.Init();
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (_isDead || damage <= 0)
+            return;
+
+        _currentHp = Mathf.Max(0, _currentHp - damage);
+
+        if (_healthBar != null)
+            _healthBar.SetHealth(_currentHp, _maxHp);
+
+        if (_currentHp <= 0)
+        {
+            Die();
+            return;
+        }
+
+        if (_damageCoroutine != null)
+            StopCoroutine(_damageCoroutine);
+
+        _damageCoroutine = StartCoroutine(PlayDamageAnimation());
+    }
+
+    private IEnumerator PlayDamageAnimation()
+    {
+        CustomAnimator.Play(AnimationStates.TakeDamage, 1, 1f, true);
+
+        float duration = CustomAnimator.GetAnimationDuration(
+            AnimationStates.TakeDamage);
+
+        if (duration > 0f)
+            yield return new WaitForSeconds(duration);
+        else
+            yield return null;
+
+        if (!_isDead)
+        {
+            CustomAnimator.Play(
+                IsStun ? AnimationStates.Stun : AnimationStates.Idle);
+        }
+
+        _damageCoroutine = null;
+    }
+
+    private void Die()
+    {
+        if (_isDead)
+            return;
+
+        _isDead = true;
+
+        if (_damageCoroutine != null)
+        {
+            StopCoroutine(_damageCoroutine);
+            _damageCoroutine = null;
+        }
+
+        ClearPlan();
+
+        if (_currentCell != null && _currentCell.stander == this)
+            _currentCell.stander = null;
+
+        TurnManager turnManager = ServiceProvider.Instance.GetService<TurnManager>();
+
+        if (turnManager != null)
+            turnManager.RemoveStun(this);
+
+        EntityRegistry registry = ServiceProvider.Instance.GetService<EntityRegistry>();
+
+        if (registry != null)
+            registry.Remove(this);
+
+        StartCoroutine(DieRoutine());
+    }
+
+    private IEnumerator DieRoutine()
+    {
+        if (_healthBar != null)
+            _healthBar.gameObject.SetActive(false);
+
+        CustomAnimator.Play(AnimationStates.TakeDamage, 1, 1f, true);
+
+        float duration = CustomAnimator.GetAnimationDuration(AnimationStates.TakeDamage);
+
+        if (duration > 0f)
+            yield return new WaitForSeconds(duration);
+        else
+            yield return null;
+
+        Destroy(gameObject);
+    }
 
     public void PlanTurn(Cell playerCell, int emptyActions)
     {
@@ -33,28 +152,11 @@ public abstract class Enemy : Unit
         if (IsInAttackRange(newCurrentCell, playerCell, _attackRange))
             PlanCombatActions(playerCell);
 
-
-        //Move one tile per turn
-        //_currentPath = new List<Cell>()
-        //{
-        //    path[0],
-        //    path[1]
-        //};
-        //
-        //_pathIndex = 1;
-        //
-        //StartCoroutine(FollowPath());
     }
 
     private Cell PlanMovementActions(Cell playerCell)
     {
         Cell newCurrentCell = CurrentCell;
-        //if (IsInGoodCover(playerCell))
-        //{
-        //    Debug.Log($"{name} holding position");
-        //    return;
-        //}
-
         Cell targetCell = FindBestCell(playerCell);
 
         if (targetCell == null)

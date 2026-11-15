@@ -9,6 +9,7 @@
         _pushDistance = 1;
         _maxTicksPerTurn = 5;
         _attackTickCost = 1;
+        _maxHp = 150;
     }
 
     protected override void PlanCombatActions(Cell playerCell)

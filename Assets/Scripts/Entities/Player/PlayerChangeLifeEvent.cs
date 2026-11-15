@@ -3,15 +3,18 @@
 internal struct PlayerChangeLifeEvent : IEvent
 {
     public uint currentLife;
+    public uint maxLife;
 
     public void Assign(params object[] parameters)
     {
         currentLife = (uint)parameters[0];
+        maxLife = (uint)parameters[1];
     }
 
     public void Reset()
     {
         currentLife = default(uint);
+        maxLife = default(uint);
     }
 }
 

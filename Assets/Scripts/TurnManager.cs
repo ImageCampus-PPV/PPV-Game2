@@ -42,7 +42,7 @@ public class TurnManager : IService
     {
         EventBus.Raise<TurnChangeEvent>(_currenturn);
         EventBus.Raise<APWalletChangeEvent>(APWallet.CurrentAP, APWallet.MaxAP);
-        EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().CurrentHp);
+        EventBus.Raise<PlayerChangeLifeEvent>(EntityRegistry.FilterEntities<Player>().First().MaxHP, EntityRegistry.FilterEntities<Player>().First().MaxHP);
         EventBus.Subscribe<DevMovePlayerEvent>(OnDevMovePlayer);
         EventBus.Subscribe<PlayerExecuteActionEvent>(OnPlayerExecuteAction);
 
@@ -250,6 +250,14 @@ public class TurnManager : IService
         _stunUnits[unit.ID] = _currenturn + 1 + AbilitiesDurationConfiguration.stunDuration;
         //unit.gameObject.GetComponent<Renderer>().material.color = Color.blue;
         Debug.Log("EnemyStunned");
+    }
+
+    public void RemoveStun(Unit unit)
+    {
+        if (unit == null)
+            return;
+
+        _stunUnits.Remove(unit.ID);
     }
 
     private void OnPlayerExecuteAction(in PlayerExecuteActionEvent callback)

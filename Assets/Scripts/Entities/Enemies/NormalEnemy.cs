@@ -9,6 +9,7 @@ public class NormalEnemy : Enemy
         _pushDistance = 2;
         _maxTicksPerTurn = 5;
         _attackTickCost = 1;
+        _maxHp = 100;
     }
 
     protected override void PlanCombatActions(Cell playerCell)

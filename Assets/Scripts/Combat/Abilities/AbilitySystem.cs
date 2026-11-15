@@ -15,8 +15,8 @@ public class AbilitySystem : IService
         EventBus eventBus = ServiceProvider.Instance.GetService<EventBus>();
         eventBus.Subscribe<OnTurnEndEvent>(OnTurnStart);
 
-        RegisterAbility(new PunchAbility());
-        RegisterAbility(new KickAbility());
+        RegisterAbility(new StunAbility());
+        RegisterAbility(new PushAbility());
     }
 
     public void RegisterAbility(IAbility ability)

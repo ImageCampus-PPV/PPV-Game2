@@ -1,8 +1,14 @@
 ﻿====================================================
 EVENT
-  Generated: 2026-07-14 12:49:35
-  Total events: 15
+  Generated: 2026-11-15 20:30:00
+  Total events: 48
 ====================================================
+
+EVENT: AbilityCooldownChangedEvent
+  Parameters (2):
+    - Ability : IAbility
+    - RemainingCooldown : Int32
+  Usage hint : AbilityCooldownChangedEvent : <Ability>, <RemainingCooldown>
 
 EVENT: APConsumeRequestAceptedEvent
   Parameters (1):
@@ -18,15 +24,124 @@ EVENT: APWalletChangeEvent
     - maxAPamount : Int32
   Usage hint : APWalletChangeEvent : <currentAPAmount>, <maxAPamount>
 
-EVENT: InfectTilesEvent
+EVENT: BackToMenuEvent
+  Parameters: (none)
+
+EVENT: ConfirmActionsButtonEvent
+  Parameters: (none)
+
+EVENT: DevAddTerminalEvent
+  Parameters (3):
+    - coordX : Int32
+    - coordY : Int32
+    - terminalTypeName : String
+  Usage hint : DevAddTerminalEvent : <coordX>, <coordY>, <terminalTypeName>
+
+EVENT: DevChangeCellStateEvent
+  Parameters (3):
+    - coordX : Int32
+    - coordY : Int32
+    - stateName : String
+  Usage hint : DevChangeCellStateEvent : <coordX>, <coordY>, <stateName>
+
+EVENT: DevMovePlayerEvent
+  Parameters (2):
+    - coordX : Int32
+    - coordY : Int32
+  Usage hint : DevMovePlayerEvent : <coordX>, <coordY>
+
+EVENT: DevRemoveEntityAtCellEvent
+  Parameters (2):
+    - coordX : Int32
+    - coordY : Int32
+  Usage hint : DevRemoveEntityAtCellEvent : <coordX>, <coordY>
+
+EVENT: DevResizeGridEvent
+  Parameters (2):
+    - width : Int32
+    - height : Int32
+  Usage hint : DevResizeGridEvent : <width>, <height>
+
+EVENT: DevSetAPEvent
   Parameters (1):
-    - position : Vector2Int
-  Usage hint : InfectTilesEvent : <position>
+    - amount : Int32
+  Usage hint : DevSetAPEvent : <amount>
+
+EVENT: DevSpawnEnemyEvent
+  Parameters (3):
+    - enemyTypeName : String
+    - coordX : Int32
+    - coordY : Int32
+  Usage hint : DevSpawnEnemyEvent : <enemyTypeName>, <coordX>, <coordY>
+
+EVENT: EndTurnButtonEvent
+  Parameters: (none)
+
+EVENT: EntityTurnStartEvent
+  Parameters (1):
+    - Entity : Unit
+  Usage hint : EntityTurnStartEvent : <Entity>
+
+EVENT: HackButtonEvent
+  Parameters: (none)
+
+EVENT: HackCompletedEvent
+  Parameters (2):
+    - terminalId : UInt32
+    - terminalType : TerminalType
+  Usage hint : HackCompletedEvent : <terminalId>, <terminalType>
+
+EVENT: HackInterruptedEvent
+  Parameters (2):
+    - terminalId : UInt32
+    - progressKept : Int32
+  Usage hint : HackInterruptedEvent : <terminalId>, <progressKept>
+
+EVENT: HackProgressEvent
+  Parameters (3):
+    - terminalId : UInt32
+    - currentTicks : Int32
+    - requiredTicks : Int32
+  Usage hint : HackProgressEvent : <terminalId>, <currentTicks>, <requiredTicks>
+
+EVENT: HackStartedEvent
+  Parameters (2):
+    - terminalId : UInt32
+    - requiredTicks : Int32
+  Usage hint : HackStartedEvent : <terminalId>, <requiredTicks>
+
+EVENT: InfectTilesEvent
+  Parameters: (none)
+
+EVENT: KickButtonEvent
+  Parameters: (none)
+
+EVENT: LevelCompleteEvent
+  Parameters: (none)
+
+EVENT: LevelFailedEvent
+  Parameters: (none)
+
+EVENT: MoveButtonEvent
+  Parameters: (none)
+
+EVENT: NextLevelEvent
+  Parameters: (none)
+
+EVENT: OnTurnEndEvent
+  Parameters: (none)
+
+EVENT: PauseEvent
+  Parameters: (none)
 
 EVENT: PlayerChangeLifeEvent
-  Parameters (1):
+  Parameters (2):
     - currentLife : UInt32
-  Usage hint : PlayerChangeLifeEvent : <currentLife>
+    - maxLife : UInt32
+  Usage hint : PlayerChangeLifeEvent : <currentLife>, <maxLife>
+
+EVENT: PlayerExecuteActionEvent
+  Parameters: (none)
 
 EVENT: PostWwiseEvent
   Parameters (2):
@@ -34,10 +149,22 @@ EVENT: PostWwiseEvent
     - SoundEmitterGameObjectID : UInt64
   Usage hint : PostWwiseEvent : <EventName>, <SoundEmitterGameObjectID>
 
+EVENT: PunchButtonEvent
+  Parameters: (none)
+
 EVENT: RegisterWwiseGameObject
   Parameters (1):
     - entityID : UInt32
   Usage hint : RegisterWwiseGameObject : <entityID>
+
+EVENT: ResetLevelEvent
+  Parameters: (none)
+
+EVENT: RestartButtonEvent
+  Parameters: (none)
+
+EVENT: ResumeGameEvent
+  Parameters: (none)
 
 EVENT: SetWwiseRTPCValue
   Parameters (2):
@@ -57,6 +184,15 @@ EVENT: SetWwiseSwitch
     - SwitchStateName : String
     - SoundEmitterGameObjectID : UInt64
   Usage hint : SetWwiseSwitch : <SwitchGroupName>, <SwitchStateName>, <SoundEmitterGameObjectID>
+
+EVENT: TerminalStateChangedEvent
+  Parameters (2):
+    - terminalId : UInt32
+    - newState : TerminalState
+  Usage hint : TerminalStateChangedEvent : <terminalId>, <newState>
+
+EVENT: ToggleToolsEvent
+  Parameters: (none)
 
 EVENT: TurnChangeEvent
   Parameters (1):
@@ -86,4 +222,10 @@ EVENT: TurnTileIntoUnstable
     - coordX : Int32
     - coordY : Int32
   Usage hint : TurnTileIntoUnstable : <coordX>, <coordY>
+
+EVENT: UndoButtonEvent
+  Parameters: (none)
+
+EVENT: WaitButtonEvent
+  Parameters: (none)
 

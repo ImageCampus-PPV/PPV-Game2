@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a64e5b0e436d4bed9780211ae245f7b, type: 3}
+  m_Name: J2_PLAYER_BACK_Data
+  m_EditorClassIdentifier: Assembly-CSharp::DragonBones.UnityDragonBonesData
+  dataName: Back
+  dragonBonesJSON: {fileID: 4900000, guid: 8d34b399f6188984ea4c95b8aa373b64, type: 3}
+  textureAtlas:
+  - textureAtlasJSON: {fileID: 4900000, guid: be503034d1c94414c9af8a7d52f118d3, type: 3}
+    texture: {fileID: 2800000, guid: 376f6637461fbd2419c5ca1b2a1c051a, type: 3}
+    material: {fileID: 2100000, guid: 51c2dca5df9379145b235ac3840a9e35, type: 2}
+    uiMaterial: {fileID: 0}

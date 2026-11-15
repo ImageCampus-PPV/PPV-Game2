@@ -5,6 +5,7 @@ public interface IAbility
     int Range { get; }
     int Cooldown { get; }
     int RemainingCooldown { get; }
+    int Damage { get; }
     AnimationStates AnimationState { get; }
 
 
