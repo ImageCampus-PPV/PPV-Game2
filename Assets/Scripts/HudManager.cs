@@ -11,7 +11,9 @@ public class HudManager : MonoBehaviour
     [SerializeField] private Button _pauseButton;
     [SerializeField] private TMP_Text _turnText;
     [SerializeField] private TMP_Text _APText;
+    [SerializeField] private Slider _APSilder;
     [SerializeField] private TMP_Text _playerLife;
+    [SerializeField] private Slider _playerLifeSilder;
     [SerializeField] private GameObject _toolsGO;
     [SerializeField] private GameObject _successBgGO;
     [SerializeField] private GameObject _failedBgGO;
@@ -40,21 +42,18 @@ public class HudManager : MonoBehaviour
         _endTextGO.SetActive(false);
         _successBgGO.SetActive(false);
         _failedBgGO.SetActive(false);
-    }
 
-    private void OnPause()
-    {
-        EventBus.Raise<PauseEvent>();
-    }
-
-    private void Start()
-    {
         EventBus.Subscribe<TurnChangeEvent>(OnTurnChange);
         EventBus.Subscribe<APWalletChangeEvent>(OnAPChange);
         EventBus.Subscribe<PlayerChangeLifeEvent>(OnPlayerLifeChange);
         EventBus.Subscribe<LevelCompleteEvent>(OnWin);
         EventBus.Subscribe<LevelFailedEvent>(OnLoss);
         EventBus.Subscribe<ToggleToolsEvent>(OnToggleTools);
+    }
+
+    private void OnPause()
+    {
+        EventBus.Raise<PauseEvent>();
     }
 
     private void OnToggleTools(in ToggleToolsEvent callback)
@@ -112,6 +111,7 @@ public class HudManager : MonoBehaviour
     private void OnPlayerLifeChange(in PlayerChangeLifeEvent playerChangeLifeEvent)
     {
         _playerLife.text = $"Life: {playerChangeLifeEvent.currentLife}";
+        _playerLifeSilder.value = (float)playerChangeLifeEvent.currentLife / (float)playerChangeLifeEvent.maxLife;
     }
 
     private void OnTurnChange(in TurnChangeEvent turnChangeEvent)
@@ -127,6 +127,7 @@ public class HudManager : MonoBehaviour
             currentAPToShow = 0;
 
         _APText.text = $"AP: {currentAPToShow} / {APWalletChangeEvent.maxAPamount}.";
+        _APSilder.value = (float)currentAPToShow / (float)APWalletChangeEvent.maxAPamount;
     }
 
     private void ExitProgram()

@@ -39,7 +39,6 @@ public class Main : MonoBehaviour
     private bool _isPaused = false;
     private GameObject _pausedScreenGO;
     private GameObject _hudGO;
-    private static int i = 0;
 
     private void Awake()
     {
@@ -115,7 +114,6 @@ public class Main : MonoBehaviour
 
     private void OnNextLevel(in NextLevelEvent callback)
     {
-        ++i;
         SceneManager.LoadScene(_nextLevel.Index);
     }
 

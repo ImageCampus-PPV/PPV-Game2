@@ -28,7 +28,8 @@ public class Player : Unit
 
     private uint _maxHp = 100;
     private uint _currentHp = 100;
-    public uint CurrentHp => _currentHp;
+    public uint MaxHP => _maxHp;
+    public uint CurrentHP => _currentHp;
 
     protected const int MOVEMENT_COST = 1;
 
@@ -43,7 +44,7 @@ public class Player : Unit
     public void SetHp(uint hp)
     {
         _currentHp = hp;
-        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
+        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp, _maxHp);
     }
 
     public IEnumerator ReduceHp(uint hpToReduce)
@@ -64,7 +65,7 @@ public class Player : Unit
         else
             _currentHp -= hpToReduce;
 
-        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
+        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp, _maxHp);
 
         if (_currentHp <= 0)
             EventBus.Raise<LevelFailedEvent>();
@@ -78,7 +79,7 @@ public class Player : Unit
         if (_currentHp > _maxHp)
             _currentHp = _maxHp;
 
-        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp);
+        EventBus.Raise<PlayerChangeLifeEvent>(_currentHp, _maxHp);
     }
 
     public override void Init()

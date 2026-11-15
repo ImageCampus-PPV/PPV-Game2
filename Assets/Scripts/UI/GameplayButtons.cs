@@ -18,7 +18,7 @@ public class GameplayButtons : MonoBehaviour
 
     [SerializeField] private Button _moveButton;
     [SerializeField] private Button _hackButton;
-    [SerializeField] private Button _waitButton;
+    //[SerializeField] private Button _waitButton;
     [SerializeField] private Button _restartButton;
     [SerializeField] private Button _undoButton;
     [SerializeField] private Button _endTurnButton;
