@@ -302,11 +302,6 @@ public class MapGrid : IService, IDisposable
         return cells;
     }
 
-    public Cell GetRandom()
-    {
-        return GetRandomOfState<CellState>();
-    }
-
     public Cell GetRandomOfState<CellType>() where CellType : CellState
     {
         Type cellState = typeof(CellType);
@@ -317,6 +312,8 @@ public class MapGrid : IService, IDisposable
         List<Vector2Int> cellsOCoords = _cellTypePerCoords[cellState];
 
         int randomIndex = UnityEngine.Random.Range(0, cellsOCoords.Count);
+
+        Debug.Log("Index: " + randomIndex);
 
         Vector2Int coordinate = cellsOCoords[randomIndex];
 
@@ -390,6 +387,9 @@ public class MapGrid : IService, IDisposable
         Unit goEnemyScript = null;
 
         _gridArray = new Cell[_cellMap.size.x, _cellMap.size.y];
+
+        if (_gridArray.Length == 0)
+            Debug.LogError($"Level grid {_cellMap} is empty");
 
         foreach (CellData cell in _cellMap._cellsData)
         {
