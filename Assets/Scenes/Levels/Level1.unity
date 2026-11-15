@@ -3669,9 +3669,9 @@ MonoBehaviour:
     <Index>k__BackingField: 3
     <Name>k__BackingField: Level2
   _menuScene:
-    sceneAsset: {fileID: 0}
+    sceneAsset: {fileID: 102900000, guid: 64e7bc5f610f3f040a1b41e264896e8d, type: 3}
     <Index>k__BackingField: 0
-    <Name>k__BackingField: 
+    <Name>k__BackingField: MainMenu
 --- !u!4 &1973655150
 Transform:
   m_ObjectHideFlags: 0

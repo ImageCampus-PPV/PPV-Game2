@@ -6,11 +6,11 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-
     [SerializeField] private SceneRef[] scenes;
     [SerializeField] private Button[] buttons;
+    [SerializeField] private Button exitButton;
 
-    private void Awake()
+    private void Start()
     {
         for (int i = 0; i < scenes.Length; ++i)
         {
@@ -19,10 +19,10 @@ public class MainMenu : MonoBehaviour
 
             int index = i;
 
-            buttons[i].onClick.AddListener(() => { LoadScene(scenes[index].Index); });
+            buttons[i]?.onClick.AddListener(() => { LoadScene(scenes[index].Index); });
         }
 
-        buttons[buttons.Length - 1].onClick.AddListener(ExitGame);
+        exitButton?.onClick.AddListener(ExitGame);
     }
 
     private void LoadScene(int index)
@@ -32,7 +32,6 @@ public class MainMenu : MonoBehaviour
 
     private void ExitGame()
     {
-        ;
 #if UNITY_EDITOR
         EditorApplication.isPlaying = false;
 #else
