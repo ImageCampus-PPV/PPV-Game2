@@ -1,6 +1,6 @@
 ﻿====================================================
 EVENT
-  Generated: 2026-11-10 20:19:45
+  Generated: 2026-11-15 20:30:00
   Total events: 48
 ====================================================
 
@@ -135,9 +135,10 @@ EVENT: PauseEvent
   Parameters: (none)
 
 EVENT: PlayerChangeLifeEvent
-  Parameters (1):
+  Parameters (2):
     - currentLife : UInt32
-  Usage hint : PlayerChangeLifeEvent : <currentLife>
+    - maxLife : UInt32
+  Usage hint : PlayerChangeLifeEvent : <currentLife>, <maxLife>
 
 EVENT: PlayerExecuteActionEvent
   Parameters: (none)
