@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a64e5b0e436d4bed9780211ae245f7b, type: 3}
+  m_Name: Front_walk_Data
+  m_EditorClassIdentifier: Assembly-CSharp::DragonBones.UnityDragonBonesData
+  dataName: Front_walk
+  dragonBonesJSON: {fileID: 4900000, guid: da9e203dd2893ac47a7c6b54a671bca2, type: 3}
+  textureAtlas:
+  - textureAtlasJSON: {fileID: 4900000, guid: 3ff0e47bfa1a39742a6b207270da918b, type: 3}
+    texture: {fileID: 2800000, guid: fd117258544cf5e409ac97c742a4edab, type: 3}
+    material: {fileID: 2100000, guid: 6f1bedac1ae00aa4dbaaa67d24c37677, type: 2}
+    uiMaterial: {fileID: 0}
