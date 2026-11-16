@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: J2_PLAYER_BACK_Data
   m_EditorClassIdentifier: Assembly-CSharp::DragonBones.UnityDragonBonesData
   dataName: Back
-  dragonBonesJSON: {fileID: 4900000, guid: 8d34b399f6188984ea4c95b8aa373b64, type: 3}
+  dragonBonesJSON: {fileID: 4900000, guid: 5ee1afdcb728ca742900f6242d411e7c, type: 3}
   textureAtlas:
-  - textureAtlasJSON: {fileID: 4900000, guid: be503034d1c94414c9af8a7d52f118d3, type: 3}
+  - textureAtlasJSON: {fileID: 4900000, guid: 7d10e2e8bc62f7143b102b56900ad534, type: 3}
     texture: {fileID: 2800000, guid: 376f6637461fbd2419c5ca1b2a1c051a, type: 3}
     material: {fileID: 2100000, guid: 51c2dca5df9379145b235ac3840a9e35, type: 2}
     uiMaterial: {fileID: 0}
