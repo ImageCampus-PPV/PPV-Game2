@@ -99,6 +99,7 @@ public class Main : MonoBehaviour
     {
         _pausedScreenGO.SetActive(isPaused);
         _isPaused = isPaused;
+        Time.timeScale = isPaused ? 0.0f : 1.0f;
     }
 
     private void ResumeGame(in ResumeGameEvent resumeGameEvent)
@@ -136,6 +137,15 @@ public class Main : MonoBehaviour
 
         if (_turnManager.IsTurnReady && !_turnManager.IsExecuting)
             StartCoroutine(_turnManager.ExecuteEnemiesTurn());
+    }
+
+    private void OnDestroy()
+    {
+        EventBus.Unsubscribe<NextLevelEvent>(OnNextLevel);
+        EventBus.Unsubscribe<ResumeGameEvent>(ResumeGame);
+        EventBus.Unsubscribe<ResetLevelEvent>(RestartGame);
+        EventBus.Unsubscribe<BackToMenuEvent>(ExitToMenu);
+        EventBus.Unsubscribe<PauseEvent>(PauseGame);
     }
 
     private void OnApplicationQuit()

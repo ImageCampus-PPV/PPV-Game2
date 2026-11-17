@@ -149,7 +149,6 @@ GameObject:
   - component: {fileID: 6053184907161580928}
   - component: {fileID: 1012697434300799801}
   - component: {fileID: 3022728742812213325}
-  - component: {fileID: 2870385063082333393}
   m_Layer: 5
   m_Name: Canvas (1)
   m_TagString: Untagged
@@ -243,27 +242,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &2870385063082333393
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4680646833021862339}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 810cea67406dd1e4ba696d1f2da1701c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  scenes:
-  - sceneAsset: {fileID: 102900000, guid: 2dd8ca4fc46a7284c80deed8261fdc8f, type: 3}
-    <Index>k__BackingField: 1
-    <Name>k__BackingField: Level1
-  buttons:
-  - {fileID: 9060143069418775575}
-  - {fileID: 0}
-  - {fileID: 5737970521481121707}
-  exitButton: {fileID: 0}
 --- !u!1 &6329983460384508933
 GameObject:
   m_ObjectHideFlags: 0
@@ -755,7 +733,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5202686001929931259, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_Name
-      value: Button (1)
+      value: Restart-Button
       objectReference: {fileID: 0}
     - target: {fileID: 8521863301976487894, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_text
@@ -960,7 +938,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5202686001929931259, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_Name
-      value: Button (2)
+      value: Exit-Button
       objectReference: {fileID: 0}
     - target: {fileID: 5202686001929931259, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_IsActive
@@ -1169,7 +1147,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5202686001929931259, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_Name
-      value: Button
+      value: Resume-Button
       objectReference: {fileID: 0}
     - target: {fileID: 8521863301976487894, guid: 1655f651338abde4b8336c00c4cf0102, type: 3}
       propertyPath: m_text
